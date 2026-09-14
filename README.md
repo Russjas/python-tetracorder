@@ -31,7 +31,7 @@ The first step is to parse these rules from the original cmd files into a json s
 
 ## Reference spectra
 
-Tetracorder rules reference spectra from USGS spectral libraries. The most recent version of the USGS spectral library is available [here](). However the tetracorder rules refer to specific refereence spectra used in the tetracorder rulesets are from a previous version of this library, and mapping is not straightforward.
+Tetracorder rules reference spectra from USGS spectral libraries. The most recent version of the USGS spectral library is available [here](https://www.usgs.gov/data/usgs-spectral-library-version-7-data). However the tetracorder rules refer to specific refereence spectra used in the tetracorder rulesets are from a previous version of this library, and mapping is not straightforward.
 The sql reference spectra database in this repository is derived from the libraries in the [Tetracorder repo](https://github.com/PSI-edu/spectroscopy-tetracorder). The database here is derived from the native libraries rather than the convolved variants.
 
 ## Evaluation logic  
@@ -50,11 +50,21 @@ This repository is **not** currently intended to be:
 
 It is an independent Python reimplementation of the parts of the algorithm required to understand, test, and reproduce the published rule-based spectral evaluation workflow.
 
+## Files
+- *tetracorder_ops.py* Some early functions re-implementing the specpr opereations - gaussian convolution, continuum calculations, feature fitting.
+- *tetracorder_rules_references.db* sqlite db of reference spectra used by the rules. These are the instrument native spectra, not the convolved spectra. Rules reference the ConvolvedRecord field.  
+- *tetracorder_rules_with_nots.json* Structured rules collection, parsed from the tetracorder command files. Includes NOT features.
+
+
 ## Disclaimer
 
 This software is provided for research and development purposes.
 
-There is **no guarantee or warranty** that the implementation is complete, correct, scientifically equivalent to the original Tetracorder implementation, or suitable for any particular application.
-
+There is **no guarantee or warranty** that the implementation is:  
+- scientifically equivalent to the original Tetracorder implementation, 
+- complete, 
+- correct,
+- or suitable for any particular application.
+  
 Do not use results from this repository as the sole basis for scientific, commercial, exploration, environmental, safety, or other consequential decisions.
 
