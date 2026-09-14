@@ -1,5 +1,5 @@
 # python-tetracorder
-A port of the rules and evaluation logic of the tetracorder algorithm to pure python - with no guarantee or waranty!
+A port of the rules and evaluation logic of the tetracorder algorithm to pure Python - with no guarantee or waranty!
 
 ## Status
 
@@ -17,22 +17,22 @@ The project is intended to:
 
 - port Tetracorder mineral identification rules into a structured, machine-readable form;
 - reproduce the relevant spectral evaluation logic in pure Python;
+- make the rule evaluation process easier to inspect, test, modify, and integrate into other Python workflows;
+- provide a foundation for testing Tetracorder-style mineral identification against modern hyperspectral datasets;
 - The implementation is therefore intended to rely primarily on standard Python scientific tools such as:
   - NumPy
   - SciPy
   - SQLite
-- make the rule evaluation process easier to inspect, test, modify, and integrate into other Python workflows;
-- provide a foundation for testing Tetracorder-style mineral identification against modern hyperspectral datasets.
 
 ## Rules
 
 The project is based on published/released [Tetracorder](https://github.com/PSI-edu/spectroscopy-tetracorder) rule definitions and attempts to reproduce their evaluation behaviour independently in Python.
-The first step is to parse these rules from the original cmd files into a json schema
+The first step is to parse these rules from the original cmd files into a json representation
 
 ## Reference spectra
 
-Tetracorder rules reference spectra from USGS spectral libraries. The most recent version of the USGS spectral library is available [here](https://www.usgs.gov/data/usgs-spectral-library-version-7-data). However the tetracorder rules refer to specific refereence spectra used in the tetracorder rulesets are from a previous version of this library, and mapping is not straightforward.
-The sql reference spectra database in this repository is derived from the libraries in the [Tetracorder repo](https://github.com/PSI-edu/spectroscopy-tetracorder). The database here is derived from the native libraries rather than the convolved variants.
+Tetracorder rules reference spectra from USGS spectral libraries. The most recent version of the USGS spectral library is available [here](https://www.usgs.gov/data/usgs-spectral-library-version-7-data). However, the Tetracorder rules refer to specific reference spectra from a previous version of this library, and mapping between them is not straightforward.
+The SQLite reference spectra database in this repository is derived from the libraries in the [Tetracorder repo](https://github.com/PSI-edu/spectroscopy-tetracorder). The database here is derived from the native libraries rather than the convolved variants.
 
 ## Evaluation logic  
 
@@ -52,8 +52,8 @@ It is an independent Python reimplementation of the parts of the algorithm requi
 
 ## Files
 - *tetracorder_ops.py* Some early functions re-implementing the specpr opereations - gaussian convolution, continuum calculations, feature fitting.
-- *tetracorder_rules_references.db* sqlite db of reference spectra used by the rules. These are the instrument native spectra, not the convolved spectra. Rules reference the ConvolvedRecord field.  
-- *tetracorder_rules_with_nots.json* Structured rules collection, parsed from the tetracorder command files. Includes NOT features.
+- *tetracorder_rules_references.db* SQLite db of reference spectra used by the rules. These are the instrument native spectra, not the convolved spectra. Rules reference the ConvolvedRecord field.  
+- *tetracorder_rules_with_nots.json* Structured rules collection, parsed from the Tetracorder command files. Includes NOT features.
 
 
 ## Disclaimer
