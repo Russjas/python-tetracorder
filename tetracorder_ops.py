@@ -4,6 +4,7 @@ to be used by the rule interpreter algorithm once implemented"""
 from dataclasses import dataclass
 from typing import Literal
 from copy import deepcopy
+import re
 
 import numpy as np
 from scipy.interpolate import CubicSpline
@@ -250,51 +251,57 @@ VARIABLE_PRESETS = {
     "HYB2ryug": HYB2RYUG_VALUES,
 }
 
+CONSTRAINT_RE = re.compile(
+    r"(FITALL>|FIT>|DEPTHALL>|DEPTH-FIT>|FD-FIT>|FDALL>|FD-DEPTH>|DEPTH>|FD>)"
+    r"\s*"
+    r"(\[[^\]]+\]|[-+]?\d*\.?\d+(?:\s+[-+]?\d*\.?\d+)?)"
+)
+
+
+def parse_constraints(constraints):
+    parsed = []
+
+    for line in constraints:
+        line = line.removeprefix("constraint:").strip()
+
+        for test, values in CONSTRAINT_RE.findall(line):
+            parsed.append({
+                "test": test,
+                "values": values.strip(),
+            })
+
+    return parsed
 
 def prepare_rules(rules, mode="default"):
     """
     Expects a rule from the parsed json rules json
-    mode  = default, default_bak23, emit_c, MMM_09c, MMM255t,
+    mode = default, default_bak23, emit_c, MMM_09c, MMM255t,
     HYB2ryug defined in Tetracorder 6.00a VARIABLES/cmd.lib.setup.variables-*
     Custom modes can be established by creating a new preset dictionary
     """
     values = VARIABLE_PRESETS[mode]
 
+    
     def replace(value):
 
         if isinstance(value, dict):
             return {key: replace(item) for key, item in value.items()}
 
         if isinstance(value, list):
+            # Parser stored symbolic values as one-item lists.
+            # Collapse the list and substitute the symbol directly.
+            if (len(value) == 1 and isinstance(value[0], str) and value[0] in values):
+                return deepcopy(values[value[0]])
+
             return [replace(item) for item in value]
 
         if isinstance(value, str) and value in values:
             return deepcopy(values[value])
+        
 
         return value
 
     return replace(rules)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #==========================================================================
 
