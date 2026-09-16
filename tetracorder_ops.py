@@ -489,8 +489,7 @@ def _validate_window(wavelengths, window, name="window"):
     try:
         lower, upper = window
     except (TypeError, ValueError):
-        return (
-            False,
+        return (False,
             f"{name} must contain exactly two wavelength bounds; "
             f"got {window!r}.",
         )
@@ -528,6 +527,27 @@ def _validate_window(wavelengths, window, name="window"):
 
     return True, ""
 
+def _window_mean(spectra, wavelengths, window, name="window"):
+    lower, upper = window
+
+    selected = (
+        (wavelengths >= lower)
+        & (wavelengths <= upper)
+    )
+
+    values = spectra[..., selected]
+
+    finite = np.isfinite(values)
+    count = finite.sum(axis=-1)
+
+    total = np.where(finite, values, 0.0).sum(axis=-1)
+
+    with np.errstate(invalid="ignore", divide="ignore"):
+        mean = total / count
+
+    mean = np.where(count > 0, mean, np.nan)
+
+    return mean
 
 
 # Continuum calculation ported from specspr
@@ -638,11 +658,7 @@ def linear_feature_continuum(
 
 
 
-def curved_feature_continuum(
-    spectra,
-    wavelengths,
-    continuum_windows,
-):
+def curved_feature_continuum(spectra, wavelengths, continuum_windows):
     """
     Reproduce the curved continuum used by Specpr/Tetracorder.
 
@@ -678,9 +694,7 @@ def curved_feature_continuum(
             raise ValueError(msg)
 
 
-    anchor_wavelengths = np.array(
-        [
-            (start + stop) / 2.0
+    anchor_wavelengths = np.array([(start + stop) / 2.0
             for start, stop in continuum_windows
         ],
         dtype=float,
@@ -688,31 +702,24 @@ def curved_feature_continuum(
 
     anchor_reflectances = []
 
-    for start, stop in continuum_windows:
-        selected = (
-            (wavelengths >= start)
-            & (wavelengths <= stop)
+    for i, window in enumerate(continuum_windows, 1):
+        anchor = _window_mean(
+            spectra,
+            wavelengths,
+            window,
+            name=f"Continuum window {i}",
         )
-
-        if not selected.any():
-            raise ValueError(
-                f"No bands in continuum window {start}–{stop}"
-            )
-
-        anchor_reflectances.append(
-            spectra[..., selected].mean(axis=-1)
-        )
-
-    # Shape becomes (..., 4)
-    anchor_reflectances = np.stack(
-        anchor_reflectances,
-        axis=-1,
-    )
-
-    feature = (
-        (wavelengths > continuum_windows[1][1])
-        & (wavelengths < continuum_windows[2][0])
-    )
+    
+        anchor_reflectances.append(anchor)
+    
+    anchor_reflectances = np.stack(anchor_reflectances,axis=-1)
+    
+    
+    if not np.all(np.isfinite(anchor_reflectances)):
+        raise ValueError(
+            "One or more continuum windows contain no finite reflectance values")
+        
+    feature = ((wavelengths > continuum_windows[1][1]) & (wavelengths < continuum_windows[2][0]))
 
     if not feature.any():
         raise ValueError("No bands in feature interval")

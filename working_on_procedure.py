@@ -208,7 +208,7 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
     windows : list
          Feature start and end windows to define the continuum, specified in the rule 
     continuum : str, optional
-        "linear" or "curved". Continuum calculation type specified in the rule
+        "linear" or "convex". Continuum calculation type specified in the rule
 
     Returns
     -------
@@ -227,39 +227,53 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
 
     
     """
-    
-    left_window = windows[0]
-    right_window = windows[1]
-    
-    left_valid = np.any(
-    (target_wavelengths >= left_window[0]) &
-    (target_wavelengths <= left_window[1])
-    )
-    
-    right_valid = np.any(
-        (target_wavelengths >= right_window[0]) &
-        (target_wavelengths <= right_window[1])
-    )
-    
-    if not left_valid or not right_valid:
-        return None
-    
     if continuum == "linear":
+        left_window = windows[0]
+        right_window = windows[1]
+        
+        left_valid = np.any(
+        (target_wavelengths >= left_window[0]) &
+        (target_wavelengths <= left_window[1])
+        )
+        
+        right_valid = np.any(
+            (target_wavelengths >= right_window[0]) &
+            (target_wavelengths <= right_window[1])
+        )
+        if not left_valid or not right_valid:
+            return None, "out_of_range"
+        
+        
         ref_cont = linear_feature_continuum(reference, target_wavelengths,
                                             left_window,right_window,)
         target_cont = linear_feature_continuum(target, target_wavelengths,
                                                left_window, right_window,)
 
-    elif continuum == "curved":
-        ref_cont = curved_feature_continuum(reference,target_wavelengths,
-                                            left_window, right_window,)
-        target_cont = curved_feature_continuum(target, target_wavelengths,
-                                               left_window, right_window,)
+    elif continuum == "convex":
+       
+        for start, stop in windows:
+            selected = ((target_wavelengths >= start)
+                & (target_wavelengths <= stop))
+            if not selected.any():
+                return None, "out_of_range"
+        try:
+            ref_cont = curved_feature_continuum(reference,target_wavelengths,
+                                                windows,)
+        except ValueError:
+            return None, "invalid_reference"
+        try:
+            target_cont = curved_feature_continuum(target, target_wavelengths,
+                                               windows,)
+        except ValueError:
+            return None, "invalid_data"
 
     else:
         raise ValueError(f"Unknown continuum type: {continuum}")
+    result = characterise_feature(ref_cont, target_cont)
 
-    return characterise_feature(ref_cont, target_cont,)
+    reference_cr = np.ma.asarray(ref_cont.continuum_removed)
+    result["reference_area"] = float(np.ma.sum(np.ma.abs(1.0 - reference_cr)))
+    return result, "valid"
 
 def fuzzy_greater(value, thresholds):
     reject, full = thresholds
@@ -281,16 +295,21 @@ def fuzzy_less(value, thresholds):
 
     return result
 
-def test_ct(feature_fit, threshold):
-    return feature_fit["continuum"] >= threshold
+def continuum_test(value, limits):
+    if np.isscalar(limits):
+        return value >= limits
 
+    low, high = limits
+    return (value >= low) & (value <= high)
 
-def test_lct(feature_fit, threshold):
-    return feature_fit["left_continuum"] >= threshold
+def test_ct(fit, values):
+    return continuum_test(fit["continuum"], values)
 
+def test_lct(fit, values):
+    return continuum_test(fit["left_continuum"], values)
 
-def test_rct(feature_fit, threshold):
-    return feature_fit["right_continuum"] >= threshold
+def test_rct(fit, values):
+    return continuum_test(fit["right_continuum"], values)
 
 def test_lct_rct_gt(fit, values):
     return fuzzy_greater(fit["left_right_ratio"], values)
@@ -336,8 +355,408 @@ FEATURE_TESTS = {
     "weight": None,
 }
 
+def get_rule_spectrum(rule, references, target_wvls, target_fwhm):
+    main_spectrum, main_wavelengths = get_reference_spectra(
+        rule["library_records"],
+        references,
+    )
+
+    convolver = GaussianConvolver(
+        lib_wl=main_wavelengths,
+        scanner_wl=target_wvls,
+        scanner_fwhm=target_fwhm,
+    )
+
+    return convolver.convolve(main_spectrum)
+
+def get_not_source_feature(not_feature, not_definitions, rules):
+    not_definition = not_definitions[not_feature["source_reference"]]
+
+    source_rule_id = not_definition["source_rule_id"]
+    source_feature_number = not_feature["source_feature"]
+
+    source_rule = next(
+        rule
+        for rule in rules
+        if rule["id"] == source_rule_id
+    )
+
+    source_feature = next(
+        feature
+        for feature in source_rule["features"]
+        if feature["number"] == source_feature_number
+    )
+
+    return source_rule, source_feature
+
+def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, target_wvls):
+    """
+    Apply Tetracorder feature tests in Ratfor evaluation order.
+
+    Parameters
+    ----------
+    feature_fit : dict
+        Output of characterise_feature().
+
+    tests : list of dict
+        Parsed tests for one feature.
+
+    Returns
+    -------
+    dict
+        {
+            "fit": ndarray,
+            "depth": ndarray,
+            "fit_depth": ndarray,
+            "tests": dict,
+        }
+
+        fit and depth are the post-test values used by subsequent
+        Tetracorder feature-role/material logic.
+    """
+    windows = feature_dict["windows"]
+    continuum_type = feature_dict["continuum"]
+    feat_fit, status = fit_feature(reference_spectrum, target_spectra, target_wvls, windows, continuum = continuum_type)
+    if status != "valid":
+        return {
+            "status": status,
+            "mod_fit": None,
+            "mod_depth": None,
+            "mod_fit_depth": None,
+            "raw_fit": None,
+            "raw_depth": None,
+            "polarity": None,
+            "reference_area": None,
+        }
+    
+    
+    
+    
+    tests = feature_dict.get("tests", [])
+
+    fit = np.ma.asarray(feat_fit["fit"]).copy()
+    depth = np.ma.asarray(feat_fit["depth"]).copy()
+
+    continuum = np.ma.asarray(feat_fit["continuum"])
+    left_continuum = np.ma.asarray(feat_fit["left_continuum"])
+    right_continuum = np.ma.asarray(feat_fit["right_continuum"])
+
+    # Convenient lookup. A feature should only have one of each test type.
+    tests_by_name = {test["test"]: test["values"] for test in tests}
+
+    test_results = {}
+
+    def values_for(name):
+        values = tests_by_name[name]
+
+        if isinstance(values, (list, tuple)) and len(values) == 1:
+            return values[0]
+
+        return values
+
+    # ----------------------------------------------------------
+    # 1. Hard continuum tests
+    # Here any fails have fit and depth immediately zerod
+    # ----------------------------------------------------------
+
+    if "ct" in tests_by_name:
+        result = continuum_test(
+            continuum, values_for("ct"))
+        test_results["ct"] = result
+        fail = ~result
+        fit[fail] = 0.0
+        depth[fail] = 0.0
+
+    if "lct" in tests_by_name:
+        result = continuum_test(left_continuum, values_for("lct"))
+        test_results["lct"] = result
+
+        fail = ~result
+        fit[fail] = 0.0
+        depth[fail] = 0.0
+
+    if "rct" in tests_by_name:
+        result = continuum_test(right_continuum, values_for("rct"))
+        test_results["rct"] = result
+
+        fail = ~result
+        fit[fail] = 0.0
+        depth[fail] = 0.0
+
+    # ----------------------------------------------------------
+    # Helper for fuzzy attenuation.
+    #
+    # Tetracorder applies each fuzzy result immediately to the
+    # CURRENT fit and depth.
+    # ----------------------------------------------------------
+
+    def apply_factor(name, factor):
+        test_results[name] = factor
+
+        fit[...] = fit * factor
+        depth[...] = depth * factor
+
+    # ----------------------------------------------------------
+    # 2. Left continuum / right continuum
+    # ---------------------------------------------------------
+
+    if "lct/rct>" in tests_by_name:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            value = left_continuum / right_continuum
+
+        factor = fuzzy_greater(value, values_for("lct/rct>"))
+
+        apply_factor("lct/rct>", factor)
+
+    # ---------------------------------------------------------
+    # 3. Right continuum / left continuum
+    # ----------------------------------------------------------
+
+    if "rct/lct>" in tests_by_name:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            value = right_continuum / left_continuum
+
+        factor = fuzzy_greater(value, values_for("rct/lct>"))
+
+        apply_factor("rct/lct>", factor)
+
+    # ----------------------------------------------------------
+    # From this point onwards, band bottom must be calculated
+    # from the CURRENT depth, not characterise_feature()["band_bottom"].
+    # ----------------------------------------------------------
+
+    def current_band_bottom():
+        return continuum * (1.0 - depth)
+
+    def current_right_shoulder_ratio():
+        band_bottom = current_band_bottom()
+
+        with np.errstate(divide="ignore", invalid="ignore"):
+            return ((right_continuum - band_bottom) / (left_continuum - band_bottom))
+
+    def current_left_shoulder_ratio():
+        band_bottom = current_band_bottom()
+
+        with np.errstate(divide="ignore", invalid="ignore"):
+            return ((left_continuum - band_bottom) / (right_continuum - band_bottom))
+
+    # ----------------------------------------------------------
+    # 4. (right continuum - band bottom) /
+    #    (left continuum - band bottom)
+    # ----------------------------------------------------------
+
+    if "rcbblc>" in tests_by_name:
+        value = current_right_shoulder_ratio()
+
+        factor = fuzzy_greater(value, values_for("rcbblc>"))
+
+        apply_factor("rcbblc>", factor)
+
+    # Recalculate because depth may just have changed.
+    if "rcbblc<" in tests_by_name:
+        value = current_right_shoulder_ratio()
+
+        factor = fuzzy_less(value, values_for("rcbblc<"))
+
+        apply_factor("rcbblc<", factor)
+
+    # ----------------------------------------------------------
+    # 5. (left continuum - band bottom) /
+    #    (right continuum - band bottom)
+    # ----------------------------------------------------------
+
+    if "lcbbrc>" in tests_by_name:
+        value = current_left_shoulder_ratio()
+
+        factor = fuzzy_greater(value,values_for("lcbbrc>"))
+
+        apply_factor("lcbbrc>", factor)
+
+    # Again recalculate from the newly modified depth.
+    if "lcbbrc<" in tests_by_name:
+        value = current_left_shoulder_ratio()
+
+        factor = fuzzy_less(value, values_for("lcbbrc<"))
+
+        apply_factor("lcbbrc<", factor)
+
+    # ----------------------------------------------------------
+    # 6. Reflectance * |band depth|
+    #
+    # This also uses CURRENT depth after all previous attenuation.
+    # ----------------------------------------------------------
+
+    if "r*bd>" in tests_by_name:
+        value = continuum * np.abs(depth)
+
+        factor = fuzzy_greater(value, values_for("r*bd>"))
+
+        apply_factor("r*bd>", factor)
+
+    # ----------------------------------------------------------
+    # "weight" is not a spectral rejection/fuzzy test here.
+    # Deal with it during feature weighting/material aggregation.
+    # ----------------------------------------------------------
+
+    if "weight" in tests_by_name:
+        test_results["weight"] = values_for("weight")
+
+    return {
+        "status": "valid",
+        "mod_fit": fit,
+        "mod_depth": depth,
+        "mod_fit_depth": fit * depth,
+        "raw_fit": feat_fit["fit"],
+        "raw_depth": feat_fit["depth"],
+        "polarity": feat_fit["polarity"],
+        "reference_area": feat_fit["reference_area"],
+    }
 
 
+def resolve_not(not_feature, source_result, resolved_features):
+    if source_result["status"] != "valid":
+        return None
+
+    source_depth = np.abs(source_result["mod_depth"])
+    source_fit = source_result["mod_fit"]
+
+    condition = not_feature["depth_condition"]
+
+    if condition["mode"] == "absolute":
+        test_depth = source_depth
+
+    elif condition["mode"] == "relative":
+        relative_to = condition["relative_to_feature"]
+
+        denominator = np.abs(resolved_features[relative_to]["mod_depth"])
+        denominator = np.where(denominator > 1e-13, denominator, 1e-13)
+
+        test_depth = source_depth / denominator
+
+    else:
+        raise ValueError(f"Unknown NOT depth mode: {condition['mode']}")
+
+    return ((test_depth > condition["threshold"]) & (source_fit > not_feature["fit_threshold"]))
+
+def resolve_feature_weights(rule_features, resolved_features):
+    raw_weights = {}
+
+    for f_id, feature in rule_features.items():
+        if feature["role"] == "not":
+            continue
+
+        result = resolved_features[f_id]
+
+        if feature["role"] == "weak" or result["status"] != "valid":
+            raw_weights[f_id] = 0.0
+            continue
+
+        weight_modifier = 1.0
+
+        for test in feature.get("tests", []):
+            if test["test"] == "weight":
+                values = test["values"]
+                weight_modifier = values[0] if isinstance(values, (list, tuple)) else values
+                break
+
+        raw_weights[f_id] = result["reference_area"] * weight_modifier
+
+    total = sum(raw_weights.values())
+
+    if total <= 0.0:
+        return {f_id: 0.0 for f_id in raw_weights}
+
+    return {f_id: weight / total for f_id, weight in raw_weights.items()}
+
+
+def resolve_positive_material(rule_features, resolved_features):
+    """
+    Resolve material fit, depth and fit-depth from positive features.
+    
+    Role semantics - Preserved from Tetracorder documentation
+    O = optional
+    W = weak must-be-present
+    D = diagnostic
+    M = must-have diagnostic
+
+    role         out_of_range / disabled        valid but fit/depth fails        valid and survives feature tests
+
+    optional     ignore                          contributes zero                 contributes
+    diagnostic   ignore                          reject material                  contributes
+    weak         reject material                 reject material                  DOES NOT contribute to weighted sums
+    must_have    reject material                 reject material                  contributes
+
+    """ 
+    
+
+    first_valid = next((resolved_features[f_id] for f_id, feature in rule_features.items()
+            if feature["role"] != "not" and resolved_features[f_id]["status"] == "valid"),
+            None)
+    if first_valid is None:
+        return None
+
+    feature_weights = resolve_feature_weights(rule_features, resolved_features)
+    
+    shape = np.shape(first_valid["mod_fit"])
+
+    sum_fit = np.zeros(shape, dtype=float)
+    sum_depth = np.zeros(shape, dtype=float)
+    sum_fit_depth = np.zeros(shape, dtype=float)
+
+    rejected = np.zeros(shape, dtype=bool)
+
+    for f_id, feature in rule_features.items():
+        if feature["role"] == "not":
+            continue
+
+        result = resolved_features[f_id]
+        role = feature["role"]
+
+        # Ratfor ifeatenable == 0.
+        if result["status"] != "valid":
+            if role == "must_have":
+                rejected[...] = True
+
+            continue
+
+        fit = np.ma.asarray(result["mod_fit"])
+        depth = np.ma.asarray(result["mod_depth"])
+
+        feature_sign = 1.0 if result["polarity"] == "absorption" else -1.0
+        weight = feature_weights[f_id]
+
+        # Tetracorder Ratfor:
+        # xx = 1.0
+        # if (bdepth / xfeat <= 0.1e-5) xx = 0.0
+        present = (depth / feature_sign) > 1e-6
+        xx = present.astype(float)
+
+        # featimprt > 0 means W, D or M.
+        # If enabled but the expected feature is not actually present, reject material.
+        if role in {"weak", "diagnostic", "must_have"}:
+            rejected |= ~np.ma.filled(present, False)
+
+        # Tetracorder Ratfor excludes weak features from sumf/sumd/sumfd.
+        if role != "weak":
+            # This non-symettric application is faithful to
+            # to the Tetracorder ratfor
+            sum_fit += np.ma.filled(fit * xx * weight, 0.0)
+
+            weighted_depth = depth * weight * feature_sign
+
+            sum_depth += np.ma.filled(weighted_depth, 0.0)
+            sum_fit_depth += np.ma.filled(weighted_depth * fit, 0.0)
+
+    sum_fit[rejected] = 0.0
+    sum_depth[rejected] = 0.0
+    sum_fit_depth[rejected] = 0.0
+
+    return {
+        "fit": sum_fit,
+        "depth": sum_depth,
+        "fit_depth": sum_fit_depth,
+        "rejected": rejected,
+    }
 
 #%% test rules
 
@@ -360,107 +779,207 @@ test_pixel = test_cube[146, 66]
 
 #%% Startup, load files and prepare rules, nots and refs
 
-rules_file = "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/tetracorder_rules_with_nots_parsed.json"
+rules_file = "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/tetracorder_rules_with_nots_parsed_normalized.json"
 references_file = "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/tetracorder_rules_references.db"
 
 with open(rules_file, "r", encoding="utf-8") as f:
     all_rules = json.load(f)
 
-# =============================================================================
-# import re
-# 
-# CONSTRAINT_RE = re.compile(
-#     r"(FITALL>|FIT>|DEPTHALL>|DEPTH-FIT>|FD-FIT>|FDALL>|FD-DEPTH>|DEPTH>|FD>)"
-#     r"\s*"
-#     r"(\[[^\]]+\]|[-+]?\d*\.?\d+(?:\s+[-+]?\d*\.?\d+)?)"
-# )
-# 
-# def parse_constraints(constraints):
-#     parsed = []
-# 
-#     for line in constraints:
-#         line = line.removeprefix("constraint:").strip()
-# 
-#         for test, values in CONSTRAINT_RE.findall(line):
-#             parsed.append({
-#                 "test": test,
-#                 "values": values.strip(),
-#             })
-# 
-#     return parsed
-# 
-# for rule in all_rules["rules"]:
-#         if rule.get("constraints"):
-#             rule["constraints"] = parse_constraints(rule["constraints"])
-# 
-# output_file = "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/tetracorder_rules_with_nots_parsed.json"
-# 
-# =============================================================================
-# =============================================================================
-# with open(output_file, "w", encoding="utf-8") as f:
-#     json.dump(all_rules, f, indent=2)
-# =============================================================================
-    
-#%%
 
 all_rules = prepare_rules(all_rules)
 rules = all_rules["rules"]
-nots = all_rules["not_definitions"]
+not_definitions = all_rules["not_definitions"]
 
 references = load_references(references_file)
+#%%
+"""
+resolve positive features
+        ↓
+apply role semantics
+        ↓
+calculate material fit/depth/fd
+        ↓
+apply material constraints
+        ↓
+is material fit > 0?
+        ↓ yes
+evaluate NOTs
+"""
 
-for rule in rules:
-    if rule["id"] == 'calcite.ws272.g2':
-        print(rule)
+
 
 
 #%%Rule evaluator fledgling funcs
+mat_agg = {}
+for rule in rules:
+    #rule = test_rule #eventually this will be passed to the function this will become
+    rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
+    rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
+    resolved_features = {}
+    for f_id, feature in rule_features_dict.items():
+        if feature["role"] != "not":
+             result = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
+             resolved_features[f_id] = result 
+    positive_material = resolve_positive_material(rule_features_dict, resolved_features)  
+    mat_agg[rule["id"]] = positive_material
+#%%
+from collections import Counter
 
-rule = test_rule3 #eventually this will be passed to the function this will become
-rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
-main_reference, not_references = prepare_rule_references(rule, nots, references, test_wvls, test_fwhm)
+summary = Counter()
 
-fits = {}
-for feature_id, feature in rule_features_dict.items():
-    #(reference, target, target_wavelengths, windows, continuum = "linear")
-    
-    if feature["role"] == "not":
-        reference = not_references[feature_id]["spectrum"] 
-        windows = not_references[feature_id]["feature"]["windows"]
-        continuum = not_references[feature_id]["feature"]["continuum"]
-        feat_fit = fit_feature(reference, test_cube, test_wvls, windows, continuum = continuum)
+for rule_id, result in mat_agg.items():
+    if result is None:
+        summary["no_valid_positive_features"] += 1
+    elif np.all(result["rejected"]):
+        summary["all_pixels_rejected"] += 1
+    elif np.any(result["rejected"]):
+        summary["partially_rejected"] += 1
     else:
-        windows = feature["windows"]
-        continuum = feature["continuum"]
-        feat_fit = fit_feature(main_reference, test_cube, test_wvls, windows, continuum = continuum)
-    fits[feature_id] = feat_fit
+        summary["no_pixels_rejected"] += 1
 
-test_results = {}
-
-for feature_id in fits.keys():
-    if fits[feature_id] is None:
+print(summary)
+for rule_id, result in mat_agg.items():
+    if result is None:
         continue
 
-    tests = rule_features_dict[feature_id].get("tests")
-    if tests is None:
-        continue
+    for key in ("fit", "depth", "fit_depth"):
+        arr = result[key]
 
-    test_results[feature_id] = {}
+        if not np.all(np.isfinite(arr)):
+            print(rule_id, key, "contains non-finite values")
+            
+for rule in rules:
+    rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
+    resolved = {}
 
-    for test in tests:
-        check = test["test"]
-        values = test["values"]
+    rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
 
-        if isinstance(values, (list, tuple)) and len(values) == 1:
-            values = values[0]
+    for f_id, feature in rule_features_dict.items():
+        if feature["role"] != "not":
+            resolved[f_id] = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
 
-        test_func = FEATURE_TESTS[check]
-        if test_func is not None:
-            result = test_func(fits[feature_id], values)
-        else:
-            result = None
+    weights = resolve_feature_weights(rule_features_dict, resolved)
 
-        test_results[feature_id][check] = result
+    total = sum(weights.values())
+
+    if weights and not np.isclose(total, 1.0) and total != 0.0:
+        print(rule["id"], total, weights)
+#%%
+import cProfile
+import pstats
+
+profiler = cProfile.Profile()
+profiler.enable()
+
+mat_agg = {}
+
+for rule in rules:
+    rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
+    rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
+
+    resolved_features = {}
+
+    for f_id, feature in rule_features_dict.items():
+        if feature["role"] != "not":
+            resolved_features[f_id] = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
+
+    positive_material = resolve_positive_material(rule_features_dict, resolved_features)
+    mat_agg[rule["id"]] = positive_material
+
+profiler.disable()
+
+stats = pstats.Stats(profiler)
+stats.sort_stats("cumulative")
+stats.print_stats(30)
 
 #%%
+for key, im in positive_material.items():
+    plt.figure()
+    plt.imshow(im)
+    plt.title(key)     
+#%%
+
+rej = positive_material["rejected"]
+
+print("Rejected pixels:", np.sum(rej))
+print("Total pixels:", rej.size)
+print("Rejected fraction:", np.mean(rej))
+
+print("fit nonzero in rejected:", np.count_nonzero(positive_material["fit"][rej]))
+print("depth nonzero in rejected:", np.count_nonzero(positive_material["depth"][rej]))
+print("fit_depth nonzero in rejected:", np.count_nonzero(positive_material["fit_depth"][rej])) 
+feature_weights = resolve_feature_weights(rule_features_dict, resolved_features)
+
+for f_id, weight in feature_weights.items():
+    feature = rule_features_dict[f_id]
+    result = resolved_features[f_id]
+
+    print(
+        f_id,
+        feature["role"],
+        result["status"],
+        "area =", result.get("reference_area"),
+        "weight =", weight,
+    )
+
+print("sum =", sum(feature_weights.values()))       
+
+for f_id, feature in rule_features_dict.items():
+    if feature["role"] == "not":
+        continue
+
+    result = resolved_features[f_id]
+
+    if result["status"] != "valid":
+        print(f_id, feature["role"], result["status"])
+        continue
+
+    depth = np.ma.asarray(result["mod_depth"])
+    feature_sign = 1.0 if result["polarity"] == "absorption" else -1.0
+    present = (depth / feature_sign) > 1e-6
+
+    print(f_id, feature["role"], "present fraction =", np.mean(np.ma.filled(present, False)))
+#%% Not work, to revist when I get there is resolution order
+for f_id, feature in rule_features_dict.items():
+    if feature["role"] == "not":
+        source_rule, source_feature = get_not_source_feature(feature, not_definitions, rules)
+        not_reference_spectrum = get_rule_spectrum(source_rule, references, test_wvls, test_fwhm)
+        source_result = resolve_feature_tests(not_reference_spectrum, source_feature, test_cube, test_wvls)
+        result = resolve_not(feature, source_result, resolved_features)
+        resolved_features[f_id] = result 
+
+#%%
+for f_id, feature in rule_features_dict.items():
+    if feature["role"] == "not":
+        print(f_id, feature["depth_condition"])
+
+
+#%%
+for rule in rules:
+    #rule = test_rule3 #eventually this will be passed to the function this will become
+    rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
+    rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
+    resolved_features = {}
+    for f_id, feature in rule_features_dict.items():
+        if feature["role"] != "not":
+             result = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
+        else:
+            source_rule, source_feature = get_not_source_feature(feature, not_definitions, rules)
+            not_reference_spectrum = get_rule_spectrum(source_rule, references, test_wvls, test_fwhm)
+            result = resolve_feature_tests(not_reference_spectrum, source_feature, test_cube, test_wvls)
+        resolved_features[f_id] = result    
+        
+#%%
+for rule in rules:
+    features_by_number = {feature["number"]: feature["id"] for feature in rule["features"]}
+
+    for feature in rule["features"]:
+        if feature["role"] != "not":
+            continue
+
+        condition = feature["depth_condition"]
+
+        if condition["mode"] == "relative":
+            feature_number = condition["relative_to_feature"]
+            condition["relative_to_feature"] = features_by_number[feature_number]
 
