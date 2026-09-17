@@ -4,7 +4,9 @@ to be used by the rule interpreter algorithm once implemented"""
 from dataclasses import dataclass
 from typing import Literal
 from copy import deepcopy
+from pathlib import Path
 import re
+import sqlite3
 
 import numpy as np
 from scipy.interpolate import CubicSpline
@@ -258,23 +260,10 @@ CONSTRAINT_RE = re.compile(
 )
 
 
-def parse_constraints(constraints):
-    parsed = []
-
-    for line in constraints:
-        line = line.removeprefix("constraint:").strip()
-
-        for test, values in CONSTRAINT_RE.findall(line):
-            parsed.append({
-                "test": test,
-                "values": values.strip(),
-            })
-
-    return parsed
 
 def prepare_rules(rules, mode="default"):
     """
-    Expects a rule from the parsed json rules json
+    Expects rules from the parsed json rules json
     mode = default, default_bak23, emit_c, MMM_09c, MMM255t,
     HYB2ryug defined in Tetracorder 6.00a VARIABLES/cmd.lib.setup.variables-*
     Custom modes can be established by creating a new preset dictionary
@@ -302,6 +291,102 @@ def prepare_rules(rules, mode="default"):
         return value
 
     return replace(rules)
+#========= load the prepared db of references ================================
+
+
+def load_references(db_file: str|Path) ->dict:
+    """
+    Access the prepared SQLite database of reference spectra used in the Tetracorder
+    algorithm.
+    Returns a dictionary keyed by (library, record number) for use by the evaluator
+    """
+    references = {}
+
+    connection = sqlite3.connect(db_file)
+    connection.row_factory = sqlite3.Row
+
+    rows = connection.execute(
+        """
+        SELECT
+            Samples.SampleID,
+            Samples.Name,
+            Samples.Library,
+            Samples.NativeRecord,
+            Samples.ConvolvedRecord,
+            Samples.OriginalTitle,
+            Samples.InstrumentCode,
+            Samples.PurityCode,
+            Samples.MeasurementCode,
+            Samples.SourceFilename,
+            Spectra.XData,
+            Spectra.YData
+        FROM Samples
+        JOIN Spectra USING (SampleID)
+        WHERE Samples.ConvolvedRecord IS NOT NULL
+        """
+    )
+
+    for row in rows:
+
+        key = (
+            row["Library"],
+            row["ConvolvedRecord"],
+        )
+
+        references[key] = {
+            "sample_id": row["SampleID"],
+            "name": row["Name"],
+            "library": row["Library"],
+            "native_record": row["NativeRecord"],
+            "convolved_record": row["ConvolvedRecord"],
+            "original_title": row["OriginalTitle"],
+            "instrument_code": row["InstrumentCode"],
+            "purity_code": row["PurityCode"],
+            "measurement_code": row["MeasurementCode"],
+            "source_filename": row["SourceFilename"],
+            "wavelengths": np.frombuffer(
+                row["XData"],
+                dtype=np.float32,
+            ).copy(),
+            "reflectance": np.frombuffer(
+                row["YData"],
+                dtype=np.float32,
+            ).copy(),
+        }
+
+    connection.close()
+
+    return references
+
+
+#========= Helpers for the rule evaluation logic==============================
+
+def fuzzy_greater(value, thresholds):
+    reject, full = thresholds
+    result = np.ones_like(value, dtype=float)
+    result[value <= reject] = 0.0
+    transition = (value > reject) & (value < full)
+    result[transition] = ((value[transition] - reject) / (full - reject))
+    return result
+
+def fuzzy_less(value, thresholds):
+    reject, full = thresholds
+
+    result = np.ones_like(value, dtype=float)
+
+    result[value >= reject] = 0.0
+
+    transition = (value < reject) & (value > full)
+    result[transition] = ((reject - value[transition]) / (reject - full))
+
+    return result
+
+def continuum_test(value, limits):
+    if np.isscalar(limits):
+        return value >= limits
+
+    low, high = limits
+    return (value >= low) & (value <= high)
 
 #==========================================================================
 

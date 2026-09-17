@@ -10,10 +10,7 @@ import matplotlib.pyplot as plt
 from tetracorder_ops import prepare_rules, GaussianConvolver
 from time import perf_counter
 from tetracorder_ops import linear_feature_continuum, curved_feature_continuum
-from tetracorder_ops import characterise_feature
-
-
-
+from tetracorder_ops import characterise_feature, fuzzy_greater, fuzzy_less, continuum_test
 
 
 
@@ -98,101 +95,6 @@ def get_reference_spectra(library_records, references):
     
     return ref["reflectance"], ref["wavelengths"]
 
-
-def prepare_rule_references(rule, not_definitions, references, target_wavelengths, target_fwhm):
-    """
-    Prepare the reference spectra required by a parsed Tetracorder rule.
-    
-    Parameters
-    ----------
-    rule : dict
-        Parsed, single, rule block from the JSON rules file.
-    
-    not_definitions : dict
-        Parsed NOT-definition mapping from the JSON rules file. All NOT-definitions
-    
-    references : dict
-        Output of load_references(); reference spectra extracted from
-        the SQLite reference database.
-    
-    target_wavelengths : ndarray
-        Wavelengths of the target spectrum or cube.
-    
-    target_fwhm : ndarray
-        FWHM values corresponding to target_wavelengths.
-    
-    Returns
-    -------
-    main_reference : ndarray
-        Main rule reference convolved onto target_wavelengths.
-        Shape: (target_wavelengths.shape[0],)
-    
-    not_references : dict
-        NOT reference spectra keyed by feature id, for example:
-    
-        {
-            "n1a": ndarray,
-            "n2a": ndarray,
-        }
-    
-        Each spectrum is convolved onto target_wavelengths and has shape:
-        (target_wavelengths.shape[0],)
-    
-    Notes
-    -----
-    1. Everything must be in microns. Reference wavelengths are stored in
-       microns, so target wavelengths and FWHM must be converted before
-       entering this pipeline. Reflectance must be fractional, 0-1.
-    
-    2. target_wavelengths.shape == target_fwhm.shape == (n_wavelengths,)
-    
-    3. Currently all parsed rules have a single positive reference, with
-       optional NOT references. This implementation therefore assumes one
-       main reference. Revisit if future rule definitions use multiple
-       positive references.
-    """
-    main_spectrum, main_wavelengths = get_reference_spectra(
-        rule["library_records"],
-        references,
-    )
-
-    convolver = GaussianConvolver(
-        lib_wl=main_wavelengths,
-        scanner_wl=target_wavelengths,
-        scanner_fwhm=target_fwhm,
-    )
-
-    main_reference = convolver.convolve(main_spectrum)
-
-    not_references = {}
-
-    for feature in rule["features"]:
-        if feature["role"] != "not":
-            continue
-
-        not_definition = not_definitions[feature["source_reference"]]
-
-        not_spectrum, not_wavelengths = get_not_reference(
-            not_definition,
-            references,)
-
-        convolver = GaussianConvolver(
-            lib_wl=not_wavelengths,
-            scanner_wl=target_wavelengths,
-            scanner_fwhm=target_fwhm,)
-        
-        convolved_spectrum = convolver.convolve(not_spectrum)
-        
-        source_feature = source_feature = not_definition["features"][str(feature["source_feature"])]
-
-        not_references[feature["id"]] = {
-            "spectrum": convolved_spectrum,
-            "feature": source_feature,}
-
-
-    return main_reference, not_references
-
-
 def fit_feature(reference, target, target_wavelengths, windows, continuum = "linear"):
     """
     Fits a feature using python equivalents of the specpr operations
@@ -275,119 +177,10 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
     result["reference_area"] = float(np.ma.sum(np.ma.abs(1.0 - reference_cr)))
     return result, "valid"
 
-def fuzzy_greater(value, thresholds):
-    reject, full = thresholds
-    result = np.ones_like(value, dtype=float)
-    result[value <= reject] = 0.0
-    transition = (value > reject) & (value < full)
-    result[transition] = ((value[transition] - reject) / (full - reject))
-    return result
-
-def fuzzy_less(value, thresholds):
-    reject, full = thresholds
-
-    result = np.ones_like(value, dtype=float)
-
-    result[value >= reject] = 0.0
-
-    transition = (value < reject) & (value > full)
-    result[transition] = ((reject - value[transition]) / (reject - full))
-
-    return result
-
-def continuum_test(value, limits):
-    if np.isscalar(limits):
-        return value >= limits
-
-    low, high = limits
-    return (value >= low) & (value <= high)
-
-def test_ct(fit, values):
-    return continuum_test(fit["continuum"], values)
-
-def test_lct(fit, values):
-    return continuum_test(fit["left_continuum"], values)
-
-def test_rct(fit, values):
-    return continuum_test(fit["right_continuum"], values)
-
-def test_lct_rct_gt(fit, values):
-    return fuzzy_greater(fit["left_right_ratio"], values)
 
 
-def test_rct_lct_gt(fit, values):
-    return fuzzy_greater(fit["right_left_ratio"], values)
 
 
-def test_lcbbrc_gt(fit, values):
-    return fuzzy_greater(fit["left_shoulder_ratio"], values)
-
-
-def test_lcbbrc_lt(fit, values):
-    return fuzzy_less(fit["left_shoulder_ratio"], values)
-
-
-def test_rcbblc_gt(fit, values):
-    return fuzzy_greater(fit["right_shoulder_ratio"], values)
-
-
-def test_rcbblc_lt(fit, values):
-    return fuzzy_less(fit["right_shoulder_ratio"], values)
-
-
-def test_r_bd_gt(fit, values):
-    return fuzzy_greater(fit["reflectance_depth"], values)
-
-FEATURE_TESTS = {
-    "ct": test_ct,
-    "lct": test_lct,
-    "rct": test_rct,
-    
-    "lct/rct>": test_lct_rct_gt,
-    "rct/lct>": test_rct_lct_gt,
-
-    "lcbbrc>": test_lcbbrc_gt,
-    "lcbbrc<": test_lcbbrc_lt,
-    "rcbblc>": test_rcbblc_gt,
-    "rcbblc<": test_rcbblc_lt,
-
-    "r*bd>": test_r_bd_gt,
-    "weight": None,
-}
-
-def get_rule_spectrum(rule, references, target_wvls, target_fwhm):
-    main_spectrum, main_wavelengths = get_reference_spectra(
-        rule["library_records"],
-        references,
-    )
-
-    convolver = GaussianConvolver(
-        lib_wl=main_wavelengths,
-        scanner_wl=target_wvls,
-        scanner_fwhm=target_fwhm,
-    )
-
-    return convolver.convolve(main_spectrum)
-
-def get_not_source_feature(not_feature, not_definitions, rules):
-    not_definition = not_definitions[not_feature["source_reference"]]
-
-    source_rule_id = not_definition["source_rule_id"]
-    source_feature_number = not_feature["source_feature"]
-
-    source_rule = next(
-        rule
-        for rule in rules
-        if rule["id"] == source_rule_id
-    )
-
-    source_feature = next(
-        feature
-        for feature in source_rule["features"]
-        if feature["number"] == source_feature_number
-    )
-
-    return source_rule, source_feature
 
 def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, target_wvls):
     """
@@ -613,30 +406,7 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
     }
 
 
-def resolve_not(not_feature, source_result, resolved_features):
-    if source_result["status"] != "valid":
-        return None
 
-    source_depth = np.abs(source_result["mod_depth"])
-    source_fit = source_result["mod_fit"]
-
-    condition = not_feature["depth_condition"]
-
-    if condition["mode"] == "absolute":
-        test_depth = source_depth
-
-    elif condition["mode"] == "relative":
-        relative_to = condition["relative_to_feature"]
-
-        denominator = np.abs(resolved_features[relative_to]["mod_depth"])
-        denominator = np.where(denominator > 1e-13, denominator, 1e-13)
-
-        test_depth = source_depth / denominator
-
-    else:
-        raise ValueError(f"Unknown NOT depth mode: {condition['mode']}")
-
-    return ((test_depth > condition["threshold"]) & (source_fit > not_feature["fit_threshold"]))
 
 def resolve_feature_weights(rule_features, resolved_features):
     raw_weights = {}
@@ -758,12 +528,231 @@ def resolve_positive_material(rule_features, resolved_features):
         "rejected": rejected,
     }
 
+def material_constraint_factor(value, values):
+    if len(values) == 1:
+        threshold = values[0]
+        return (value >= threshold).astype(float)
+
+    if len(values) == 2:
+        reject, full = values
+        return fuzzy_greater(value, (reject, full))
+
+    raise ValueError(f"Expected 1 or 2 constraint values, got {values}")
+
+
+
+
+
+def resolve_material_constraints(material_result, material_constraints):
+
+    CONSTRAINT_ORDER = (
+    "FITALL>",
+    "DEPTHALL>",
+    "FDALL>",
+    "FIT>",
+    "DEPTH>",
+    "DEPTH-FIT>",
+    "FD>",
+    "FD-FIT>",
+    "FD-DEPTH>",
+        )
+
+
+    fit = material_result["fit"].copy()
+    depth = material_result["depth"].copy()
+    fit_depth = material_result["fit_depth"].copy()
+
+    constraints_by_test = {constraint["test"]: constraint for constraint in material_constraints}
+
+    for test in CONSTRAINT_ORDER:
+        if test not in constraints_by_test:
+            continue
+
+        constraint = constraints_by_test[test]
+        values = constraint["values"]
+
+        if test == "FITALL>":
+            factor = material_constraint_factor(fit, values)
+            fit *= factor
+            depth *= factor
+            fit_depth *= factor
+
+        elif test == "DEPTHALL>":
+            factor = material_constraint_factor(np.abs(depth), values)
+            fit *= factor
+            depth *= factor
+            fit_depth *= factor
+
+        elif test == "FDALL>":
+            factor = material_constraint_factor(fit_depth, values)
+            fit *= factor
+            depth *= factor
+            fit_depth *= factor
+
+        elif test == "FIT>":
+            fit *= material_constraint_factor(fit, values)
+
+        elif test == "DEPTH>":
+            depth *= material_constraint_factor(np.abs(depth), values)
+
+        elif test == "DEPTH-FIT>":
+            depth *= material_constraint_factor(fit, values)
+
+        elif test == "FD>":
+            fit_depth *= material_constraint_factor(fit_depth, values)
+
+        elif test == "FD-FIT>":
+            fit_depth *= material_constraint_factor(fit, values)
+
+        elif test == "FD-DEPTH>":
+            fit_depth *= material_constraint_factor(depth, values)
+
+    return {
+        "fit": fit,
+        "depth": depth,
+        "fit_depth": fit_depth,
+        "rejected": material_result["rejected"],
+    }
+
+def resolve_not(not_feature, source_result, resolved_features):
+    if source_result["status"] != "valid":
+        return None
+
+    source_depth = np.abs(source_result["mod_depth"])
+    source_fit = source_result["mod_fit"]
+
+    condition = not_feature["depth_condition"]
+
+    if condition["mode"] == "absolute":
+        test_depth = source_depth
+
+    elif condition["mode"] == "relative":
+        relative_to = condition["relative_to_feature"]
+
+        denominator = np.abs(resolved_features[relative_to]["mod_depth"])
+        denominator = np.where(denominator > 1e-13, denominator, 1e-13)
+
+        test_depth = source_depth / denominator
+
+    else:
+        raise ValueError(f"Unknown NOT depth mode: {condition['mode']}")
+
+    return ((test_depth > condition["threshold"]) & (source_fit > not_feature["fit_threshold"]))
+
+def get_rule_spectrum(rule, references, target_wvls, target_fwhm):
+    main_spectrum, main_wavelengths = get_reference_spectra(
+        rule["library_records"],
+        references,
+    )
+
+    convolver = GaussianConvolver(
+        lib_wl=main_wavelengths,
+        scanner_wl=target_wvls,
+        scanner_fwhm=target_fwhm,
+    )
+
+    return convolver.convolve(main_spectrum)
+
+
+def resolve_material_nots(material_result, rule_features, resolved_features, not_definitions, rules_dict, references, target_wvls, target_fwhm, target):
+    if material_result is None:
+        return None
+
+    fit = material_result["fit"].copy()
+    depth = material_result["depth"].copy()
+    fit_depth = material_result["fit_depth"].copy()
+
+    alive = fit > 0
+
+    if not np.any(alive):
+        return {
+            "fit": fit,
+            "depth": depth,
+            "fit_depth": fit_depth,
+            "rejected": material_result["rejected"],
+        }
+
+    for f_id, not_feature in rule_features.items():
+        if not_feature["role"] != "not":
+            continue
+
+        not_definition = not_definitions[not_feature["source_reference"]]
+
+        source_rule = rules_dict[not_definition["source_rule_id"]]
+        source_rule_features = {feature["id"]: feature for feature in source_rule["features"]}
+        source_feature = source_rule_features[not_feature["source_feature"]]
+
+        source_reference_spectrum = get_rule_spectrum(source_rule, references, target_wvls, target_fwhm)
+        source_result = resolve_feature_tests(source_reference_spectrum, source_feature, target, target_wvls)
+
+        not_mask = resolve_not(not_feature, source_result, resolved_features)
+
+        if not_mask is None:
+            continue
+
+        reject = alive & not_mask
+
+        fit[reject] = 0.0
+        depth[reject] = 0.0
+        fit_depth[reject] = 0.0
+
+        alive[reject] = False
+
+        if not np.any(alive):
+            break
+
+    return {
+        "fit": fit,
+        "depth": depth,
+        "fit_depth": fit_depth,
+        "rejected": material_result["rejected"],
+    }
+
+def characterise_material(rule_id: str,
+                          rules_dict: dict,
+                          references: dict,
+                          not_definitions: dict,
+                          target_spectra: np.ndarray,
+                          target_wavelengths: np.ndarray,
+                          target_fwhm: np.ndarray
+                            )-> dict|None:
+    rule = rules_dict[rule_id]
+    rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
+    rule_reference_spectrum = get_rule_spectrum(rule, references, target_wavelengths, target_fwhm)
+    
+    resolved_features = {}
+    
+    for f_id, feature in rule_features_dict.items():
+        if feature["role"] != "not":
+             result = resolve_feature_tests(rule_reference_spectrum, feature, target_spectra, target_wavelengths)
+             resolved_features[f_id] = result 
+    
+    positive_material = resolve_positive_material(rule_features_dict, resolved_features) 
+    
+    material_constraints = rule.get("constraints")
+    constrained_material = resolve_material_constraints(positive_material, material_constraints)
+    
+    if constrained_material is None: return None
+           
+    notted_material = resolve_material_nots(constrained_material, 
+                                            rule_features_dict, 
+                                            resolved_features, 
+                                            not_definitions, rules_dict, references, test_wvls, test_fwhm, test_cube)
+    
+    if notted_material is None: return None
+
+    return notted_material
 #%% test rules
 
 test_rule = {'kind': 'group', 'number': 2, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'calcite.ws272.g2', 'library_records': {'SMALL': {'library': '[sprlb06]', 'record': '666'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Calcite WS272                W1R1Ha', 'output_title': 'carbonate calcite WS272', 'materials': [{'name': 'calcite'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 2.1780  2.2080  2.3770  2.4060 ct [CTHRESH4] r*bd> [RBD23]', '   n1a NOT [NOTbroadFe2]  1  0.20a  0.5   \\# NOT broad fe2+ 1-um feature', '   n2a NOT [NOTepidote]   1  0.08r1 0.3   \\# NOT epidote little 2.25 band', '\\# changed notepidote from 0.20r1 1/25/00 BWR', '\\# notepidote d/f changed from 0.15r1 0.6 1/26/00 BWR JBD', '\\#', '\\#       added broad Fe2   1/5/2000', '\\#       added not epidote 1/5/2000', '\\# Gregg Swayze determined the optional band hurts more than helps 3/95', '\\#Ow 2.1180  2.1380  2.1780  2.2080 ct 0.04', '\\# Notes:', '\\#        Feat:  1  has a weight of 0.959', '\\#        Feat:  2  has a weight of 0.041'], 'constraints': ['constraint: FD-FIT>[GLBLFDFIT] DEPTH-FIT>[GLBLDPFITg2]', 'constraint: FITALL>[GLBLFITALL]'], 'output_raw': '   output=fit depth fd\n   carbonate_calcite                     \\# Output base file name  was calcite\n   8 DN 255 = [O8DN50]\n   compress= zip', 'action': 'case 6', 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[2.178, 2.208], [2.377, 2.406]], 'tests': [{'test': 'ct', 'values': 0.04}, {'test': 'r*bd>', 'values': [0.0007, 0.0011]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTbroadFe2]', 'source_feature': 1, 'depth_condition': {'mode': 'absolute', 'threshold': 0.2}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTepidote]', 'source_feature': 1, 'depth_condition': {'mode': 'relative', 'threshold': 0.08, 'relative_to_feature': 1}, 'fit_threshold': 0.3}]}  
 o_rule = {'kind': 'group', 'number': 4, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'olivine_fo80_hs285.4b', 'library_records': {'SMALL': {'library': '[splib06]', 'record': '3696'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Olivine HS285.4B Fo80 s06crj3a=b', 'output_title': 'olivine HS285.4B Fo80 =b', 'materials': [{'name': 'olivine'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 0.680   0.777   1.720   1.850  ct .01  rct/lct> 0.6 0.7', '   n1a NOT [NOTMSNW16]    2 0.1a 0.5   \\# not melting snow 16              1.2-micron water band', '   n2a NOT [NOTH2OM5GPL]  2 0.1a 0.5   \\# not Water+Montmor SWy-2+5.01g/l  1.2-micron water band', '   n3a NOT [NOTH2OM16GPL] 2 0.1a 0.5   \\# not Water+Montmor SWy-2+16.5g/l  1.2-micron water band', '   n4a NOT [NOTWATER100]  1 0.1a 0.5   \\# not water-20C-100cm-path-model   0.74-micron water band', '\\# Notes:', '\\#         added not features to not be confused with 1.9 micron water bands t5.27b1 RNC 10/12/2022', '\\# Notes:', '\\#         Feat:  1  has a weight of', '\\#         Feat:  2  has a weight of'], 'constraints': ['constraint: FD-FIT>[GLBLFDFIT] DEPTH-FIT>[GLBLDPFITg2]', 'constraint: FITALL>[GLBLFITALL]'], 'output_raw': '   output=fit depth fd\n   olivine_fo80_hs285               \\# Output base file name\n                                    \\# previous to t5.2e1 was olivine_fo80_ki3377\n\n   8 DN 255 = 1.0000\n   compress= zip', 'action': None, 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[0.68, 0.777], [1.72, 1.85]], 'tests': [{'test': 'ct', 'values': [0.01]}, {'test': 'rct/lct>', 'values': [0.6, 0.7]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTMSNW16]', 'source_feature': 2, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTH2OM5GPL]', 'source_feature': 2, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n3a', 'number': 3, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTH2OM16GPL]', 'source_feature': 2, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n4a', 'number': 4, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTWATER100]', 'source_feature': 1, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}]}
 test_rule2 ={'kind': 'group', 'number': 2, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'calcite.ws272.g2', 'library_records': {'SMALL': {'library': '[sprlb06]', 'record': '666'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Calcite WS272                W1R1Ha', 'output_title': 'carbonate calcite WS272', 'materials': [{'name': 'calcite'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 2.1780  2.2080  2.3770  2.4060 ct [CTHRESH4] r*bd> [RBD23]', '   n1a NOT [NOTbroadFe2]  1  0.20a  0.5   \\# NOT broad fe2+ 1-um feature', '   n2a NOT [NOTepidote]   1  0.08r1 0.3   \\# NOT epidote little 2.25 band', '\\# changed notepidote from 0.20r1 1/25/00 BWR', '\\# notepidote d/f changed from 0.15r1 0.6 1/26/00 BWR JBD', '\\#', '\\#       added broad Fe2   1/5/2000', '\\#       added not epidote 1/5/2000', '\\# Gregg Swayze determined the optional band hurts more than helps 3/95', '\\#Ow 2.1180  2.1380  2.1780  2.2080 ct 0.04', '\\# Notes:', '\\#        Feat:  1  has a weight of 0.959', '\\#        Feat:  2  has a weight of 0.041'], 'constraints': ['constraint: FD-FIT>[GLBLFDFIT] DEPTH-FIT>[GLBLDPFITg2]', 'constraint: FITALL>[GLBLFITALL]'], 'output_raw': '   output=fit depth fd\n   carbonate_calcite                     \\# Output base file name  was calcite\n   8 DN 255 = [O8DN50]\n   compress= zip', 'action': 'case 6', 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[2.178, 2.208], [2.377, 2.406]], 'tests': [{'test': 'ct', 'values': 0.04}, {'test': 'r*bd>', 'values': [0.0007, 0.0011]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTbroadFe2]', 'source_feature': 1, 'depth_condition': {'mode': 'absolute', 'threshold': 0.2}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTepidote]', 'source_feature': 1, 'depth_condition': {'mode': 'relative', 'threshold': 0.08, 'relative_to_feature': 1}, 'fit_threshold': 0.3}]}
 test_rule3 ={'kind': 'group', 'number': 2, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'calcite.ws272.g2', 'library_records': {'SMALL': {'library': '[sprlb06]', 'record': '666'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Calcite WS272                W1R1Ha', 'output_title': 'carbonate calcite WS272', 'materials': [{'name': 'calcite'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 2.1780  2.2080  2.3770  2.4060 ct [CTHRESH4] r*bd> [RBD23]', '   n1a NOT [NOTbroadFe2]  1  0.20a  0.5   \\# NOT broad fe2+ 1-um feature', '   n2a NOT [NOTepidote]   1  0.08r1 0.3   \\# NOT epidote little 2.25 band', '\\# changed notepidote from 0.20r1 1/25/00 BWR', '\\# notepidote d/f changed from 0.15r1 0.6 1/26/00 BWR JBD', '\\#', '\\#       added broad Fe2   1/5/2000', '\\#       added not epidote 1/5/2000', '\\# Gregg Swayze determined the optional band hurts more than helps 3/95', '\\#Ow 2.1180  2.1380  2.1780  2.2080 ct 0.04', '\\# Notes:', '\\#        Feat:  1  has a weight of 0.959', '\\#        Feat:  2  has a weight of 0.041'], 'constraints': [{'test': 'FD-FIT>', 'values': [0.3, 0.4]}, {'test': 'DEPTH-FIT>', 'values': [0.65, 0.7]}, {'test': 'FITALL>', 'values': [0.2, 0.3]}], 'output_raw': '   output=fit depth fd\n   carbonate_calcite                     \\# Output base file name  was calcite\n   8 DN 255 = [O8DN50]\n   compress= zip', 'action': 'case 6', 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[2.178, 2.208], [2.377, 2.406]], 'tests': [{'test': 'ct', 'values': 0.04}, {'test': 'r*bd>', 'values': [0.0007, 0.0011]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTbroadFe2]', 'source_feature': 1, 'depth_condition': {'mode': 'absolute', 'threshold': 0.2}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTepidote]', 'source_feature': 1, 'depth_condition': {'mode': 'relative', 'threshold': 0.08, 'relative_to_feature': 1}, 'fit_threshold': 0.3}]}
+test_rule4 ={'kind': 'group', 'number': 2, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'calcite.ws272.g2', 'library_records': {'SMALL': {'library': '[sprlb06]', 'record': '666'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Calcite WS272                W1R1Ha', 'output_title': 'carbonate calcite WS272', 'materials': [{'name': 'calcite'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 2.1780  2.2080  2.3770  2.4060 ct [CTHRESH4] r*bd> [RBD23]', '   n1a NOT [NOTbroadFe2]  1  0.20a  0.5   \\# NOT broad fe2+ 1-um feature', '   n2a NOT [NOTepidote]   1  0.08r1 0.3   \\# NOT epidote little 2.25 band', '\\# changed notepidote from 0.20r1 1/25/00 BWR', '\\# notepidote d/f changed from 0.15r1 0.6 1/26/00 BWR JBD', '\\#', '\\#       added broad Fe2   1/5/2000', '\\#       added not epidote 1/5/2000', '\\# Gregg Swayze determined the optional band hurts more than helps 3/95', '\\#Ow 2.1180  2.1380  2.1780  2.2080 ct 0.04', '\\# Notes:', '\\#        Feat:  1  has a weight of 0.959', '\\#        Feat:  2  has a weight of 0.041'], 'constraints': [{'test': 'FD-FIT>', 'values': [0.3, 0.4]}, {'test': 'DEPTH-FIT>', 'values': [0.65, 0.7]}, {'test': 'FITALL>', 'values': [0.2, 0.3]}], 'output_raw': '   output=fit depth fd\n   carbonate_calcite                     \\# Output base file name  was calcite\n   8 DN 255 = [O8DN50]\n   compress= zip', 'action': 'case 6', 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[2.178, 2.208], [2.377, 2.406]], 'tests': [{'test': 'ct', 'values': 0.04}, {'test': 'r*bd>', 'values': [0.0007, 0.0011]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTbroadFe2]', 'source_feature': 1, 'depth_condition': {'mode': 'absolute', 'threshold': 0.2}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTepidote]', 'source_feature': 1, 'depth_condition': {'mode': 'relative', 'threshold': 0.08, 'relative_to_feature': 'f1a'}, 'fit_threshold': 0.3}]}
+o_rule2 = {'kind': 'group', 'number': 4, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'olivine_fo80_hs285.4b', 'library_records': {'SMALL': {'library': '[splib06]', 'record': '3696'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Olivine HS285.4B Fo80 s06crj3a=b', 'output_title': 'olivine HS285.4B Fo80 =b', 'materials': [{'name': 'olivine'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 0.680   0.777   1.720   1.850  ct .01  rct/lct> 0.6 0.7', '   n1a NOT [NOTMSNW16]    2 0.1a 0.5   \\# not melting snow 16              1.2-micron water band', '   n2a NOT [NOTH2OM5GPL]  2 0.1a 0.5   \\# not Water+Montmor SWy-2+5.01g/l  1.2-micron water band', '   n3a NOT [NOTH2OM16GPL] 2 0.1a 0.5   \\# not Water+Montmor SWy-2+16.5g/l  1.2-micron water band', '   n4a NOT [NOTWATER100]  1 0.1a 0.5   \\# not water-20C-100cm-path-model   0.74-micron water band', '\\# Notes:', '\\#         added not features to not be confused with 1.9 micron water bands t5.27b1 RNC 10/12/2022', '\\# Notes:', '\\#         Feat:  1  has a weight of', '\\#         Feat:  2  has a weight of'], 'constraints': [{'test': 'FD-FIT>', 'values': [0.3, 0.4]}, {'test': 'DEPTH-FIT>', 'values': [0.65, 0.7]}, {'test': 'FITALL>', 'values': [0.2, 0.3]}], 'output_raw': '   output=fit depth fd\n   olivine_fo80_hs285               \\# Output base file name\n                                    \\# previous to t5.2e1 was olivine_fo80_ki3377\n\n   8 DN 255 = 1.0000\n   compress= zip', 'action': None, 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[0.68, 0.777], [1.72, 1.85]], 'tests': [{'test': 'ct', 'values': [0.01]}, {'test': 'rct/lct>', 'values': [0.6, 0.7]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTMSNW16]', 'source_feature': 2, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTH2OM5GPL]', 'source_feature': 2, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n3a', 'number': 3, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTH2OM16GPL]', 'source_feature': 2, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n4a', 'number': 4, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTWATER100]', 'source_feature': 1, 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}]}
+test_rule5 = {'kind': 'group', 'number': 2, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'calcite.ws272.g2', 'library_records': {'SMALL': {'library': '[sprlb06]', 'record': '666'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Calcite WS272                W1R1Ha', 'output_title': 'carbonate calcite WS272', 'materials': [{'name': 'calcite'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 2.1780  2.2080  2.3770  2.4060 ct [CTHRESH4] r*bd> [RBD23]', '   n1a NOT [NOTbroadFe2]  1  0.20a  0.5   \\# NOT broad fe2+ 1-um feature', '   n2a NOT [NOTepidote]   1  0.08r1 0.3   \\# NOT epidote little 2.25 band', '\\# changed notepidote from 0.20r1 1/25/00 BWR', '\\# notepidote d/f changed from 0.15r1 0.6 1/26/00 BWR JBD', '\\#', '\\#       added broad Fe2   1/5/2000', '\\#       added not epidote 1/5/2000', '\\# Gregg Swayze determined the optional band hurts more than helps 3/95', '\\#Ow 2.1180  2.1380  2.1780  2.2080 ct 0.04', '\\# Notes:', '\\#        Feat:  1  has a weight of 0.959', '\\#        Feat:  2  has a weight of 0.041'], 'constraints': [{'test': 'FD-FIT>', 'values': [0.3, 0.4]}, {'test': 'DEPTH-FIT>', 'values': [0.65, 0.7]}, {'test': 'FITALL>', 'values': [0.2, 0.3]}], 'output_raw': '   output=fit depth fd\n   carbonate_calcite                     \\# Output base file name  was calcite\n   8 DN 255 = [O8DN50]\n   compress= zip', 'action': 'case 6', 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[2.178, 2.208], [2.377, 2.406]], 'tests': [{'test': 'ct', 'values': 0.04}, {'test': 'r*bd>', 'values': [0.0007, 0.0011]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTbroadFe2]', 'source_feature': 'f1a', 'depth_condition': {'mode': 'absolute', 'threshold': 0.2}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTepidote]', 'source_feature': 'f1a', 'depth_condition': {'mode': 'relative', 'threshold': 0.08, 'relative_to_feature': 'f1a'}, 'fit_threshold': 0.3}]}
+o_rule3 = {'kind': 'group', 'number': 4, 'use': True, 'udata': 'reflectance', 'convolve': False, 'preratio': None, 'preprocess': None, 'algorithm': 'tricorder-primary', 'id': 'olivine_fo80_hs285.4b', 'library_records': {'SMALL': {'library': '[splib06]', 'record': '3696'}, 'MEDIUM': {'library': '[splib06]', 'record': 'xxxx'}, 'LARGE': {'library': '[splib06]', 'record': 'xxxx'}}, 'reference_title': 'Olivine HS285.4B Fo80 s06crj3a=b', 'output_title': 'olivine HS285.4B Fo80 =b', 'materials': [{'name': 'olivine'}], 'identification_confidence': 8, 'features_raw': ['   f1a DLw 0.680   0.777   1.720   1.850  ct .01  rct/lct> 0.6 0.7', '   n1a NOT [NOTMSNW16]    2 0.1a 0.5   \\# not melting snow 16              1.2-micron water band', '   n2a NOT [NOTH2OM5GPL]  2 0.1a 0.5   \\# not Water+Montmor SWy-2+5.01g/l  1.2-micron water band', '   n3a NOT [NOTH2OM16GPL] 2 0.1a 0.5   \\# not Water+Montmor SWy-2+16.5g/l  1.2-micron water band', '   n4a NOT [NOTWATER100]  1 0.1a 0.5   \\# not water-20C-100cm-path-model   0.74-micron water band', '\\# Notes:', '\\#         added not features to not be confused with 1.9 micron water bands t5.27b1 RNC 10/12/2022', '\\# Notes:', '\\#         Feat:  1  has a weight of', '\\#         Feat:  2  has a weight of'], 'constraints': [{'test': 'FD-FIT>', 'values': [0.3, 0.4]}, {'test': 'DEPTH-FIT>', 'values': [0.65, 0.7]}, {'test': 'FITALL>', 'values': [0.2, 0.3]}], 'output_raw': '   output=fit depth fd\n   olivine_fo80_hs285               \\# Output base file name\n                                    \\# previous to t5.2e1 was olivine_fo80_ki3377\n\n   8 DN 255 = 1.0000\n   compress= zip', 'action': None, 'features': [{'id': 'f1a', 'number': 1, 'reference_alias': 'a', 'role': 'diagnostic', 'source_code': 'DLw', 'continuum': 'linear', 'coordinates': 'wavelength', 'windows': [[0.68, 0.777], [1.72, 1.85]], 'tests': [{'test': 'ct', 'values': [0.01]}, {'test': 'rct/lct>', 'values': [0.6, 0.7]}]}, {'id': 'n1a', 'number': 1, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTMSNW16]', 'source_feature': 'f2a', 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n2a', 'number': 2, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTH2OM5GPL]', 'source_feature': 'f2a', 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n3a', 'number': 3, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTH2OM16GPL]', 'source_feature': 'f2a', 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}, {'id': 'n4a', 'number': 4, 'reference_alias': 'a', 'role': 'not', 'source_reference': '[NOTWATER100]', 'source_feature': 'f1a', 'depth_condition': {'mode': 'absolute', 'threshold': 0.1}, 'fit_threshold': 0.5}]}
+
 #%% Test pixel setup
 import spectral as sp
 test_root = "C:/Users/Hyperspectral/Documents/HS_Data/Exhibit_boxes/20260831/SWIR/Processed_exhibits/grangegorman_84_0m00_1m00_2026-08-31_11-56-27"
@@ -779,7 +768,7 @@ test_pixel = test_cube[146, 66]
 
 #%% Startup, load files and prepare rules, nots and refs
 
-rules_file = "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/tetracorder_rules_with_nots_parsed_normalized.json"
+rules_file = "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/tetracorder_rules_as_dict.json"
 references_file = "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/tetracorder_rules_references.db"
 
 with open(rules_file, "r", encoding="utf-8") as f:
@@ -788,9 +777,14 @@ with open(rules_file, "r", encoding="utf-8") as f:
 
 all_rules = prepare_rules(all_rules)
 rules = all_rules["rules"]
+
 not_definitions = all_rules["not_definitions"]
 
 references = load_references(references_file)
+#%%
+for rule in rules:
+    if rule["id"] == test_rule4["id"] or rule["id"] == o_rule2["id"]:
+        print(rule)
 #%%
 """
 resolve positive features
@@ -802,69 +796,98 @@ calculate material fit/depth/fd
 apply material constraints
         ↓
 is material fit > 0?
-        ↓ yes
+        ↓
 evaluate NOTs
+        ↓ 
+material-level outputs complete
+        ↓
+ALL ORDINARY MATERIALS
+        ↓
+the current per-material evaluator
+        ↓
+fit/depth/fd after NOTs
+        ↓ Current
+GROUP COMPETITION
+        ↓
+highest fit wins each pixel in each group
+        ↓
+optional class override
+        ↓
+zero all losing materials
+        ↓
+winning material has action?
+        ↓ yes
+run CASE(s)
+        ↓
+case-specific material evaluation / resolution
+        ↓
+final outputs
 """
 
-
+#%%
 
 
 #%%Rule evaluator fledgling funcs
+#rule = rules['calcite.ws272.g2'] #eventually this will be passed to the function this will become
+#rule = rules["pyroxene.hypersthene.pyx02.e.g1"]
+rule = rules["clinochlore.fe.gds157"]
+rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
+rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
+material_constraints = rule.get("constraints")
+
+
+resolved_features = {}
+for f_id, feature in rule_features_dict.items():
+    if feature["role"] != "not":
+         result = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
+         resolved_features[f_id] = result 
+positive_material = resolve_positive_material(rule_features_dict, resolved_features) 
+constrained_material = resolve_material_constraints(positive_material, material_constraints)
+notted_material = resolve_material_nots(constrained_material, rule_features_dict, resolved_features, not_definitions, rules, references, test_wvls, test_fwhm, test_cube)
+#%
+
+
+
+
+#%%
+plt.figure()
+plt.subplot(131)
+plt.title("positive_material")
+plt.imshow(positive_material["fit"])
+plt.subplot(132)
+plt.title("constrained_material")
+plt.imshow(constrained_material["fit"])
+plt.subplot(133)
+plt.title("notted_material")
+plt.imshow(notted_material["fit"])
+
+#%% All rules
 mat_agg = {}
-for rule in rules:
+con_agg = {}
+not_agg = {}
+total_start = perf_counter()
+for rid, rule in rules.items():
+    t0 = perf_counter()
     #rule = test_rule #eventually this will be passed to the function this will become
     rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
     rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
+    material_constraints = rule.get("constraints") 
     resolved_features = {}
     for f_id, feature in rule_features_dict.items():
         if feature["role"] != "not":
              result = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
              resolved_features[f_id] = result 
-    positive_material = resolve_positive_material(rule_features_dict, resolved_features)  
-    mat_agg[rule["id"]] = positive_material
-#%%
-from collections import Counter
-
-summary = Counter()
-
-for rule_id, result in mat_agg.items():
-    if result is None:
-        summary["no_valid_positive_features"] += 1
-    elif np.all(result["rejected"]):
-        summary["all_pixels_rejected"] += 1
-    elif np.any(result["rejected"]):
-        summary["partially_rejected"] += 1
+    positive_material = resolve_positive_material(rule_features_dict, resolved_features)
+    if positive_material is None: constrained_material = None
     else:
-        summary["no_pixels_rejected"] += 1
-
-print(summary)
-for rule_id, result in mat_agg.items():
-    if result is None:
-        continue
-
-    for key in ("fit", "depth", "fit_depth"):
-        arr = result[key]
-
-        if not np.all(np.isfinite(arr)):
-            print(rule_id, key, "contains non-finite values")
-            
-for rule in rules:
-    rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
-    resolved = {}
-
-    rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
-
-    for f_id, feature in rule_features_dict.items():
-        if feature["role"] != "not":
-            resolved[f_id] = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
-
-    weights = resolve_feature_weights(rule_features_dict, resolved)
-
-    total = sum(weights.values())
-
-    if weights and not np.isclose(total, 1.0) and total != 0.0:
-        print(rule["id"], total, weights)
-#%%
+        constrained_material = resolve_material_constraints(positive_material, material_constraints)
+        
+    if constrained_material is None: notted_material = None
+    else:
+        notted_material = resolve_material_nots(constrained_material, rule_features_dict, resolved_features, not_definitions, rules, references, test_wvls, test_fwhm, test_cube) 
+    print(f"single eval on {rid}: {perf_counter() - t0:.3f} s")
+print(f"Total eval on  materials: {perf_counter() - total_start:.3f} s")
+#%% profiling
 import cProfile
 import pstats
 
@@ -872,114 +895,51 @@ profiler = cProfile.Profile()
 profiler.enable()
 
 mat_agg = {}
+con_agg = {}
+not_agg = {}
 
-for rule in rules:
+for rid, rule in rules.items():
     rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
     rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
+    material_constraints = rule.get("constraints")
 
     resolved_features = {}
 
     for f_id, feature in rule_features_dict.items():
         if feature["role"] != "not":
-            resolved_features[f_id] = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
+            result = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
+            resolved_features[f_id] = result
 
     positive_material = resolve_positive_material(rule_features_dict, resolved_features)
-    mat_agg[rule["id"]] = positive_material
+
+    if positive_material is None:
+        constrained_material = None
+    else:
+        constrained_material = resolve_material_constraints(positive_material, material_constraints)
+
+    if constrained_material is None:
+        notted_material = None
+    else:
+        notted_material = resolve_material_nots(
+            constrained_material,
+            rule_features_dict,
+            resolved_features,
+            not_definitions,
+            rules,
+            references,
+            test_wvls,
+            test_fwhm,
+            test_cube,
+        )
+
+    mat_agg[rid] = positive_material
+    con_agg[rid] = constrained_material
+    not_agg[rid] = notted_material
 
 profiler.disable()
 
 stats = pstats.Stats(profiler)
 stats.sort_stats("cumulative")
-stats.print_stats(30)
-
-#%%
-for key, im in positive_material.items():
-    plt.figure()
-    plt.imshow(im)
-    plt.title(key)     
-#%%
-
-rej = positive_material["rejected"]
-
-print("Rejected pixels:", np.sum(rej))
-print("Total pixels:", rej.size)
-print("Rejected fraction:", np.mean(rej))
-
-print("fit nonzero in rejected:", np.count_nonzero(positive_material["fit"][rej]))
-print("depth nonzero in rejected:", np.count_nonzero(positive_material["depth"][rej]))
-print("fit_depth nonzero in rejected:", np.count_nonzero(positive_material["fit_depth"][rej])) 
-feature_weights = resolve_feature_weights(rule_features_dict, resolved_features)
-
-for f_id, weight in feature_weights.items():
-    feature = rule_features_dict[f_id]
-    result = resolved_features[f_id]
-
-    print(
-        f_id,
-        feature["role"],
-        result["status"],
-        "area =", result.get("reference_area"),
-        "weight =", weight,
-    )
-
-print("sum =", sum(feature_weights.values()))       
-
-for f_id, feature in rule_features_dict.items():
-    if feature["role"] == "not":
-        continue
-
-    result = resolved_features[f_id]
-
-    if result["status"] != "valid":
-        print(f_id, feature["role"], result["status"])
-        continue
-
-    depth = np.ma.asarray(result["mod_depth"])
-    feature_sign = 1.0 if result["polarity"] == "absorption" else -1.0
-    present = (depth / feature_sign) > 1e-6
-
-    print(f_id, feature["role"], "present fraction =", np.mean(np.ma.filled(present, False)))
-#%% Not work, to revist when I get there is resolution order
-for f_id, feature in rule_features_dict.items():
-    if feature["role"] == "not":
-        source_rule, source_feature = get_not_source_feature(feature, not_definitions, rules)
-        not_reference_spectrum = get_rule_spectrum(source_rule, references, test_wvls, test_fwhm)
-        source_result = resolve_feature_tests(not_reference_spectrum, source_feature, test_cube, test_wvls)
-        result = resolve_not(feature, source_result, resolved_features)
-        resolved_features[f_id] = result 
-
-#%%
-for f_id, feature in rule_features_dict.items():
-    if feature["role"] == "not":
-        print(f_id, feature["depth_condition"])
-
-
-#%%
-for rule in rules:
-    #rule = test_rule3 #eventually this will be passed to the function this will become
-    rule_features_dict = {feature["id"]: feature for feature in rule["features"]}
-    rule_reference_spectrum = get_rule_spectrum(rule, references, test_wvls, test_fwhm)
-    resolved_features = {}
-    for f_id, feature in rule_features_dict.items():
-        if feature["role"] != "not":
-             result = resolve_feature_tests(rule_reference_spectrum, feature, test_cube, test_wvls)
-        else:
-            source_rule, source_feature = get_not_source_feature(feature, not_definitions, rules)
-            not_reference_spectrum = get_rule_spectrum(source_rule, references, test_wvls, test_fwhm)
-            result = resolve_feature_tests(not_reference_spectrum, source_feature, test_cube, test_wvls)
-        resolved_features[f_id] = result    
-        
-#%%
-for rule in rules:
-    features_by_number = {feature["number"]: feature["id"] for feature in rule["features"]}
-
-    for feature in rule["features"]:
-        if feature["role"] != "not":
-            continue
-
-        condition = feature["depth_condition"]
-
-        if condition["mode"] == "relative":
-            feature_number = condition["relative_to_feature"]
-            condition["relative_to_feature"] = features_by_number[feature_number]
-
+stats.print_stats(40)
+stats.sort_stats("tottime")
+stats.print_stats(40)
