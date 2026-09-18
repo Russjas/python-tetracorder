@@ -324,6 +324,40 @@ def _validate_wavelengths(wavelengths):
 
     return wavelengths
 
+def _validate_wavelengths(wavelengths, valid_bands=None):
+    """
+    Validate wavelength data.
+
+    The full wavelength array may contain non-monotonic channels if those
+    channels are excluded by valid_bands. The usable wavelength sequence
+    must be strictly increasing.
+    """
+    wavelengths = np.asarray(wavelengths, dtype=float)
+
+    if wavelengths.ndim != 1:
+        raise ValueError(f"Wavelengths must be one-dimensional; got shape{wavelengths.shape}.")
+
+    if wavelengths.size == 0:
+        raise ValueError("Wavelength array is empty.")
+
+    if not np.all(np.isfinite(wavelengths)):
+        raise ValueError("Wavelength array contains non-finite values.")
+
+    if valid_bands is None:
+        selected = wavelengths
+    else:
+        valid_bands = np.asarray(valid_bands, dtype=bool)
+
+        if valid_bands.shape != wavelengths.shape:
+            raise ValueError("valid_bands must have the same shape as wavelengths")
+
+        selected = wavelengths[valid_bands]
+
+    if not np.all(np.diff(selected) > 0):
+        raise ValueError("Valid wavelengths must be strictly increasing with no duplicates.")
+
+    return wavelengths
+
 
 def _validate_window(wavelengths, window, name="window", valid_bands = None):
     """
@@ -420,7 +454,7 @@ def linear_feature_continuum(
         Mean continuum reflectances.
     """
     spectra = np.asanyarray(spectra)
-    wavelengths = _validate_wavelengths(wavelengths)
+    wavelengths = np.asarray(wavelengths, dtype=float)
 
     if valid_bands is None:
         valid_bands = np.ones(wavelengths.shape, dtype=bool)
@@ -428,7 +462,10 @@ def linear_feature_continuum(
         valid_bands = np.asarray(valid_bands, dtype=bool)
 
     if valid_bands.shape != wavelengths.shape:
-        raise ValueError("valid_bands must have the same shape as wavelengths")
+        raise ValueError(
+            "valid_bands must have the same shape as wavelengths"
+        )
+    wavelengths = _validate_wavelengths(wavelengths)
 
     if spectra.shape[-1] != wavelengths.size:
         raise ValueError(
@@ -521,7 +558,7 @@ def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_band
         ]
     """
     spectra = np.asanyarray(spectra)
-    wavelengths = _validate_wavelengths(wavelengths)
+    
 
     if valid_bands is None:
         valid_bands = np.ones(wavelengths.shape, dtype=bool)
@@ -530,6 +567,8 @@ def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_band
 
     if valid_bands.shape != wavelengths.shape:
         raise ValueError("valid_bands must have the same shape as wavelengths")
+
+    wavelengths = _validate_wavelengths(wavelengths, valid_bands=valid_bands)
 
     if spectra.shape[-1] != wavelengths.size:
         raise ValueError(

@@ -12,20 +12,112 @@ import numpy as np
 from src.group_evaluator import GroupEvaluator
 
 
-root_name = "C:/Users/Hyperspectral/Documents/HS_Data/Exhibit_boxes/20260831/SWIR/Processed_exhibits/dh-64-03-carroweagh_0_0m00_1m00_2026-08-31_11-50-53"
+#root_name = "C:/Users/Hyperspectral/Documents/HS_Data/Exhibit_boxes/20260831/SWIR/Processed_exhibits/dh-64-03-carroweagh_0_0m00_1m00_2026-08-31_11-50-53"
+root_name = "C:/Users/Hyperspectral/Documents/HS_Data/NGU/processed_vnir/VNIR_YtteroyaBH1_7_extracted_image"
 
-
-test_cube = np.load(root_name + "_savgol.npy")/100.0
-test_wvls = np.load(root_name + "_bands.npy")/1000.0
+test_cube = np.load(root_name + "_savgol.npy")
+test_wvls = np.load(root_name + "_bands.npy")/1000
 test_meta_path = root_name + "_metadata.json"
 
 with open(test_meta_path, "r", encoding="utf-8") as f:
     test_meta = json.load(f)
-test_fwhm = np.array([float(x) for x in test_meta["fwhm"]])[13:262]/1000.0
-test_pixel = test_cube[146, 66]
+#test_fwhm = np.array([float(x) for x in test_meta["fwhm"]])[13:262]/1000.0
+#test_pixel = test_cube[146, 66]
+spacing = np.median(np.diff(test_wvls))
+test_fwhm = np.full(test_wvls.shape, spacing)
+#%%
+data = sp.io.envi.open(
+    "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/cuprite.95.cal.rtgc.v.hdr",
+    "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/cuprite.95.cal.rtgc.v",
+)
+
+test_cube = np.array(data.load(), dtype=float)
+
+test_cube[test_cube == -32767] = np.nan
+test_cube /= 20000.0
+
+metadata = sp.io.envi.read_envi_header(
+    "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/cuprite.95.cal.rtgc.v.hdr"
+)
+
+test_wvls = np.array(
+    [float(x) for x in metadata["wavelength"]]
+)
+
+# Rules are µm; AVIRIS header wavelengths are likely nm.
+if test_wvls.max() > 100:
+    test_wvls /= 1000.0
+
+spacing = np.median(np.diff(test_wvls))
+test_fwhm = np.full(test_wvls.shape, spacing)
+print(np.nanmin(test_cube), np.nanmean(test_cube), np.nanmax(test_cube))
+print(test_wvls.min(), test_wvls.max())
+print(np.sum(~np.isfinite(test_cube)))
+#%
+mins = np.nanmin(test_cube, axis=(0, 1))
+means = np.nanmean(test_cube, axis=(0, 1))
+
+for wl, mn, mean in zip(test_wvls, mins, means):
+    if mn < 0:
+        print(wl, mn, mean)
+        
+order = np.argsort(test_wvls)
+
+test_wvls = test_wvls[order]
+test_cube = test_cube[..., order]
+test_fwhm = test_fwhm[order]
+
+valid_bands = np.ones(224, dtype=bool)
+#values from Tetracorder setup files
+for start, stop in [
+    (1, 2),
+    (13, 13),
+    (31, 33),
+    (81, 83),
+    (95, 97),
+    (108, 111),
+    (153, 167),
+    (172, 175),
+    (224, 224),
+]:
+    valid_bands[start - 1:stop] = False
+#%%
+from time import perf_counter
+t0 = perf_counter()
+tetra = GroupEvaluator(
+    test_cube,
+    test_wvls,
+    test_fwhm,
+    target_valid_bands=valid_bands,
+)
+print(perf_counter()-t0)
 
 
-tetra = GroupEvaluator(test_cube, test_wvls, test_fwhm)
+#%%
+import matplotlib.pyplot as plt
+#tetra = GroupEvaluator(test_cube, test_wvls, test_fwhm)
+group_winners = tetra.group_winners
+for gid, group in group_winners.items():
+    if group is not None:
+        if np.any(group["fit"] > 0):
+            plt.figure()
+            plt.subplot(131)
+            plt.title("fit")
+            plt.imshow(group["fit"])
+            
+            plt.subplot(132)
+            plt.title("depth")
+            plt.imshow(group["depth"])
+            
+            plt.subplot(133)
+            plt.title("fit_depth")
+            plt.imshow(group["fit_depth"])
+            plt.suptitle(f"Tetracorder group winners for: group {gid}")
+            plt.savefig(f"C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/Tetracorder-group-winners-for-group-{gid}.png")
+            plt.close()
+    print(group.keys()) if group is not None else print(None)
+
+
 #%%
 rules = tetra.evaluator.rules
 for rid, rule in rules.items():
