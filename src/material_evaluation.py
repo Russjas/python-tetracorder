@@ -14,6 +14,7 @@ from .tetracorder_ops import (GaussianConvolver,
                              continuum_test, 
                              load_references,
                              prepare_rules,
+                             _wtochbin
 )
 from .config import RRATIO_REFERENCES
 
@@ -41,8 +42,12 @@ class MaterialEvaluator:
                  target_wavelengths: np.ndarray,
                  target_fwhm: np.ndarray,
                  target_valid_bands: np.ndarray|None = None,
-                 mode: str = "default"
+                 mode: str = "default",
+                 disabled_materials: set|None = None
                  ):
+
+        self.rules, self.not_definitions = self._prepare_rules(rules, mode)
+        self.disabled_materials = set(disabled_materials or ())
 
         self.rules, self.not_definitions = self._prepare_rules(rules, mode)
         self.wavelengths = target_wavelengths
@@ -62,6 +67,9 @@ class MaterialEvaluator:
 
     def evaluate(self, rule_id: str, target_spectra: np.ndarray) -> dict | None:
 
+        if rule_id in self.disabled_materials:
+            return None
+        
         rule = self.rules[rule_id]
 
         if rule["algorithm"] == "nvres":
@@ -225,6 +233,57 @@ class MaterialEvaluator:
         return resolved_features
 
 
+    def _native_not_source(self, source_rule_id, source_feature_id, target_spectra):
+        """
+        Fit and depth of a NOT source feature as native tp1mat leaves them in
+        zfit / zdepth.
+
+        tp1mat evaluates a material's features in rule order. When a weak,
+        diagnostic or must-have feature is absent (depth / sign <= 1e-6) it
+        zeroes that feature and every later feature, then returns. So the
+        source feature is 0 wherever an earlier W/D/M feature of the source
+        material failed. Disabled features (ifeatenable = 0) do not trigger
+        this.
+        """
+        source_rule = self.rules[source_rule_id]
+        reference = self.rule_spectra[source_rule_id]
+        dead = None
+
+        positive = [f for f in source_rule["features"] if f["role"] != "not"]
+        # native tp1mat loops ifeat = 1..nfeat, ifeat taken from the label (f2a -> 2)
+        for feature in sorted(positive, key=lambda f: f["number"]):
+            if feature["role"] == "not":
+                continue
+
+            result = resolve_feature_tests(reference, feature, target_spectra,
+                                           self.wavelengths, self.valid_bands)
+            valid = result["status"] == "valid"
+
+            if valid:
+                fit = np.ma.filled(np.ma.asarray(result["mod_fit"], dtype=float), 0.0)
+                depth = np.ma.filled(np.ma.asarray(result["mod_depth"], dtype=float), 0.0)
+                if dead is None:
+                    dead = np.zeros(fit.shape, dtype=bool)
+                if feature["role"] in {"weak", "diagnostic", "must_have"}:
+                    sign = 1.0 if result["polarity"] == "absorption" else -1.0
+                    with np.errstate(invalid="ignore"):
+                        dead_here = dead | ~(depth / sign > 1e-6)
+                else:
+                    dead_here = dead
+
+            if feature["id"] == source_feature_id:
+                if not valid:
+                    return result
+                return {**result,
+                        "mod_fit": np.where(dead_here, 0.0, fit),
+                        "mod_depth": np.where(dead_here, 0.0, depth)}
+
+            if valid:
+                dead = dead_here
+
+        raise KeyError(f"{source_rule_id} has no feature {source_feature_id}")
+
+
     def _resolve_nots(self,
                       material_result: dict,
                       rule_features: dict,
@@ -249,16 +308,14 @@ class MaterialEvaluator:
             if not_feature["role"] != "not":
                 continue
 
-            not_definition = self.not_definitions[not_feature["source_reference"]]
-            source_rule_id = not_definition["source_rule_id"]
-            source_rule = self.rules[source_rule_id]
-            source_rule_features = {feature["id"]: feature for feature in source_rule["features"]}
-            source_feature = source_rule_features[not_feature["source_feature"]]
-
-            source_reference_spectrum = self.rule_spectra[source_rule_id]
-
-            source_result = resolve_feature_tests(source_reference_spectrum, source_feature,
-                                                target_spectra,self.wavelengths, self.valid_bands)
+            # A disabled material is never evaluated, so native's stored
+            # zdepth/zfit for it stay zero and the NOT silently never fires.
+            if not_feature["source_material"] in self.disabled_materials:
+                continue
+            
+            source_result = self._native_not_source(not_feature["source_material"],
+                                                    not_feature["source_feature"],
+                                                    target_spectra)
 
             not_mask = resolve_not(not_feature, source_result, resolved_features)
 
@@ -334,6 +391,9 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
         valid_bands = np.asarray(valid_bands, dtype=bool)
     if valid_bands.shape != target_wavelengths.shape:
         raise ValueError("valid_bands must have the same shape as target_wavelengths")
+
+    # bandmp skips a channel wherever the reference is deleted (rflibc == delpt)
+    valid_bands = valid_bands & np.isfinite(np.asarray(reference, dtype=float))
     
     if continuum == "linear":
         left_window = windows[0]
@@ -393,8 +453,11 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
             return None, "disabled"
         
         try:
-            ref_cont = curved_feature_continuum(reference,target_wavelengths,
-                                                windows,valid_bands=valid_bands)
+            # Tetracorder/Specpr: bdmset linear continuum on the inner windows for the reference
+            # deliberate asymmetry between reference and target continuum
+            ref_cont = linear_feature_continuum(reference, target_wavelengths,
+                                                windows[1], windows[2],
+                                                valid_bands=valid_bands)
         except ValueError:
             return None, "invalid_reference"
         try:
@@ -410,8 +473,8 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
     except ValueError:
         return None, "invalid_reference"
 
-    reference_cr = np.ma.asarray(ref_cont.continuum_removed)
-    result["reference_area"] = float(np.ma.sum(np.ma.abs(1.0 - reference_cr)))
+    # reference_area (feature weight) comes from characterise_feature:
+    # native getifeat sums |1 - cr| over the band channels only
     return result, "valid"
 
 
@@ -472,9 +535,15 @@ def fit_nvres_feature(
         or not np.any(feature_selected & valid_bands)):
         return None, "disabled"
 
-    # nvres only works over the feature and its two continuum regions.
-    region = ((target_wavelengths >= left_window[0])
-        & (target_wavelengths <= right_window[1]))
+    # specpr wtochbin takes a CONTIGUOUS channel run and stops at the first
+    # channel past w2. The AVIRIS array folds back at the spectrometer joins
+    # (ch 32 -> 33 is 0.687 -> 0.664), so a wavelength mask picks up channels
+    # from the far side that native never sees: 0.661-0.681 is channels 30-31
+    # natively, 30, 31, 33, 34 by mask.
+    cl1, cl2 = _wtochbin(target_wavelengths, left_window[0], left_window[1])
+    cr1, cr2 = _wtochbin(target_wavelengths, right_window[0], right_window[1])
+
+    region = slice(cl1, cr2 + 1)
 
     wavelengths = target_wavelengths[region]
     reference = reference[region]
@@ -486,13 +555,13 @@ def fit_nvres_feature(
         & np.isfinite(ratio_reference)
         & (np.abs(ratio_reference) > 1e-13))
 
-    left = ((wavelengths >= left_window[0])
-        & (wavelengths <= left_window[1])
-        & ratio_valid)
+    left = np.zeros(wavelengths.shape, dtype=bool)
+    left[: cl2 - cl1 + 1] = True
+    left &= ratio_valid
 
-    right = ((wavelengths >= right_window[0])
-        & (wavelengths <= right_window[1])
-        & ratio_valid)
+    right = np.zeros(wavelengths.shape, dtype=bool)
+    right[cr1 - cl1: cr2 - cl1 + 1] = True
+    right &= ratio_valid
 
     if not np.any(left) or not np.any(right):
         return None, "invalid_reference"
@@ -873,7 +942,7 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
     # This also uses CURRENT depth after all previous attenuation.
     # ----------------------------------------------------------
 
-    if "r*bd>" in tests_by_name:
+    #if "r*bd>" in tests_by_name:
          # DELIBERATE DIVERGENCE from tp1mat.r (see github spectroscopy-tetracorder issue #6). 
          #The Ratfor takes the
         # reject limit from zcontlgtr(1) (getifeat.r:506/851), not zrtimesbd(1):
@@ -882,9 +951,48 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
         # zrtimesbd(1) is parsed (getifeat.r:1185) but never read. We honour the
         # rule's own r*bd> reject value, so this will differ from deployed Tetracorder
         # on near-threshold pixels
-        value = continuum * np.abs(depth)
+        #value = continuum * np.abs(depth)
 
-        factor = fuzzy_greater(value, values_for("r*bd>"))
+        #factor = fuzzy_greater(value, values_for("r*bd>"))
+
+        #apply_factor("r*bd>", factor)
+
+    if "r*bd>" in tests_by_name:
+         # tp1mat.r: xtmp1 = conref*bdepth - SIGNED, despite the Ratfor comment
+        # claiming r*abs(bd) - and forced to 0.0 when the feature is absent
+        # (bdepth/xfeat <= 0.1e-5). An emission feature therefore always gives
+        # xtmp1 <= 0 and can never clear a lower limit of 0.0, so native never
+        # detects a material whose emission feature carries an r*bd> test.
+        sign = 1.0 if feat_fit["polarity"] == "absorption" else -1.0
+        with np.errstate(invalid="ignore"):
+            present = (depth / sign) > 1e-6
+        value = np.ma.where(present, continuum * depth, 0.0)
+
+        # TEMPORARY native Tetracorder bug emulation:
+        # tp1mat.r incorrectly takes the LOWER r*bd fuzzy limit
+        # from zcontlgtr(1), i.e. the lower lct/rct> threshold.
+        # If no lct/rct> test exists, zcontlgtr defaults to 0.0.
+        rbd_upper = values_for("r*bd>")[1]
+        #rbd_lower = values_for("r*bd>")[0]
+        if "lct/rct>" in tests_by_name:
+            rbd_lower = values_for("lct/rct>")[0]
+        else:
+            rbd_lower = 0.0
+
+        factor = np.ones(np.shape(value), dtype=float)
+
+        reject = value < rbd_lower
+        fuzzy = (
+            (value >= rbd_lower)
+            & (value < rbd_upper)
+        )
+
+        factor[reject] = 0.0
+
+        factor[fuzzy] = (
+            (value[fuzzy] - rbd_lower)
+            / (rbd_upper - rbd_lower)
+        )
 
         apply_factor("r*bd>", factor)
 

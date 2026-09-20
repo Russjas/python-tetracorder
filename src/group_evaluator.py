@@ -11,11 +11,20 @@ from .config import NOGROUP0
 
 
 class GroupEvaluator:
-    def __init__(self, target_spectra, target_wavelengths, target_fwhm, mode = "default", target_valid_bands = None, reference_file = None, rules_file = None ):
+    def __init__(self, target_spectra, target_wavelengths, target_fwhm, mode = "default", target_valid_bands = None, reference_file = None, rules_file = None,
+                 disabled_groups = None, disabled_cases = None, disabled_materials = None,
+                 temperature = None, pressure = None ):
+        self.temperature = temperature    # (min, max) Kelvin of the data set, or None
+        self.pressure = pressure          # (min, max) bar of the data set, or None
         self.target =  target_spectra
         self.wavelengths = target_wavelengths
         self.fwhm = target_fwhm
         self.mode = mode
+
+        self.disabled_groups = {int(g) for g in (disabled_groups or ())}
+        self.disabled_cases = {int(c) for c in (disabled_cases or ())}
+        self.disabled_materials = set(disabled_materials or ())
+
         self.valid_bands = target_valid_bands
         if self.valid_bands is None:
             self.valid_bands = np.ones(self.wavelengths.shape, dtype=bool)
@@ -28,8 +37,40 @@ class GroupEvaluator:
                 self.wavelengths,
                 self.fwhm,
                 target_valid_bands = self.valid_bands,
-                mode=mode)
+                mode=mode,
+                disabled_materials = self.disabled_materials)
+        self.disabled_materials |= self._resolve_physical_and_disable()
+        self.evaluator.disabled_materials = self.disabled_materials
         self.group_winners, self.case_winners = self.evaluate()
+        self.group_winners, self.case_winners = self.evaluate()
+
+    def _resolve_physical_and_disable(self):
+        """Materials whose declared temperature / pressure range excludes the data.
+
+        applygtpconstraints.r disables a material outright when the data range
+        lies entirely outside [limit1, limit4]; the inner two limits are parsed
+        by the Ratfor and never read. Limits and data ranges are Kelvin and bar.
+        A material with no declared limit, or a run with no declared condition,
+        is left enabled.
+        """
+        disabled = set()
+        conditions = (("temperature", self.temperature), ("pressure", self.pressure))
+
+        for mid, rule in self.evaluator.rules.items():
+            if mid in self.disabled_materials:
+                continue
+            for name, data_range in conditions:
+                limits = rule.get("physical", {}).get(name)
+                if not limits or data_range is None:
+                    continue
+                low, high = limits[0], limits[3]
+                if low is not None and data_range[1] < low:
+                    disabled.add(mid)
+                    break
+                if high is not None and data_range[0] > high:
+                    disabled.add(mid)
+                    break
+        return disabled
 
     def evaluate(self):
 
@@ -37,16 +78,21 @@ class GroupEvaluator:
         # Any material exclusion rule logic could go here        
         group0 = {}
         groups = {}
-
+        count = 1
         for mid, rule in self.evaluator.rules.items():
             if rule["kind"] != "group":
                 continue
-            print(f"Evaluating {mid}")
+            if int(rule["number"]) in self.disabled_groups:
+                continue
+            if mid in self.disabled_materials:
+                continue
+            print(f"Evaluating {count} of {len(self.evaluator.rules)}: {mid}")
             result = self.evaluator.evaluate(mid, self.target)
             if rule["number"] == 0:
                 group0[mid] = result
             else:
                 groups.setdefault(rule["number"], {})[mid] = result
+            count +=1
 
         # Evaluate each group to assemble the group winners
         group_winners = {}
@@ -92,11 +138,12 @@ class GroupEvaluator:
         cases = {}
         
         for mid, rule in self.evaluator.rules.items():
-            #search for case definitions in the rule file
             if rule["kind"] != "case":
                 continue
             case_num = int(rule["number"])
             if case_num not in case_masks:
+                continue
+            if case_num in self.disabled_cases or mid in self.disabled_materials:
                 continue
             # evaluate those cases as if they were group rules
             # and store the results
