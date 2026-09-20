@@ -1415,7 +1415,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -1550,7 +1551,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -1685,7 +1687,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -1820,7 +1823,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -1955,7 +1959,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -2090,7 +2095,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -2225,7 +2231,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -2360,7 +2367,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -2498,7 +2506,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -2636,7 +2645,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -2774,7 +2784,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -2912,7 +2923,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -3050,7 +3062,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -3188,7 +3201,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -3326,7 +3340,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -3465,7 +3480,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -3605,7 +3621,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -6483,7 +6500,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -6644,7 +6662,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -6988,7 +7007,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -7373,7 +7393,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -7609,7 +7630,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -7846,7 +7868,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -8047,7 +8070,8 @@
             "mode": "absolute",
             "threshold": 0.5
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -12499,7 +12523,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -12638,7 +12663,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -12867,7 +12893,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -13006,7 +13033,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -13146,7 +13174,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -13412,7 +13441,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -13552,7 +13582,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -13703,7 +13734,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -13843,7 +13875,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -13983,7 +14016,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -14123,7 +14157,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -14262,7 +14297,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -14402,7 +14438,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -14935,7 +14972,8 @@
             "mode": "absolute",
             "threshold": 0.03
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "kjarosite200"
         }
       ]
     },
@@ -15256,7 +15294,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -15269,7 +15308,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -15282,7 +15322,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         }
       ]
     },
@@ -15602,7 +15643,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -15615,7 +15657,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -15628,7 +15671,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         }
       ]
     },
@@ -17188,7 +17232,8 @@
             "mode": "absolute",
             "threshold": 0.08
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dry_long_grass-thick"
         }
       ]
     },
@@ -17687,7 +17732,8 @@
             "threshold": 0.5,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "dry_long_grass-thick"
         }
       ]
     },
@@ -18247,7 +18293,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -18260,7 +18307,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -18273,7 +18321,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -18286,7 +18335,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -18389,7 +18439,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -18492,7 +18543,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -19002,7 +19054,8 @@
             "mode": "absolute",
             "threshold": 0.25
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -19135,7 +19188,8 @@
             "mode": "absolute",
             "threshold": 0.25
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -19528,7 +19582,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -20034,7 +20089,8 @@
             "mode": "absolute",
             "threshold": 0.15
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         },
         {
           "id": "n2a",
@@ -20047,7 +20103,8 @@
             "mode": "absolute",
             "threshold": 0.06
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -20320,7 +20377,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -20333,7 +20391,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -20346,7 +20405,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         }
       ]
     },
@@ -20483,7 +20543,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -20496,7 +20557,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -20509,7 +20571,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         }
       ]
     },
@@ -20785,7 +20848,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -20926,7 +20990,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -21346,7 +21411,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dry_long_grass-thick"
         },
         {
           "id": "n2a",
@@ -21359,7 +21425,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dry_long_grass-thick"
         }
       ]
     },
@@ -21499,7 +21566,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dry_long_grass-thick"
         },
         {
           "id": "n2a",
@@ -21512,7 +21580,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dry_long_grass-thick"
         }
       ]
     },
@@ -21618,7 +21687,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dry_long_grass-thick"
         },
         {
           "id": "n2a",
@@ -21631,7 +21701,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dry_long_grass-thick"
         }
       ]
     },
@@ -21768,7 +21839,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -21781,7 +21853,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -21794,7 +21867,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         }
       ]
     },
@@ -21930,7 +22004,8 @@
             "mode": "absolute",
             "threshold": 0.15
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -21943,7 +22018,8 @@
             "mode": "absolute",
             "threshold": 0.15
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -21956,7 +22032,8 @@
             "mode": "absolute",
             "threshold": 0.15
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         }
       ]
     },
@@ -22624,7 +22701,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -22742,7 +22820,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -22860,7 +22939,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -28763,7 +28843,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n2a",
@@ -28777,7 +28858,8 @@
             "threshold": 0.3,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -28895,7 +28977,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n2a",
@@ -28909,7 +28992,8 @@
             "threshold": 0.3,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -29027,7 +29111,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n2a",
@@ -29041,7 +29126,8 @@
             "threshold": 0.3,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -29260,7 +29346,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "kalun250c"
         },
         {
           "id": "n2a",
@@ -29274,7 +29361,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "kalun150c"
         },
         {
           "id": "n3a",
@@ -29288,7 +29376,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "naalun150c"
         },
         {
           "id": "n4a",
@@ -29302,7 +29391,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "muscovite-medhigh-Al"
         }
       ]
     },
@@ -29632,7 +29722,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "kalun250c"
         },
         {
           "id": "n2a",
@@ -29646,7 +29737,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n3a",
@@ -29660,7 +29752,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "gypsum"
         }
       ]
     },
@@ -29783,7 +29876,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "muscovite-med-Al"
         },
         {
           "id": "n2a",
@@ -29797,7 +29891,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "kalun250c"
         },
         {
           "id": "n3a",
@@ -29811,7 +29906,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "gypsum"
         }
       ]
     },
@@ -29920,7 +30016,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.4
+          "fit_threshold": 0.4,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n2a",
@@ -29934,7 +30031,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "gypsum"
         }
       ]
     },
@@ -30165,7 +30263,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.4
+          "fit_threshold": 0.4,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n2a",
@@ -30179,7 +30278,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "gypsum"
         }
       ]
     },
@@ -31128,7 +31228,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.4
+          "fit_threshold": 0.4,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n2a",
@@ -31142,7 +31243,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "gypsum"
         }
       ]
     },
@@ -31254,7 +31356,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.4
+          "fit_threshold": 0.4,
+          "source_material": "muscovite-medhigh-Al"
         },
         {
           "id": "n2a",
@@ -31268,7 +31371,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "gypsum"
         }
       ]
     },
@@ -31557,7 +31661,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -31716,7 +31821,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "kalun250c"
         },
         {
           "id": "n2a",
@@ -31730,7 +31836,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "muscovite-medhigh-Al"
         }
       ]
     },
@@ -31884,7 +31991,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -32370,7 +32478,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -32524,7 +32633,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -33503,7 +33613,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -33650,7 +33761,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -33797,7 +33909,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -35808,7 +35921,8 @@
             "threshold": 0.2,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -35952,7 +36066,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -36100,7 +36215,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -36213,7 +36329,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -36422,7 +36539,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -36600,7 +36718,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -36842,7 +36961,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -36856,7 +36976,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -37003,7 +37124,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -37433,7 +37555,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -37608,7 +37731,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -37714,7 +37838,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -37820,7 +37945,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -37926,7 +38052,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -38189,7 +38316,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -38327,7 +38455,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -38465,7 +38594,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -38603,7 +38733,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -38741,7 +38872,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -38879,7 +39011,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -39055,7 +39188,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -39357,7 +39491,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -39912,7 +40047,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -39926,7 +40062,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         },
         {
           "id": "n3a",
@@ -39940,7 +40077,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -40108,7 +40246,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -40122,7 +40261,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         },
         {
           "id": "n3a",
@@ -40136,7 +40276,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -40308,7 +40449,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -40322,7 +40464,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -40481,7 +40624,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -40495,7 +40639,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         },
         {
           "id": "n3a",
@@ -40509,7 +40654,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -40672,7 +40818,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -40686,7 +40833,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         },
         {
           "id": "n3a",
@@ -40700,7 +40848,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.92
+          "fit_threshold": 0.92,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -41040,7 +41189,8 @@
             "mode": "absolute",
             "threshold": 0.2
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "chlor+muscphy"
         },
         {
           "id": "n2a",
@@ -41054,7 +41204,8 @@
             "threshold": 0.08,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "epidote.gds26.a.g2"
         }
       ]
     },
@@ -41170,7 +41321,8 @@
             "mode": "absolute",
             "threshold": 0.2
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "chlor+muscphy"
         },
         {
           "id": "n2a",
@@ -41184,7 +41336,8 @@
             "threshold": 0.08,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "epidote.gds26.a.g2"
         },
         {
           "id": "n3a",
@@ -41198,7 +41351,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -42203,7 +42357,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -42217,7 +42372,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -42347,7 +42503,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -42361,7 +42518,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -42487,7 +42645,8 @@
             "threshold": 0.25,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -42501,7 +42660,8 @@
             "threshold": 0.6,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -42892,7 +43052,8 @@
             "threshold": 0.08,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "epidote.gds26.a.g2"
         }
       ]
     },
@@ -43731,7 +43892,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -43836,7 +43998,8 @@
             "threshold": 0.22,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "muscovite-medhigh-Al"
         }
       ]
     },
@@ -45592,7 +45755,8 @@
             "threshold": 0.3,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.6
+          "fit_threshold": 0.6,
+          "source_material": "kalun250c"
         }
       ]
     },
@@ -45954,7 +46118,8 @@
             "mode": "absolute",
             "threshold": 0.2
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -46263,7 +46428,8 @@
             "mode": "absolute",
             "threshold": 0.25
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -46408,7 +46574,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         }
       ]
     },
@@ -46586,7 +46753,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -47833,7 +48001,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -48105,7 +48274,8 @@
             "mode": "absolute",
             "threshold": 0.25
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -48258,7 +48428,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -48272,7 +48443,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -48399,7 +48571,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -48413,7 +48586,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -48540,7 +48714,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -48554,7 +48729,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -48681,7 +48857,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -48695,7 +48872,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -48808,7 +48986,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -48822,7 +49001,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -49101,7 +49281,8 @@
             "mode": "absolute",
             "threshold": 0.2
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "chlor+muscphy"
         },
         {
           "id": "n2a",
@@ -49115,7 +49296,8 @@
             "threshold": 0.08,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "epidote.gds26.a.g2"
         }
       ]
     },
@@ -49645,7 +49827,8 @@
             "threshold": 0.5,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.3
+          "fit_threshold": 0.3,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -51425,7 +51608,8 @@
             "mode": "absolute",
             "threshold": 0.04
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dryveg.grass.long"
         }
       ]
     },
@@ -52002,7 +52186,8 @@
             "threshold": 0.15,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "white_pvc_pipe"
         },
         {
           "id": "n2a",
@@ -52016,7 +52201,8 @@
             "threshold": 0.95,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "dolomite"
         }
       ]
     },
@@ -53599,7 +53785,8 @@
             "mode": "absolute",
             "threshold": 0.05
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -53702,7 +53889,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -53715,7 +53903,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -53728,7 +53917,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -53741,7 +53931,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -53844,7 +54035,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -53857,7 +54049,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -53870,7 +54063,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -53883,7 +54077,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -53986,7 +54181,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -53999,7 +54195,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -54012,7 +54209,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -54025,7 +54223,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -54144,7 +54343,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -54157,7 +54357,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -54170,7 +54371,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -54183,7 +54385,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -54344,7 +54547,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -54357,7 +54561,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -54370,7 +54575,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -54383,7 +54589,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -54516,7 +54723,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -54529,7 +54737,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -54542,7 +54751,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -54555,7 +54765,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -54682,7 +54893,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -54695,7 +54907,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -54708,7 +54921,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -54721,7 +54935,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -54831,7 +55046,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -54844,7 +55060,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -54857,7 +55074,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -54870,7 +55088,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -54980,7 +55199,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -54993,7 +55213,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -55006,7 +55227,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -55019,7 +55241,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -55129,7 +55352,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -55142,7 +55366,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -55155,7 +55380,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -55168,7 +55394,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -55278,7 +55505,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -55291,7 +55519,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -55304,7 +55533,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -55317,7 +55547,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -55427,7 +55658,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -55440,7 +55672,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -55453,7 +55686,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -55466,7 +55700,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -55576,7 +55811,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -55589,7 +55825,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -55602,7 +55839,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -55615,7 +55853,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -55725,7 +55964,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -55738,7 +55978,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -55751,7 +55992,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -55764,7 +56006,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -55874,7 +56117,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -55887,7 +56131,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -55900,7 +56145,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -55913,7 +56159,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -56053,7 +56300,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -56066,7 +56314,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -56079,7 +56328,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -56092,7 +56342,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -56219,7 +56470,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -56232,7 +56484,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -56245,7 +56498,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -56258,7 +56512,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -56367,7 +56622,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -56380,7 +56636,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -56393,7 +56650,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -56406,7 +56664,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -56515,7 +56774,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -56528,7 +56788,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -56541,7 +56802,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -56554,7 +56816,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -56663,7 +56926,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -56676,7 +56940,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -56689,7 +56954,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -56702,7 +56968,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -56810,7 +57077,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water-20C-100cm-path-model"
         }
       ]
     },
@@ -56921,7 +57189,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -56934,7 +57203,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -56947,7 +57217,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -56960,7 +57231,8 @@
             "mode": "absolute",
             "threshold": 0.08
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -57097,7 +57369,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -57110,7 +57383,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -57123,7 +57397,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -57136,7 +57411,8 @@
             "mode": "absolute",
             "threshold": 0.08
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -57274,7 +57550,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -57287,7 +57564,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -57300,7 +57578,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n5a",
@@ -57313,7 +57592,8 @@
             "mode": "absolute",
             "threshold": 0.08
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -57451,7 +57731,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -57464,7 +57745,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -57477,7 +57759,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -57490,7 +57773,8 @@
             "mode": "absolute",
             "threshold": 0.08
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -57628,7 +57912,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -57641,7 +57926,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -57654,7 +57940,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n4a",
@@ -57667,7 +57954,8 @@
             "mode": "absolute",
             "threshold": 0.08
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -57803,7 +58091,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "snow.slush.16"
         },
         {
           "id": "n2a",
@@ -57816,7 +58105,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont5.01gpl"
         },
         {
           "id": "n3a",
@@ -57829,7 +58119,8 @@
             "mode": "absolute",
             "threshold": 0.1
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "water+mont16.5gpl"
         },
         {
           "id": "n5a",
@@ -57842,7 +58133,8 @@
             "mode": "absolute",
             "threshold": 0.08
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -75740,7 +76032,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -75868,7 +76161,8 @@
             "mode": "absolute",
             "threshold": 0.7
           },
-          "fit_threshold": 0.4
+          "fit_threshold": 0.4,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -76082,7 +76376,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -76296,7 +76591,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -76555,7 +76851,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -76814,7 +77111,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -77073,7 +77371,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -77287,7 +77586,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -77603,7 +77903,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -77818,7 +78119,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -78134,7 +78436,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -78411,7 +78714,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -78881,7 +79185,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -79095,7 +79400,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -79309,7 +79615,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -79568,7 +79875,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -79827,7 +80135,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -80086,7 +80395,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -80300,7 +80610,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -80616,7 +80927,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -80831,7 +81143,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -81147,7 +81460,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -81424,7 +81738,8 @@
             "mode": "absolute",
             "threshold": 0.3
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "vegetation1"
         }
       ]
     },
@@ -89396,7 +89711,8 @@
             "mode": "absolute",
             "threshold": 0.2
           },
-          "fit_threshold": 0.5
+          "fit_threshold": 0.5,
+          "source_material": "g4-fe2+generic_chlor+muscphy"
         },
         {
           "id": "n2a",
@@ -89410,7 +89726,8 @@
             "threshold": 0.05,
             "relative_to_feature": "f1a"
           },
-          "fit_threshold": 0.2
+          "fit_threshold": 0.2,
+          "source_material": "epidote.gds26.a.g2"
         }
       ]
     },
