@@ -4,6 +4,7 @@ Top level module to evaluate sample spectra against the full Tetracorder numeric
 from pathlib import Path
 import gzip
 import re
+import json
 
 import numpy as np
 
