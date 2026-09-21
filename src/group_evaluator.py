@@ -42,7 +42,6 @@ class GroupEvaluator:
         self.disabled_materials |= self._resolve_physical_and_disable()
         self.evaluator.disabled_materials = self.disabled_materials
         self.group_winners, self.case_winners = self.evaluate()
-        self.group_winners, self.case_winners = self.evaluate()
 
     def _resolve_physical_and_disable(self):
         """Materials whose declared temperature / pressure range excludes the data.
