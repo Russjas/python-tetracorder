@@ -187,7 +187,7 @@ class GroupEvaluator:
         raise FileNotFoundError(f"Could not find required Tetracorder file: {filename}")
 
     #==========writing functions =======================================================
-    def _write_like_tetracorder(self, output_dir):
+    def write_like_tetracorder(self, output_dir):
         """
         Write every enabled material's fit, depth and fd images as Tetracorder
         does: <dir>/<name>.<plane>.gz (VICAR label + 8-bit image, gzipped) and
@@ -253,6 +253,52 @@ class GroupEvaluator:
                         "file type = ENVI Standard\ndata type = 1\ninterleave = bsq\n"
                         "sensor type = spectral data\nbyte order = 0\n"
                         "wavelength units = Micrometers\n")
+
+    def write_npz(self, path):
+        """
+        Save every group and case result to one compressed .npz:
+
+            materials            str, index -> material id; 0 = "" (nothing detected)
+            group_N_material     int16 code into materials
+            group_N_fit          float32
+            group_N_depth        float32
+            group_N_fit_depth    float32
+            case_N_...           the same for each case
+            wavelengths, valid_bands
+            meta                 JSON string: mode, files, conditions, disabled lists
+
+        Read back with np.load(path); no pickling is needed or allowed.
+        """
+        materials = [""] + list(self.evaluator.rules)
+        code = {mid: i for i, mid in enumerate(materials)}
+        arrays = {"materials": np.array(materials, dtype=str),
+                "wavelengths": np.asarray(self.wavelengths, dtype=np.float32),
+                "valid_bands": np.asarray(self.valid_bands, dtype=bool)}
+
+        for kind, results in (("group", self.group_winners), ("case", self.case_winners)):
+            for number, result in results.items():
+                if result is None:
+                    continue
+                winner = np.asarray(result["winner"], dtype=object)
+                codes = np.zeros(winner.shape, dtype=np.int16)
+                for mid in set(winner[winner != None]):  # noqa: E711
+                    codes[winner == mid] = code[mid]
+                arrays[f"{kind}_{number}_material"] = codes
+                for key in ("fit", "depth", "fit_depth"):
+                    arrays[f"{kind}_{number}_{key}"] = np.asarray(
+                        np.ma.filled(np.ma.asarray(result[key]), 0.0), dtype=np.float32)
+
+        arrays["meta"] = np.array(json.dumps({
+            "mode": self.mode,
+            "rules_file": str(self.rules_file),
+            "reference_file": str(self.reference_file),
+            "temperature_K": list(self.temperature) if self.temperature is not None else None,
+            "pressure_bar": list(self.pressure) if self.pressure is not None else None,
+            "disabled_groups": sorted(self.disabled_groups),
+            "disabled_cases": sorted(self.disabled_cases),
+            "disabled_materials": sorted(self.disabled_materials),
+        }))
+        np.savez_compressed(Path(path), **arrays)
 
 
     
