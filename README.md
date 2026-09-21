@@ -1,4 +1,8 @@
 # python-tetracorder
+
+![Cuprite, Nevada (AVIRIS 1995): 2 µm mineral map from native Tetracorder 6.00 and from python-tetracorder](resources/cuprite95_group2_comparison.jpg)
+*Cuprite95 group 2 (2 µm minerals). Native Tetracorder 6.00 (centre) and python-tetracorder (right) from the same inputs, both drawn with Tetracorder's own colouring. See [Fidelity](#fidelity).*
+
 A port of the rules and evaluation logic of the tetracorder algorithm to pure Python - with no guarantee or warranty!  
 This is merely a translation of the expertise encoded in the phenomenal [Tetracorder](https://github.com/PSI-edu/spectroscopy-tetracorder) expert system.  
 All citation and credit should go to:  
@@ -173,7 +177,7 @@ The complete test comparison output is in [this file](tests/tetracorder_native_v
 | Group 3 | 4 | 0 | 550,506 | 550,506 | 1.0000 | 1.0000 |
 | Group 4 | 48 | 21 | 401,157 | 401,157 | 1.0000 | 0.9999 |
 | Group 5 | 35 | 20 | 7,265 | 7,265 | 1.0000 | 1.0000 |
-| Group 20 | 41 | 20 | 17,727 | 17,727 | 1.0000 | 0.9986 |s
+| Group 20 | 41 | 20 | 17,727 | 17,727 | 1.0000 | 0.9986 |
 | Group 21 | 40 | 20 | 17,726 | 17,726 | 1.0000 | 0.9986 |
 | Group 22 | 29 | 20 | 6,178 | 6,178 | 1.0000 | 1.0000 |
 | Group 37 | 29 | 20 | 6,178 | 6,178 | 1.0000 | 1.0000 |

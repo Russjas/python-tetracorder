@@ -302,8 +302,85 @@ class GroupEvaluator:
         np.savez_compressed(Path(path), **arrays)
 
 
-    
+    def write_jpgs(self, output_dir, dpi=150):
+        from matplotlib.figure import Figure
+        from matplotlib.patches import Patch
+        from matplotlib import colormaps
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        rules = self.evaluator.rules
+        nl, ns = self.target.shape[:2]
+        cube = np.asarray(self.target, dtype=np.float32)[..., np.asarray(self.valid_bands, dtype=bool)]
+        grey = np.nanmean(np.where(cube > -1e30, cube, np.nan), axis=2)
+        lo, hi = np.nanpercentile(grey, (2, 98))
+        grey = np.nan_to_num(np.clip((grey - lo) / (hi - lo), 0, 1))
+        palette = np.vstack([colormaps[c].colors for c in ("tab20", "tab20b", "tab20c")])
+        palette = palette[np.ptp(palette, axis=1) > 0.1]          # greys would vanish into the background
+        for kind, results in (("group", self.group_winners), ("case", self.case_winners)):
+            for number, result in sorted(results.items()):
+                if result is None:
+                    continue
+                winner = np.asarray(result["winner"], dtype=object)
+                ids, counts = np.unique(winner[winner != None].astype(str), return_counts=True)  # noqa: E711
+                if ids.size == 0:
+                    continue
+                order = np.argsort(counts)[::-1]
+                rgb = np.repeat(grey[..., None], 3, axis=2)
+                handles = []
+                slots = [m for m, r in rules.items() if r["kind"] == kind
+                        and int(r["number"]) in ({number, 0} if kind == "group" else {number})]
+                fd = np.ma.filled(np.ma.asarray(result["fit_depth"], dtype=np.float32), 0.0)
+                for mid, n in zip(ids[order], counts[order]):
+                    colour = palette[slots.index(mid) % len(palette)]
+                    won = winner == mid
+                    lines = [l.split("\\#")[0].strip() for l in rules[mid]["output_raw"].splitlines()]
+                    lines = [l for l in lines if l]
+                    name = lines[1].split()[0]
+                    dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
+                    value = VARIABLE_PRESETS[self.mode].get(value, value)
+                    d = np.clip(np.floor(fd[won] * (int(dn) / float(value)) + 0.5), 0, 255)
+                    w = (np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255) / 255.0)[:, None]
+                    rgb[won] = rgb[won] * (1 - w) + colour * w      # gen.fd.gif.images gamma
+                    handles.append(Patch(color=colour, label=f"{name}  ({n} px)"))
+                fig = Figure(figsize=(8 * ns / nl + 3, 8))
+                ax = fig.subplots()
+                ax.imshow(np.clip(rgb, 0, 1), interpolation="nearest")
+                ax.set_axis_off()
+                ax.set_title(f"{kind} {number}: {OUTPUT_DIRS[kind][number]}")
+                ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.01, 1),
+                            fontsize=7, frameon=False)
+                fig.savefig(output_dir / f"{kind}{number:02d}_{OUTPUT_DIRS[kind][number].split('.', 1)[1]}.jpg",
+                            dpi=dpi, bbox_inches="tight", pil_kwargs={"quality": 95})
 
+    def write_plain_jpgs(self, output_dir):
+           from matplotlib import colormaps
+           from matplotlib.image import imsave
+           output_dir = Path(output_dir)
+           output_dir.mkdir(parents=True, exist_ok=True)
+           rules = self.evaluator.rules
+           nl, ns = self.target.shape[:2]
+           palette = np.vstack([colormaps[c].colors for c in ("tab20", "tab20b", "tab20c")])
+           palette = palette[np.ptp(palette, axis=1) > 0.1]          # same colours as write_jpgs
+           for kind, results in (("group", self.group_winners), ("case", self.case_winners)):
+               for number, result in sorted(results.items()):
+                   if result is None:
+                       continue
+                   winner = np.asarray(result["winner"], dtype=object)
+                   slots = [m for m, r in rules.items() if r["kind"] == kind
+                            and int(r["number"]) in ({number, 0} if kind == "group" else {number})]
+                   fd = np.ma.filled(np.ma.asarray(result["fit_depth"], dtype=np.float32), 0.0)
+                   rgb = np.zeros((nl, ns, 3))
+                   for mid in set(winner[winner != None]):  # noqa: E711
+                       won = winner == mid
+                       lines = [l.split("\\#")[0].strip() for l in rules[mid]["output_raw"].splitlines()]
+                       lines = [l for l in lines if l]
+                       dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
+                       value = VARIABLE_PRESETS[self.mode].get(value, value)
+                       d = np.clip(np.floor(fd[won] * (int(dn) / float(value)) + 0.5), 0, 255)
+                       w = (np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255) / 255.0)[:, None]
+                       rgb[won] = palette[slots.index(mid) % len(palette)] * w      # gen.fd.gif.images gamma
+                   imsave(output_dir / f"{kind}{number:02d}_{OUTPUT_DIRS[kind][number].split('.', 1)[1]}.jpg",
+                          np.clip(rgb, 0, 1), pil_kwargs={"quality": 95})
 
 def resolve_group(group_results, group0=None):
 

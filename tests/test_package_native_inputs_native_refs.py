@@ -95,24 +95,24 @@ print("r06av95a:", R06_AV95)
 
 
 # =============================================================================
-# PACKAGE  (reloaded so edits to TetracorderP are picked up in the same kernel)
+# PACKAGE  (reloaded so edits to tetracorderp are picked up in the same kernel)
 # =============================================================================
 
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-import TetracorderP.config                                              # noqa: E402
-import TetracorderP.tetracorder_ops                                     # noqa: E402
-import TetracorderP.material_evaluation                                 # noqa: E402
-import TetracorderP.group_evaluator                                     # noqa: E402
+import tetracorderp.config                                              # noqa: E402
+import tetracorderp.tetracorder_ops                                     # noqa: E402
+import tetracorderp.material_evaluation                                 # noqa: E402
+import tetracorderp.group_evaluator                                     # noqa: E402
 
-for module in (TetracorderP.config, TetracorderP.tetracorder_ops,
-               TetracorderP.material_evaluation, TetracorderP.group_evaluator):
+for module in (tetracorderp.config, tetracorderp.tetracorder_ops,
+               tetracorderp.material_evaluation, tetracorderp.group_evaluator):
     importlib.reload(module)
 
-from TetracorderP.config import RRATIO_REFERENCES                       # noqa: E402
-from TetracorderP.material_evaluation import MaterialEvaluator          # noqa: E402
-from TetracorderP.group_evaluator import GroupEvaluator                 # noqa: E402
+from tetracorderp.config import RRATIO_REFERENCES                       # noqa: E402
+from tetracorderp.material_evaluation import MaterialEvaluator          # noqa: E402
+from tetracorderp.group_evaluator import GroupEvaluator                 # noqa: E402
 
 
 # =============================================================================
@@ -410,10 +410,10 @@ rules = run.evaluator.rules
 #% =============================================================================
 # COMPARE WITH NATIVE OUTPUT
 # =============================================================================
-import importlib, TetracorderP.tetracorder_ops, TetracorderP.material_evaluation
-importlib.reload(TetracorderP.tetracorder_ops)
-importlib.reload(TetracorderP.material_evaluation)
-from TetracorderP.config import NOGROUP0                                # noqa: E402
+import importlib, tetracorderp.tetracorder_ops, tetracorderp.material_evaluation
+importlib.reload(tetracorderp.tetracorder_ops)
+importlib.reload(tetracorderp.material_evaluation)
+from tetracorderp.config import NOGROUP0                                # noqa: E402
 
 
 def nint_uint8(values, scale):
@@ -582,72 +582,103 @@ print(f"{'set':10s} {'mats':>5s} {'noout':>5s} {'native':>8s} {'python':>8s} "
 for label, n, miss, nn, pn, jac, fexact in summary:
     print(f"{label:10s} {n:5d} {miss:5d} {nn:8d} {pn:8d} {jac:7.4f} {fexact:7.4f}")
 #%%
-from TetracorderP.config import VARIABLE_PRESETS, OUTPUT_DIRS
+from tetracorderp.config import VARIABLE_PRESETS, OUTPUT_DIRS
 
-def _write_like_tet(self, output_dir):
-    """
-    Write every enabled material's fit, depth and fd images as Tetracorder
-    does: <dir>/<name>.<plane>.gz (VICAR label + 8-bit image, gzipped) and
-    <name>.<plane>.gz.hdr. Pixels a material did not win are 0. Group-0
-    materials are written into every group directory that includes group 0.
-    """
-    output_dir = Path(output_dir)
-    rules = self.evaluator.rules
-    nl, ns = self.target.shape[:2]
-    lblsiz = ns if ns >= 299 else ns * (299 // ns + 1)      # creatoutfiles.r
-    label = (f"LBLSIZE={lblsiz}  FORMAT='BYTE'  TYPE='IMAGE'  RECSIZE={ns}  "
-             f"ORG='BSQ'  NL={nl}  NS={ns}  NB=1  ").encode().ljust(lblsiz)
 
-    # groups that write output, and those that take group 0 (cubecorder.r:448-468)
-    live_groups = {int(r["number"]) for r in rules.values() if r["kind"] == "group"} \
-        - {0} - set(self.disabled_groups)
-    takes_group0 = sorted(live_groups - NOGROUP0)
+def write_plain_jpgs(self, output_dir):
+           from matplotlib import colormaps
+           from matplotlib.image import imsave
+           output_dir = Path(output_dir)
+           output_dir.mkdir(parents=True, exist_ok=True)
+           rules = self.evaluator.rules
+           nl, ns = self.target.shape[:2]
+           palette = np.vstack([colormaps[c].colors for c in ("tab20", "tab20b", "tab20c")])
+           palette = palette[np.ptp(palette, axis=1) > 0.1]          # same colours as write_jpgs
+           for kind, results in (("group", self.group_winners), ("case", self.case_winners)):
+               for number, result in sorted(results.items()):
+                   if result is None:
+                       continue
+                   winner = np.asarray(result["winner"], dtype=object)
+                   slots = [m for m, r in rules.items() if r["kind"] == kind
+                            and int(r["number"]) in ({number, 0} if kind == "group" else {number})]
+                   fd = np.ma.filled(np.ma.asarray(result["fit_depth"], dtype=np.float32), 0.0)
+                   rgb = np.zeros((nl, ns, 3))
+                   for mid in set(winner[winner != None]):  # noqa: E711
+                       won = winner == mid
+                       lines = [l.split("\\#")[0].strip() for l in rules[mid]["output_raw"].splitlines()]
+                       lines = [l for l in lines if l]
+                       dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
+                       value = VARIABLE_PRESETS[self.mode].get(value, value)
+                       d = np.clip(np.floor(fd[won] * (int(dn) / float(value)) + 0.5), 0, 255)
+                       w = (np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255) / 255.0)[:, None]
+                       rgb[won] = palette[slots.index(mid) % len(palette)] * w      # gen.fd.gif.images gamma
+                   imsave(output_dir / f"{kind}{number:02d}_{OUTPUT_DIRS[kind][number].split('.', 1)[1]}.jpg",
+                          np.clip(rgb, 0, 1), pil_kwargs={"quality": 95})
+write_plain_jpgs(run, "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/write_jpgs_native_convolved_plain")
 
-    for rid, rule in rules.items():
-        if rid in self.disabled_materials:
-            continue
-        number = int(rule["number"])
-        if rule["kind"] == "case":
-            if number in self.disabled_cases:
-                continue
-            targets = [(OUTPUT_DIRS["case"][number], self.case_winners.get(number))]
-        elif number == 0:
-            targets = [(OUTPUT_DIRS["group"][g], self.group_winners.get(g))
-                       for g in takes_group0]
-        elif number in live_groups:
-            targets = [(OUTPUT_DIRS["group"][number], self.group_winners.get(number))]
-        else:
-            continue
+#%%
+import re, numpy as np
+from pathlib import Path
+from matplotlib.image import imsave
+from src.config import VARIABLE_PRESETS
 
-        # output block: "output=fit depth fd" / "<name>" / "8 DN 255 = <value>"
-        lines = [l.split("\\#")[0].strip() for l in rule["output_raw"].splitlines()]
-        lines = [l for l in lines if l]
-        name = lines[1].split()[0]
-        dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
-        value = VARIABLE_PRESETS[self.mode].get(value, value)
-        depth_scale = int(dn) / float(value)
+support = Path(r"\\wsl.localhost\Ubuntu\home\hyperspectral\tetracorder-data\cuprite95\testrun1\cmds.color.support")
+master = "\n".join(l for l in (support / "davinci.master.colors").read_text().splitlines()
+                   if not l.lstrip().startswith("#"))
+colours = {n: np.array([float(r), float(g), float(b)]) / 255.0 for r, g, b, n in re.findall(
+    r"argb\[1,1,1\]\s*=\s*([\d.]+)\s*;\s*argb\[1,1,2\]\s*=\s*([\d.]+)\s*;\s*argb\[1,1,3\]\s*=\s*([\d.]+)\s*;\s*(c_\w+)\s*=\s*argb",
+    master)}
+clark, c = {}, None
+for line in (support / "davinci.make.2micron-mins-detail2.a").read_text().splitlines():
+    line = line.split("#")[0]
+    if m := re.match(r"\s*c\s*=\s*(c_\w+)", line):
+        c = colours[m.group(1)]
+    if m := re.search(r'group\.2um/([^"]+?)\.(fd\.gif|depth\.gz)"', line):
+        clark[m.group(1)] = (c, m.group(2))
 
-        for subdir, result in targets:
-            (output_dir / subdir).mkdir(parents=True, exist_ok=True)
-            won = (np.asarray(result["winner"], dtype=object) == rid
-                   if result is not None else np.zeros((nl, ns), dtype=bool))
+rules = run.evaluator.rules
+result = run.group_winners[2]
+winner = np.asarray(result["winner"], dtype=object)
+planes = {"fd.gif": np.ma.filled(np.ma.asarray(result["fit_depth"], dtype=np.float32), 0.0),
+          "depth.gz": np.ma.filled(np.ma.asarray(result["depth"], dtype=np.float32), 0.0)}
 
-            for plane, key, scale, suffix in (("fit", "fit", 255.0, "FIT"),
-                                              ("depth", "depth", depth_scale, "DEPTHS"),
-                                              ("fd", "fit_depth", depth_scale, "FIT*DEPTH")):
-                values = (np.ma.filled(np.ma.asarray(result[key], dtype=np.float32), 0.0)
-                          if result is not None else np.zeros((nl, ns), np.float32))
-                x = np.where(won, values, 0.0).astype(np.float32) * np.float32(scale)
-                image = np.clip(np.floor(np.nan_to_num(x).astype(np.float64) + 0.5), 0, 255)
+rgb = np.zeros(winner.shape + (3,))
+for mid in set(winner[winner != None]):  # noqa: E711
+    lines = [l.split("\\#")[0].strip() for l in rules[mid]["output_raw"].splitlines()]
+    lines = [l for l in lines if l]
+    entry = clark.get(lines[1].split()[0])
+    if entry is None:
+        continue
+    colour, source = entry
+    won = winner == mid
+    dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
+    value = VARIABLE_PRESETS[run.mode].get(value, value)
+    d = np.clip(np.floor(planes[source][won] * (int(dn) / float(value)) + 0.5), 0, 255)
+    if source == "fd.gif":
+        d = np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255)      # gen.fd.gif.images gamma
+    rgb[won] = colour * (d / 255.0)[:, None]                         # xcolor + a*(c/255)
+imsave("group02_clark-detail2-emulatedbug.jpg", np.clip(rgb, 0, 1), pil_kwargs={"quality": 95})
 
-                path = output_dir / subdir / f"{name}.{plane}"
-                with gzip.GzipFile(f"{path}.gz", "wb", compresslevel=6, mtime=0) as f:
-                    f.write(label + image.astype(np.uint8).tobytes())
-                Path(f"{path}.gz.hdr").write_text(
-                    f"ENVI\ndescription = {{\n  {rule['output_title']} {suffix}\n  }}\n"
-                    f"samples = {ns}\nlines   = {nl}\nbands   = 1\n"
-                    f"header offset = {lblsiz}\nfile compression = 1\n"
-                    "file type = ENVI Standard\ndata type = 1\ninterleave = bsq\n"
-                    "sensor type = spectral data\nbyte order = 0\n"
-                    "wavelength units = Micrometers\n")
-_write_like_tet(run, "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/write_like_tet_native_convolved")
+#%%
+import numpy as np
+from pathlib import Path
+from matplotlib.figure import Figure
+from matplotlib.image import imread
+
+run_dir = Path(r"\\wsl.localhost\Ubuntu\home\hyperspectral\tetracorder-data\cuprite95\testrun1")
+nl, ns = rgb.shape[:2]
+scene = imread(run_dir / "base-image" / "color-visRGB.jpg")
+native = imread(run_dir / "color.results" /
+                "cuprite95-aviris_t6.00geo2_color-results_2micron-minerals-detail2.png")[:, :ns, :3]
+
+fig = Figure(figsize=(3 * 4 * ns / nl + 0.6, 4 + 0.5), facecolor="black")
+axes = fig.subplots(1, 3, gridspec_kw={"wspace": 0.03})
+for ax, image, title in zip(axes, (scene, native, np.clip(rgb, 0, 1)),
+                            ("AVIRIS 1995, Cuprite NV", "Tetracorder 6.00 (ratfor)", "python-tetracorder")):
+    ax.imshow(image, interpolation="nearest")
+    ax.set_title(title, color="white", fontsize=11)
+    ax.set_axis_off()
+fig.text(0.5, 0.06, "2 µm minerals, group 2, coloured as Tetracorder davinci.make.2micron-mins-detail2.a",
+         ha="center", color="0.7", fontsize=8)
+fig.savefig("cuprite95_group2_comparison.jpg", dpi=600, bbox_inches="tight", facecolor="black",
+            pil_kwargs={"quality": 95})
