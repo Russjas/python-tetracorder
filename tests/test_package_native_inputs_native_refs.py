@@ -95,24 +95,24 @@ print("r06av95a:", R06_AV95)
 
 
 # =============================================================================
-# PACKAGE  (reloaded so edits to src are picked up in the same kernel)
+# PACKAGE  (reloaded so edits to TetracorderP are picked up in the same kernel)
 # =============================================================================
 
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-import src.config                                              # noqa: E402
-import src.tetracorder_ops                                     # noqa: E402
-import src.material_evaluation                                 # noqa: E402
-import src.group_evaluator                                     # noqa: E402
+import TetracorderP.config                                              # noqa: E402
+import TetracorderP.tetracorder_ops                                     # noqa: E402
+import TetracorderP.material_evaluation                                 # noqa: E402
+import TetracorderP.group_evaluator                                     # noqa: E402
 
-for module in (src.config, src.tetracorder_ops,
-               src.material_evaluation, src.group_evaluator):
+for module in (TetracorderP.config, TetracorderP.tetracorder_ops,
+               TetracorderP.material_evaluation, TetracorderP.group_evaluator):
     importlib.reload(module)
 
-from src.config import RRATIO_REFERENCES                       # noqa: E402
-from src.material_evaluation import MaterialEvaluator          # noqa: E402
-from src.group_evaluator import GroupEvaluator                 # noqa: E402
+from TetracorderP.config import RRATIO_REFERENCES                       # noqa: E402
+from TetracorderP.material_evaluation import MaterialEvaluator          # noqa: E402
+from TetracorderP.group_evaluator import GroupEvaluator                 # noqa: E402
 
 
 # =============================================================================
@@ -410,10 +410,10 @@ rules = run.evaluator.rules
 #% =============================================================================
 # COMPARE WITH NATIVE OUTPUT
 # =============================================================================
-import importlib, src.tetracorder_ops, src.material_evaluation
-importlib.reload(src.tetracorder_ops)
-importlib.reload(src.material_evaluation)
-from src.config import NOGROUP0                                # noqa: E402
+import importlib, TetracorderP.tetracorder_ops, TetracorderP.material_evaluation
+importlib.reload(TetracorderP.tetracorder_ops)
+importlib.reload(TetracorderP.material_evaluation)
+from TetracorderP.config import NOGROUP0                                # noqa: E402
 
 
 def nint_uint8(values, scale):
@@ -581,3 +581,73 @@ print(f"{'set':10s} {'mats':>5s} {'noout':>5s} {'native':>8s} {'python':>8s} "
       f"{'jacc':>7s} {'fit=':>7s}")
 for label, n, miss, nn, pn, jac, fexact in summary:
     print(f"{label:10s} {n:5d} {miss:5d} {nn:8d} {pn:8d} {jac:7.4f} {fexact:7.4f}")
+#%%
+from TetracorderP.config import VARIABLE_PRESETS, OUTPUT_DIRS
+
+def _write_like_tet(self, output_dir):
+    """
+    Write every enabled material's fit, depth and fd images as Tetracorder
+    does: <dir>/<name>.<plane>.gz (VICAR label + 8-bit image, gzipped) and
+    <name>.<plane>.gz.hdr. Pixels a material did not win are 0. Group-0
+    materials are written into every group directory that includes group 0.
+    """
+    output_dir = Path(output_dir)
+    rules = self.evaluator.rules
+    nl, ns = self.target.shape[:2]
+    lblsiz = ns if ns >= 299 else ns * (299 // ns + 1)      # creatoutfiles.r
+    label = (f"LBLSIZE={lblsiz}  FORMAT='BYTE'  TYPE='IMAGE'  RECSIZE={ns}  "
+             f"ORG='BSQ'  NL={nl}  NS={ns}  NB=1  ").encode().ljust(lblsiz)
+
+    # groups that write output, and those that take group 0 (cubecorder.r:448-468)
+    live_groups = {int(r["number"]) for r in rules.values() if r["kind"] == "group"} \
+        - {0} - set(self.disabled_groups)
+    takes_group0 = sorted(live_groups - NOGROUP0)
+
+    for rid, rule in rules.items():
+        if rid in self.disabled_materials:
+            continue
+        number = int(rule["number"])
+        if rule["kind"] == "case":
+            if number in self.disabled_cases:
+                continue
+            targets = [(OUTPUT_DIRS["case"][number], self.case_winners.get(number))]
+        elif number == 0:
+            targets = [(OUTPUT_DIRS["group"][g], self.group_winners.get(g))
+                       for g in takes_group0]
+        elif number in live_groups:
+            targets = [(OUTPUT_DIRS["group"][number], self.group_winners.get(number))]
+        else:
+            continue
+
+        # output block: "output=fit depth fd" / "<name>" / "8 DN 255 = <value>"
+        lines = [l.split("\\#")[0].strip() for l in rule["output_raw"].splitlines()]
+        lines = [l for l in lines if l]
+        name = lines[1].split()[0]
+        dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
+        value = VARIABLE_PRESETS[self.mode].get(value, value)
+        depth_scale = int(dn) / float(value)
+
+        for subdir, result in targets:
+            (output_dir / subdir).mkdir(parents=True, exist_ok=True)
+            won = (np.asarray(result["winner"], dtype=object) == rid
+                   if result is not None else np.zeros((nl, ns), dtype=bool))
+
+            for plane, key, scale, suffix in (("fit", "fit", 255.0, "FIT"),
+                                              ("depth", "depth", depth_scale, "DEPTHS"),
+                                              ("fd", "fit_depth", depth_scale, "FIT*DEPTH")):
+                values = (np.ma.filled(np.ma.asarray(result[key], dtype=np.float32), 0.0)
+                          if result is not None else np.zeros((nl, ns), np.float32))
+                x = np.where(won, values, 0.0).astype(np.float32) * np.float32(scale)
+                image = np.clip(np.floor(np.nan_to_num(x).astype(np.float64) + 0.5), 0, 255)
+
+                path = output_dir / subdir / f"{name}.{plane}"
+                with gzip.GzipFile(f"{path}.gz", "wb", compresslevel=6, mtime=0) as f:
+                    f.write(label + image.astype(np.uint8).tobytes())
+                Path(f"{path}.gz.hdr").write_text(
+                    f"ENVI\ndescription = {{\n  {rule['output_title']} {suffix}\n  }}\n"
+                    f"samples = {ns}\nlines   = {nl}\nbands   = 1\n"
+                    f"header offset = {lblsiz}\nfile compression = 1\n"
+                    "file type = ENVI Standard\ndata type = 1\ninterleave = bsq\n"
+                    "sensor type = spectral data\nbyte order = 0\n"
+                    "wavelength units = Micrometers\n")
+_write_like_tet(run, "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/write_like_tet_native_convolved")

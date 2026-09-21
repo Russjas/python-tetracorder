@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "python-tetracorder"
+version = "0.1.0"
+description = "An independent Python reimplementation of the Tetracorder spectral identification rules and evaluation logic."
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+    { name = "Russell Rogers" }
+]
+
+license = "GPL-3.0-or-later"
+
+keywords = [
+    "hyperspectral",
+    "spectroscopy",
+    "tetracorder",
+    "mineral-mapping",
+    "remote-sensing",
+    "geology"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)"
+]
+
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10"
+]
+
+
+[project.urls]
+Homepage = "https://github.com/Russjas/python-tetracorder"
+Repository = "https://github.com/Russjas/python-tetracorder"
+Issues = "https://github.com/Russjas/python-tetracorder/issues"
+Upstream-Tetracorder = "https://github.com/PSI-edu/spectroscopy-tetracorder"
+
+
+[tool.setuptools]
+packages = ["TetracorderP"]
+
+
+[tool.setuptools.data-files]
+"resources" = [
+    "resources/tetracorder_rules_as_dict.json",
+    "resources/tetracorder_rules_references.db"
+]
