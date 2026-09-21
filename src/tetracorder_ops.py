@@ -459,8 +459,7 @@ def linear_feature_continuum(
     )
 
 
-def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_bands=None,
-                             native_outer_windows=False):
+def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_bands=None):
     """
     Curved continuum removal for target spectra: bandmpcv.
 
@@ -477,11 +476,11 @@ def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_band
     The continuum-removed spectrum covers the inner windows and the band,
     inner_left_start..inner_right_stop (imgflg = 0).
 
-    valid_bands is honoured in all four windows. Natively, bandmpcv
-    skips only deleted OBSERVED points in the two outer windows (it tests
-    rflibc there, but rlbc is 0.0 outside the inner windows), so
-    [DELETPTS] channels are used there. native_outer_windows=True
-    reproduces that exactly.
+    valid_bands is honoured in the two inner windows only. bandmpcv
+    skips only deleted OBSERVED points in the outer windows (it tests
+    rflibc there, but rlbc is 0.0 outside the inner windows,
+    getifeat.r:1674-1710), so [DELETPTS] channels are averaged into
+    the outer anchors.
 
     NOTE: natively the REFERENCE of a curved feature is continuum removed
     by bdmset with a straight line through the two inner windows. Use
@@ -510,7 +509,7 @@ def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_band
     for i, (a, b) in enumerate(ch):
         idx = slice(a, b + 1)
         vals = spectra[..., idx]
-        if i in (1, 2) or not native_outer_windows:
+        if i in (1, 2):
             vals = np.where(valid_bands[idx], vals, np.nan).astype(np.float32)
         m, w, n = _window_mean(vals, wavelengths[idx], np.ones(b - a + 1, dtype=bool))
         means.append(m)

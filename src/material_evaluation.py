@@ -434,13 +434,15 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
         
     elif continuum == "convex":
        
-        for start, stop in windows:
+        for i, (start, stop) in enumerate(windows):
             selected = ((target_wavelengths >= start) & (target_wavelengths <= stop))
 
             if not np.any(selected):
                 return None, "out_of_range"
 
-            if not np.any(selected & valid_bands):
+            # native bandmpcv skips reference-deleted channels only in the inner
+            # windows (rlbc is 0.0 outside them), so only those need one.
+            if i in (1, 2) and not np.any(selected & valid_bands):
                 return None, "disabled"
         
         feature_selected = ((target_wavelengths > windows[1][1])
@@ -1172,11 +1174,14 @@ def resolve_material_constraints(material_result, material_constraints):
     constraints_by_test = {constraint["test"]: constraint for constraint in material_constraints}
 
     for test in CONSTRAINT_ORDER:
-        if test not in constraints_by_test:
-            continue
-
-        constraint = constraints_by_test[test]
-        values = constraint["values"]
+        # getconstraints.r:83-96 defaults every threshold to 0.0 and tp1mat
+        # runs all nine blocks unconditionally, so an omitted constraint is a
+        # hard ">= 0" cut. Only the three keyed on a signed quantity can bite:
+        # FDALL> (tp1mat.r:751, zeroes fit, depth AND fd), FD> (873) and
+        # FD-DEPTH> (901). The rest key on fit or abs(depth), never negative.
+        constraint = constraints_by_test.get(test)
+        values = constraint["values"] if constraint else (0.0, 0.0)
+        
 
         if test == "FITALL>":
             factor = material_constraint_factor(fit, values)
