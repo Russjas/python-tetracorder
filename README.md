@@ -158,7 +158,7 @@ The python implementation is significantly slower - although there are optimisat
 
 Summary statistics are also calculated for each group and case. Materials present in the rules but without a corresponding native output file are reported as `without native output` and are excluded from the direct numerical comparison.
 
-The complete test comparison output is in [this file](tests/fidelity_test_specpr_preconvolved). Only a summary is presented here.
+The complete test comparison output is in [this file](tests/fidelity_test_specpr_preconvolved.md). Only a summary is presented here.
 
 #### Run summary
 
