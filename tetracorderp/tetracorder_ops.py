@@ -254,20 +254,55 @@ def _prepare(spectra, wavelengths, valid_bands):
     return spectra, wavelengths, valid_bands
 
 
+# ======Refactored for perfomance======================================================
+# Slower than the below.This processes every channel of the feature span
+# while number of channels per window is almost always significantly less
+# than the size of the span provided when called by linear continuum
+# neglibible on curved continuum, which pass pre-sliced windows.
+
+# Preserved as summation order differs (NumPy pairwise vs
+# channel-by-channel), giving up to ~4 ulp differences in window means. I may revert.
+
+# def _window_mean(values, wav, mask):
+#     """
+#     REAL*4 means of reflectance and wavelength over mask (last axis),
+#     skipping NaN, as the bandmp continuum loops do. Returns means and counts.
+#     """
+#     ok = mask & np.isfinite(values)
+#     n = ok.sum(axis=-1)
+#     with np.errstate(invalid="ignore", divide="ignore"):
+#         refl = (np.where(ok, values, np.float32(0)).sum(axis=-1, dtype=np.float32)
+#                 / n.astype(np.float32))
+#         wl = (np.where(ok, wav, np.float32(0)).sum(axis=-1, dtype=np.float32)
+#               / n.astype(np.float32))
+#     return refl.astype(np.float32), wl.astype(np.float32), n
+# =============================================================================
+
 def _window_mean(values, wav, mask):
     """
     REAL*4 means of reflectance and wavelength over mask (last axis),
     skipping NaN, as the bandmp continuum loops do. Returns means and counts.
-    """
-    ok = mask & np.isfinite(values)
-    n = ok.sum(axis=-1)
-    with np.errstate(invalid="ignore", divide="ignore"):
-        refl = (np.where(ok, values, np.float32(0)).sum(axis=-1, dtype=np.float32)
-                / n.astype(np.float32))
-        wl = (np.where(ok, wav, np.float32(0)).sum(axis=-1, dtype=np.float32)
-              / n.astype(np.float32))
-    return refl.astype(np.float32), wl.astype(np.float32), n
 
+    Accumulates channel by channel in channel order (the Fortran DO loop),
+    touching only the masked channels.
+    """
+    shape = values.shape[:-1]
+    refl_sum = np.zeros(shape, dtype=np.float32)
+    wl_sum = np.zeros(shape, dtype=np.float32)
+    n = np.zeros(shape, dtype=np.intp)
+
+    for c in np.flatnonzero(mask):
+        v = values[..., c]
+        good = np.isfinite(v)
+        refl_sum += np.where(good, v, np.float32(0))
+        wl_sum += np.where(good, np.float32(wav[c]), np.float32(0))
+        n += good
+
+    with np.errstate(invalid="ignore", divide="ignore"):
+        count = n.astype(np.float32)
+        refl = refl_sum / count
+        wl = wl_sum / count
+    return refl, wl, n
 
 def _remove_continuum(values, continuum, use):
     """rfobsc = rfobs / contin where valid and |contin| > 0.1e-20, else deleted."""
@@ -523,17 +558,26 @@ def characterise_feature(
     # ------------------------------------------------------------------
     # bandmp sums over cl1..cr2, REAL*8
     # ------------------------------------------------------------------
-    ok = np.isfinite(rfobsc) & np.isfinite(rflibc)
-    n = ok.sum(axis=-1)
-    drl = np.where(ok, rflibc, 0).astype(np.float64)
-    dro = np.where(ok, rfobsc, 0).astype(np.float64)
 
-    suml = drl.sum(axis=-1)
-    sumll = (drl * drl).sum(axis=-1)
-    sumol = (dro * drl).sum(axis=-1)
+    # There was a significant refactor here to avoid broadcasting to p x n
+    # intermediate arrays and take advantage of matrix-vector products
+    # original not preserved as cast to float32 should eliminate any
+    # difference in the float64 values from accumulation order.
+    ref_ok = np.isfinite(rflibc)
+    r = np.where(ref_ok, rflibc, 0).astype(np.float64)       # 1-D, REAL*8
+    ok = np.isfinite(rfobsc) & ref_ok                        # P * n bool
+    n = ok.sum(axis=-1)
+    okf = ok.astype(np.float64)                              
+    dro = np.where(ok, rfobsc, 0).astype(np.float64)         
+
+    suml = okf @ r
+    sumll = okf @ (r * r)
+    sumol = dro @ r
     sumo = dro.sum(axis=-1)
-    sumoo = (dro * dro).sum(axis=-1)
+    sumoo = np.einsum("...i,...i->...", dro, dro)
     dxn = np.where(n > 0, n, 1).astype(np.float64)
+
+
 
     top = (sumol - sumo * suml / dxn).astype(np.float32)
     bottom = (sumll - suml * suml / dxn).astype(np.float32)

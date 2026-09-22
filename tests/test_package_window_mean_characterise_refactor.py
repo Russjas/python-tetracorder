@@ -548,3 +548,287 @@ run.write_jpgs(r"C:\Users\Hyperspectral\Documents\GitHub\python-tetracorder\test
 
 
 #%%END TEST SCRIPT, MESSING BELOW
+#%% profile a strip
+import cProfile, pstats
+from tetracorderp.group_evaluator import GroupEvaluator
+LINES = slice(0, 100)
+cube = np.ascontiguousarray(np.load(cache_file)[LINES])
+cProfile.run("GroupEvaluator(cube, wavelengths, fwhm, mode=MODE, target_valid_bands=valid_bands, "
+             "reference_file=str(REFERENCE_DB), rules_file=str(RULES), disabled_groups=FORCED_GROUPS, "
+             "disabled_cases=FORCED_CASES, temperature=TEMPERATURE, pressure=PRESSURE)", "prof.out")
+pstats.Stats("prof.out").sort_stats("cumulative").print_stats(25)
+#%%
+#%% lawn grass: old ascii copy vs splib06a copy, both against native 7644
+#%% [RATIOGVEG1] lawn grass: splib06a copy vs old ASCII copy, both against native s06av95a 7644
+import sqlite3
+from tetracorderp.convolve import Convolver
+
+_, native = read_specpr(S06_AV95, 7644)
+conv = Convolver(wavelengths, fwhm)
+
+def lawn_grass(db):
+    con = sqlite3.connect(db)
+    cols = [r[1] for r in con.execute("PRAGMA table_info(Spectra)")]
+    sel = "XData, YData" + (", FData" if "FData" in cols else "")
+    row = con.execute(f"SELECT {sel} FROM Samples JOIN Spectra USING (SampleID) "
+                      "WHERE Library = 'splib06b' AND ConvolvedRecord = 7644").fetchone()
+    con.close()
+    arrays = [np.frombuffer(b, np.float32).astype(np.float64) for b in row]
+    return arrays + [None] * (3 - len(arrays))
+
+x_new, y_new, f_new = lawn_grass(REFERENCE_DB)
+x_old, y_old, _ = lawn_grass(REPO / "resources" / "tetracorder_rules_references.db")
+f_old = np.interp(x_old, x_new, f_new)      # Beckman FWHM onto the ASCII grid
+
+for label, (x, y, f) in {"splib06a copy": (x_new, y_new, f_new),
+                         "old ASCII copy": (x_old, y_old, f_old)}.items():
+    keep = np.isfinite(x) & np.isfinite(y) & np.isfinite(f)
+    p = conv.convolve(x[keep], f[keep], y[keep])
+    ok = valid_bands & np.isfinite(native) & np.isfinite(p)
+    d = np.abs(p - native)
+    worst = np.argmax(np.where(ok, d, 0))
+    print(f"{label:15s} {keep.sum():4d} ch  max|diff| {d[ok].max():.2e} at "
+          f"{wavelengths[worst]:.4f} um  (python NaN where native valid: "
+          f"{int((valid_bands & np.isfinite(native) & np.isnan(p)).sum())})")
+    
+#%% hypothesis: native 7644 was convolved from a cubic-spline 3961-ch version
+from scipy.interpolate import CubicSpline
+
+con = sqlite3.connect(REFERENCE_DB)
+gx, gf = (np.frombuffer(b, np.float32).astype(np.float64) for b in con.execute(
+    "SELECT XData, FData FROM Samples JOIN Spectra USING (SampleID) "
+    "WHERE Library = 'splib06b' AND ConvolvedRecord = 2568").fetchone())
+con.close()
+print(f"3961 grid from jarosite-K: {gx.size} ch, {gx[0]:.4f}-{gx[-1]:.4f} um")
+
+keep = np.isfinite(x_new) & np.isfinite(y_new)
+inside = (gx >= x_new[keep][0]) & (gx <= x_new[keep][-1])
+for bc in ("not-a-knot", "natural"):
+    y_csp = CubicSpline(x_new[keep], y_new[keep], bc_type=bc)(gx[inside])
+    p = conv.convolve(gx[inside], gf[inside], y_csp)
+    ok = valid_bands & np.isfinite(native) & np.isfinite(p)
+    d = np.abs(p - native)
+    worst = np.argmax(np.where(ok, d, 0))
+    print(f"csp3961 ({bc:10s}) max|diff| {d[ok].max():.2e} at {wavelengths[worst]:.4f} um")
+    
+#%% benchmark _window_mean: old (span + mask) vs new (channel loop) on real features
+import json, time
+import numpy as np
+from tetracorderp.tetracorder_ops import _wtochbin, prepare_rules
+
+N_FEATURES = 20          # linear features to test (distinct window pairs)
+REPEATS = 3              # timing repeats per call, best taken
+BLOCK = slice(0, 100)    # cube lines to use
+
+def window_mean_old(values, wav, mask):
+    ok = mask & np.isfinite(values)
+    n = ok.sum(axis=-1)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        refl = (np.where(ok, values, np.float32(0)).sum(axis=-1, dtype=np.float32)
+                / n.astype(np.float32))
+        wl = (np.where(ok, wav, np.float32(0)).sum(axis=-1, dtype=np.float32)
+              / n.astype(np.float32))
+    return refl.astype(np.float32), wl.astype(np.float32), n
+
+def window_mean_new(values, wav, mask):
+    shape = values.shape[:-1]
+    refl_sum = np.zeros(shape, dtype=np.float32)
+    wl_sum = np.zeros(shape, dtype=np.float32)
+    n = np.zeros(shape, dtype=np.intp)
+    for c in np.flatnonzero(mask):
+        v = values[..., c]
+        good = np.isfinite(v)
+        refl_sum += np.where(good, v, np.float32(0))
+        wl_sum += np.where(good, np.float32(wav[c]), np.float32(0))
+        n += good
+    with np.errstate(invalid="ignore", divide="ignore"):
+        count = n.astype(np.float32)
+        return refl_sum / count, wl_sum / count, n
+
+def best_time(fn, *args):
+    t = []
+    for _ in range(REPEATS):
+        t0 = time.perf_counter(); out = fn(*args); t.append(time.perf_counter() - t0)
+    return min(t), out
+
+def ulps(a, b):
+    """max float32 ulp distance where both finite"""
+    ok = np.isfinite(a) & np.isfinite(b)
+    if not ok.any():
+        return 0
+    ia = a[ok].astype(np.float32).view(np.int32).astype(np.int64)
+    ib = b[ok].astype(np.float32).view(np.int32).astype(np.int64)
+    return int(np.abs(ia - ib).max())
+
+# ---- inputs, prepared as linear_feature_continuum does --------------------
+wl32 = np.asarray(wavelengths, dtype=np.float32)
+valid = np.asarray(valid_bands, dtype=bool)
+block = np.ascontiguousarray(np.asarray(cube[BLOCK], dtype=np.float32))
+
+with open(RULES, encoding="utf-8") as fh:
+    all_rules = prepare_rules(json.load(fh), mode=MODE)["rules"]
+
+seen, features = set(), []
+for mid, rule in all_rules.items():
+    for f in rule["features"]:
+        if f.get("role") == "not" or f["continuum"] != "linear":
+            continue
+        key = json.dumps(f["windows"])
+        if key in seen:
+            continue
+        seen.add(key)
+        features.append((mid, f["id"], f["windows"]))
+    if len(features) >= N_FEATURES:
+        break
+
+# ---- run ------------------------------------------------------------------
+print(f"block {block.shape}, {len(features)} features\n")
+print(f"{'material':30s} {'feat':4s} {'n':>3s} {'kL':>3s} {'kR':>3s} "
+      f"{'old ms':>8s} {'new ms':>8s} {'x':>5s}  n_eq  refl_ulp wl_ulp")
+tot_old = tot_new = 0.0
+for mid, fid, (lw, rw) in features:
+    try:
+        cl1, cl2 = _wtochbin(wl32, float(lw[0]), float(lw[1]))
+        cr1, cr2 = _wtochbin(wl32, float(rw[0]), float(rw[1]))
+    except ValueError:
+        continue
+    span = slice(cl1, cr2 + 1)
+    wav = wl32[span]
+    k = np.arange(cl1, cr2 + 1)
+    left, right = k <= cl2, k >= cr1
+    values = np.where(valid[span], block[..., span], np.nan).astype(np.float32)
+
+    t_old = t_new = 0.0
+    n_eq, r_ulp, w_ulp = True, 0, 0
+    for mask in (left, right):
+        to, (ro, wo, no) = best_time(window_mean_old, values, wav, mask)
+        tn, (rn, wn, nn) = best_time(window_mean_new, values, wav, mask)
+        t_old += to; t_new += tn
+        n_eq &= np.array_equal(no, nn)
+        r_ulp = max(r_ulp, ulps(ro, rn)); w_ulp = max(w_ulp, ulps(wo, wn))
+    tot_old += t_old; tot_new += t_new
+    print(f"{mid[:30]:30s} {fid:4s} {values.shape[-1]:3d} {left.sum():3d} {right.sum():3d} "
+          f"{t_old*1e3:8.1f} {t_new*1e3:8.1f} {t_old/t_new:5.1f}  {str(n_eq):5s} "
+          f"{r_ulp:8d} {w_ulp:6d}")
+
+print(f"\ntotal: old {tot_old:.2f} s, new {tot_new:.2f} s, speed-up {tot_old/tot_new:.1f}x")
+#%% benchmark characterise_feature sums: old (broadcast + products) vs new (matvec)
+import time
+import numpy as np
+from tetracorderp.tetracorder_ops import linear_feature_continuum
+
+N_FEATURES = 20
+REPEATS = 3
+BLOCK = slice(0, 100)
+TINY = np.float32(0.1e-20)
+
+def sums_old(rflibc, rfobsc):
+    ok = np.isfinite(rfobsc) & np.isfinite(rflibc)
+    n = ok.sum(axis=-1)
+    drl = np.where(ok, rflibc, 0).astype(np.float64)
+    dro = np.where(ok, rfobsc, 0).astype(np.float64)
+    return (n, drl.sum(axis=-1), (drl * drl).sum(axis=-1), (dro * drl).sum(axis=-1),
+            dro.sum(axis=-1), (dro * dro).sum(axis=-1))
+
+def sums_new(rflibc, rfobsc):
+    ref_ok = np.isfinite(rflibc)
+    r = np.where(ref_ok, rflibc, 0).astype(np.float64)
+    ok = np.isfinite(rfobsc) & ref_ok
+    n = ok.sum(axis=-1)
+    okf = ok.astype(np.float64)
+    dro = np.where(ok, rfobsc, 0).astype(np.float64)
+    return (n, okf @ r, okf @ (r * r), dro @ r,
+            dro.sum(axis=-1), np.einsum("...i,...i->...", dro, dro))
+
+def finish(sums, rflibc, ext):
+    """downstream arithmetic of characterise_feature, unchanged"""
+    n, suml, sumll, sumol, sumo, sumoo = sums
+    dxn = np.where(n > 0, n, 1).astype(np.float64)
+    top = (sumol - sumo * suml / dxn).astype(np.float32)
+    bottom = (sumll - suml * suml / dxn).astype(np.float32)
+    botm2 = (sumoo - sumo * sumo / dxn).astype(np.float32)
+    with np.errstate(invalid="ignore", divide="ignore", over="ignore"):
+        slope = np.where(np.abs(bottom) < TINY, 0, top / bottom).astype(np.float32)
+        xk = ((1.0 - slope) / slope).astype(np.float32)
+        xk1 = (xk + 1.0).astype(np.float32)
+        depth = (1.0 - ((rflibc[ext] + xk) / xk1).astype(np.float32)).astype(np.float32)
+        bprime = np.where(np.abs(botm2) < TINY, 0, top / botm2).astype(np.float32)
+        fit = np.sqrt(np.abs(slope * bprime)).astype(np.float32)
+    return dict(top=top, bottom=bottom, botm2=botm2, fit=fit, depth=depth)
+
+def best_time(fn, *args):
+    t = []
+    for _ in range(REPEATS):
+        t0 = time.perf_counter(); out = fn(*args); t.append(time.perf_counter() - t0)
+    return min(t), out
+
+def ulps(a, b):
+    ok = np.isfinite(a) & np.isfinite(b)
+    if not ok.any():
+        return 0
+    ia = a[ok].astype(np.float32).view(np.int32).astype(np.int64)
+    ib = b[ok].astype(np.float32).view(np.int32).astype(np.int64)
+    return int(np.abs(ia - ib).max())
+
+def nan_mismatch(a, b):
+    return int((np.isnan(a) != np.isnan(b)).sum())
+
+# ---- inputs ----------------------------------------------------------------
+ev = run.evaluator
+wl32 = np.asarray(wavelengths, dtype=np.float32)
+block = np.ascontiguousarray(np.asarray(cube[BLOCK], dtype=np.float32))
+
+features, seen = [], set()
+for mid, rule in ev.rules.items():
+    if mid not in ev.rule_spectra:
+        continue
+    for f in rule["features"]:
+        if f.get("role") == "not" or f["continuum"] != "linear":
+            continue
+        key = (mid, f["id"])
+        if key in seen:
+            continue
+        seen.add(key)
+        features.append((mid, f["id"], f["windows"]))
+    if len(features) >= N_FEATURES:
+        break
+
+# ---- run -------------------------------------------------------------------
+print(f"block {block.shape}, {len(features)} features\n")
+print(f"{'material':28s} {'feat':4s} {'n':>3s} {'old ms':>8s} {'new ms':>8s} {'x':>5s}  "
+      f"n_eq  sum_rel   top bot bm2 fit dep  nan")
+tot_old = tot_new = 0.0
+for mid, fid, (lw, rw) in features:
+    reference = ev.rule_spectra[mid]
+    valid = np.asarray(valid_bands, bool) & np.isfinite(np.asarray(reference, float))
+    try:
+        ref_c = linear_feature_continuum(reference, wl32, lw, rw, valid_bands=valid)
+        tgt_c = linear_feature_continuum(block, wl32, lw, rw, valid_bands=valid)
+    except ValueError:
+        continue
+    rflibc = np.asarray(np.ma.filled(np.ma.asarray(ref_c.continuum_removed, np.float32), np.nan))
+    rfobsc = np.asarray(np.ma.filled(np.ma.asarray(tgt_c.continuum_removed, np.float32), np.nan))
+
+    inner = np.flatnonzero(ref_c.interior & np.isfinite(rflibc))
+    if inner.size == 0:
+        continue
+    minch = inner[np.argmin(rflibc[inner])]
+    maxch = inner[np.argmax(rflibc[inner])]
+    ext = maxch if (rflibc[maxch] - 1.0) > (1.0 - rflibc[minch]) else minch
+
+    to, so = best_time(sums_old, rflibc, rfobsc)
+    tn, sn = best_time(sums_new, rflibc, rfobsc)
+    tot_old += to; tot_new += tn
+
+    n_eq = np.array_equal(so[0], sn[0])
+    rel = max(float(np.nanmax(np.abs(a - b) / np.maximum(np.abs(a), 1e-300)))
+              for a, b in zip(so[1:], sn[1:]))
+    fo, fn_ = finish(so, rflibc, ext), finish(sn, rflibc, ext)
+    u = {k: ulps(fo[k], fn_[k]) for k in fo}
+    nm = sum(nan_mismatch(fo[k], fn_[k]) for k in fo)
+
+    print(f"{mid[:28]:28s} {fid:4s} {rflibc.size:3d} {to*1e3:8.1f} {tn*1e3:8.1f} "
+          f"{to/tn:5.1f}  {str(n_eq):5s} {rel:8.1e} {u['top']:4d} {u['bottom']:3d} "
+          f"{u['botm2']:3d} {u['fit']:3d} {u['depth']:3d} {nm:4d}")
+
+print(f"\ntotal sums: old {tot_old:.2f} s, new {tot_new:.2f} s, speed-up {tot_old/tot_new:.1f}x")
