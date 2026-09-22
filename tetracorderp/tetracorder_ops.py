@@ -99,7 +99,8 @@ def load_references(db_file: str | Path) -> dict:
             Samples.MeasurementCode,
             Samples.SourceFilename,
             Spectra.XData,
-            Spectra.YData
+            Spectra.YData,
+            Spectra.FData
         FROM Samples
         JOIN Spectra USING (SampleID)
         WHERE Samples.ConvolvedRecord IS NOT NULL
@@ -122,6 +123,7 @@ def load_references(db_file: str | Path) -> dict:
             "source_filename": row["SourceFilename"],
             "wavelengths": np.frombuffer(row["XData"], dtype=np.float32).copy(),
             "reflectance": np.frombuffer(row["YData"], dtype=np.float32).copy(),
+            "fwhm": np.frombuffer(row["FData"], dtype=np.float32).copy(),
         }
 
     connection.close()
@@ -171,118 +173,6 @@ def continuum_test(value, limits):
 
     low, high = limits
     return (value >= low) & (value <= high)
-
-
-#==========================================================================
-
-class GaussianConvolver:
-    """
-    Convolve high-resolution library spectra to scanner channels using
-    Gaussian spectral response functions defined by scanner FWHM.
-
-    The convolution weights are calculated once and can then be reused
-    for multiple library spectra on the same wavelength grid.
-
-    Usage:
-    convolver = GaussianConvolver(
-                lib_wl=library_wavelengths,
-                scanner_wl=scanner_wavelengths,
-                scanner_fwhm=scanner_fwhm,
-                )
-    convolved_reflectance = convolver.convolve(library_reflectance,)
-    """
-
-    def __init__(self, lib_wl, scanner_wl, scanner_fwhm):
-        self.lib_wl = np.asarray(lib_wl, dtype=float)
-        self.scanner_wl = np.asarray(scanner_wl, dtype=float)
-        self.scanner_fwhm = np.asarray(scanner_fwhm, dtype=float)
-
-        if self.scanner_fwhm.ndim == 0 or self.scanner_fwhm.size == 1:
-            self.scanner_fwhm = np.full(
-                self.scanner_wl.shape,
-                float(self.scanner_fwhm.ravel()[0]),
-            )
-
-        if self.scanner_wl.shape != self.scanner_fwhm.shape:
-            raise ValueError("scanner_wl and scanner_fwhm must have equal lengths")
-
-        if self.lib_wl.ndim != 1:
-            raise ValueError("lib_wl must be one-dimensional")
-
-        if np.any(np.diff(self.lib_wl) <= 0):
-            raise ValueError("lib_wl must be strictly increasing")
-
-        if np.any(self.scanner_fwhm <= 0):
-            raise ValueError("All scanner FWHM values must be positive")
-
-        self.weights = self._build_weights()
-
-    def _build_weights(self):
-        # Gaussian response:
-        # exp(-4 ln(2) * ((x - centre) / FWHM)**2)
-        offset = self.lib_wl[None, :] - self.scanner_wl[:, None]
-
-        weights = np.exp(-4.0 * np.log(2.0) * (offset / self.scanner_fwhm[:, None]) ** 2)
-
-        # Approximate integration widths on the library wavelength grid.
-        # This matters if the library grid is not perfectly uniform.
-        spacing = np.gradient(self.lib_wl)
-        weights *= spacing[None, :]
-
-        # Do not calculate scanner bands whose centres fall outside the
-        # library wavelength coverage.
-        outside = ((self.scanner_wl <= self.lib_wl.min())
-                   | (self.scanner_wl >= self.lib_wl.max()))
-        weights[outside] = 0.0
-
-        # Negligible weights add computation without affecting the result.
-        weights[weights < 1e-8] = 0.0
-
-        return weights
-
-    def convolve(self, lib_refl):
-        """
-        Parameters
-        ----------
-        lib_refl : ndarray
-            Either:
-                (library_bands,)
-            or:
-                (number_of_spectra, library_bands)
-
-        Returns
-        -------
-        ndarray
-            Spectrum/spectra convolved to scanner_wl.
-        """
-        spectra = np.asarray(lib_refl, dtype=float)
-        was_1d = spectra.ndim == 1
-
-        if was_1d:
-            spectra = spectra[None, :]
-
-        if spectra.ndim != 2:
-            raise ValueError("lib_refl must be one- or two-dimensional")
-
-        if spectra.shape[1] != self.lib_wl.size:
-            raise ValueError(
-                f"Expected {self.lib_wl.size} library bands, "
-                f"received {spectra.shape[1]}"
-            )
-
-        valid = np.isfinite(spectra)
-
-        # Renormalise independently where individual spectra contain NaNs.
-        numerator = np.where(valid, spectra, 0.0) @ self.weights.T
-        denominator = valid.astype(float) @ self.weights.T
-
-        result = np.full(numerator.shape, np.nan, dtype=float)
-        np.divide(numerator, denominator, out=result, where=denominator > 0)
-
-        if was_1d:
-            return result[0]
-
-        return result
 
 
 #========= Continuum-removed feature container ================================

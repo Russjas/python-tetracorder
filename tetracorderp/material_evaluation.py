@@ -5,8 +5,7 @@ from pathlib import Path
 import json
 import numpy as np
 
-from .tetracorder_ops import (GaussianConvolver,
-                            linear_feature_continuum, 
+from .tetracorder_ops import (linear_feature_continuum, 
                              curved_feature_continuum,
                              characterise_feature,
                              fuzzy_greater,
@@ -17,7 +16,7 @@ from .tetracorder_ops import (GaussianConvolver,
                              _wtochbin
 )
 from .config import RRATIO_REFERENCES
-
+from .convolve import Convolver
 
 class MaterialEvaluator:
     """
@@ -174,30 +173,23 @@ class MaterialEvaluator:
             references = load_references(references)
 
         spectra = {}
-        convolvers = {}
+        cache = {}
+        fwhm = np.broadcast_to(np.asarray(self.fwhm, dtype=float), self.wavelengths.shape)
+        convolver = Convolver(self.wavelengths, fwhm)
 
         for rule_id, rule in self.rules.items():
             library = rule["library_records"]["SMALL"]["library"].strip("[]")
             library = LIBRARY_MAP[library]
 
             record = int(rule["library_records"]["SMALL"]["record"])
-            reference = references[(library, record)]
+            key = (library, record)
 
-            reference_wavelengths = reference["wavelengths"]
-
-            key = (
-                reference_wavelengths.shape,
-                reference_wavelengths.tobytes(),
-            )
-
-            if key not in convolvers:
-                convolvers[key] = GaussianConvolver(
-                    lib_wl=reference_wavelengths,
-                    scanner_wl=self.wavelengths,
-                    scanner_fwhm=self.fwhm,
-                )
-
-            spectra[rule_id] = convolvers[key].convolve(reference["reflectance"])
+            if key not in cache:
+                reference = references[key]
+                cache[key] = convolver.convolve(reference["wavelengths"],
+                                                reference["fwhm"],
+                                                reference["reflectance"])
+            spectra[rule_id] = cache[key]
         
         return spectra
 
@@ -205,12 +197,12 @@ class MaterialEvaluator:
         spectra = {}
         for ratio_name, key in RRATIO_REFERENCES.items():
             ratio_reference = references[key]
-            convolver = GaussianConvolver(
-                lib_wl=ratio_reference["wavelengths"],
-                scanner_wl=self.wavelengths,
-                scanner_fwhm=self.fwhm)
+            fwhm = np.broadcast_to(np.asarray(self.fwhm, dtype=float), self.wavelengths.shape)
+            convolver = Convolver(self.wavelengths, fwhm)
 
-            spectra[ratio_name] = (convolver.convolve(ratio_reference["reflectance"]))
+            spectra[ratio_name] = convolver.convolve(ratio_reference["wavelengths"],
+                                                    ratio_reference["fwhm"],
+                                                    ratio_reference["reflectance"])
         return spectra
 
 
