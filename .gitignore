@@ -40,6 +40,10 @@ Thumbs.db
 *.db-journal
 *.sqlite-journal
 
+# native style outputs or data
+.gz
+.hdr
+
 # Temporary / scratch files
 *.tmp
 *.bak
