@@ -1,5 +1,30 @@
 # Fidelity test - SPECpr pre-convolved references
 
+`python-tetracorder` has an internal GaussianConvolver and SQLite database of the required reference spectra, at their original library sampling, before any convolution. This convolver is perhaps not as robust as it could be, and certainly differs from the SpecPr convolution used to produce their sensor-specific convolution libraries.  
+
+As this is an algorithmic test only, it was decided to use the existing pre-convolved libraries, [s06av95a](https://github.com/PSI-edu/spectroscopy-tetracorder/blob/main/sl1/usgs/library06.conv/s06av95a) / [r06av95a](https://github.com/PSI-edu/spectroscopy-tetracorder/blob/main/sl1/usgs/rlib06/r06av95a), for the python side test run.
+
+Instead of loading the spectral reference database and performing convolution in Python, the validation test supplies the already-convolved native SPECpr reference spectra directly to `MaterialEvaluator`.  Thus the subclassing of GroupEvaluator in the validation script, to avoid the convolution step.  
+
+No evaluation functions in `python-tetracorder` are patched or replaced.
+
+Everything downstream of reference preparation is executed by the Python package, including:
+
+- continuum and feature evaluation;
+- fit and band-depth calculation;
+- feature weighting;
+- material constraints;
+- diagnostic / required feature tests;
+- NOT tests;
+- group-0 handling;
+- group winner selection;
+- case triggering and case evaluation;
+- NVRES / red-edge evaluation;
+- physical-condition material disabling.
+
+
+
+
 ## Run summary
 
 | Item | Value |

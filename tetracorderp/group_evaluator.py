@@ -89,7 +89,7 @@ class GroupEvaluator:
                 continue
             if mid in self.disabled_materials:
                 continue
-            print(f"Evaluating {count} of {len(self.evaluator.rules)}: {mid}")
+            #print(f"Evaluating {count} of {len(self.evaluator.rules)}: {mid}")
             result = self.evaluator.evaluate(mid, self.target)
             if rule["number"] == 0:
                 group0[mid] = result
@@ -188,6 +188,7 @@ class GroupEvaluator:
         raise FileNotFoundError(f"Could not find required Tetracorder file: {filename}")
 
     #==========writing functions =======================================================
+    
     def write_like_tetracorder(self, output_dir):
         """
         Write every enabled material's fit, depth and fd images as Tetracorder
@@ -199,8 +200,7 @@ class GroupEvaluator:
         rules = self.evaluator.rules
         nl, ns = self.target.shape[:2]
         lblsiz = ns if ns >= 299 else ns * (299 // ns + 1)      # creatoutfiles.r
-        label = (f"LBLSIZE={lblsiz}  FORMAT='BYTE'  TYPE='IMAGE'  RECSIZE={ns}  "
-                f"ORG='BSQ'  NL={nl}  NS={ns}  NB=1  ").encode().ljust(lblsiz)
+        
 
         # groups that write output, and those that take group 0 (cubecorder.r:448-468)
         live_groups = {int(r["number"]) for r in rules.values() if r["kind"] == "group"} \
@@ -236,15 +236,25 @@ class GroupEvaluator:
                 won = (np.asarray(result["winner"], dtype=object) == rid
                     if result is not None else np.zeros((nl, ns), dtype=bool))
 
-                for plane, key, scale, suffix in (("fit", "fit", 255.0, "FIT"),
+                for plane, key, scale, suffix in (("fit", "fit", 255.0, "FITS"),
                                                 ("depth", "depth", depth_scale, "DEPTHS"),
-                                                ("fd", "fit_depth", depth_scale, "FIT*DEPTH")):
+                                                ("fd", "fit_depth", depth_scale, "F*D")):
                     values = (np.ma.filled(np.ma.asarray(result[key], dtype=np.float32), 0.0)
                             if result is not None else np.zeros((nl, ns), np.float32))
                     x = np.where(won, values, 0.0).astype(np.float32) * np.float32(scale)
                     image = np.clip(np.floor(np.nan_to_num(x).astype(np.float64) + 0.5), 0, 255)
 
                     path = output_dir / subdir / f"{name}.{plane}"
+                    title = f"{rule['output_title']:<40}{suffix}"
+                    label = (
+                        f"LBLSIZE={lblsiz:<16}"
+                        f"FORMAT='BYTE'  TYPE='IMAGE'  BUFSIZ=20262   "
+                        f"DIM=2  EOL=0  RECSIZE={ns}  ORG='BSQ'  "
+                        f"NL={nl}  NS={ns}  NB=1  "
+                        f"N1=0  N2=0  N3=0  N4=0  NBB=0  NLB=0  "
+                        f"TASK='tetracorder'  USER='root'  "
+                        f"TITLE='{title}'"
+                    ).encode("ascii").ljust(lblsiz)
                     with gzip.GzipFile(f"{path}.gz", "wb", compresslevel=6, mtime=0) as f:
                         f.write(label + image.astype(np.uint8).tobytes())
                     Path(f"{path}.gz.hdr").write_text(

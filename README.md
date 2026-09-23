@@ -27,7 +27,7 @@ The project is intended to:
 ## Rules/Materials
 
 The project is based on published/released [Tetracorder](https://github.com/PSI-edu/spectroscopy-tetracorder) rule definitions and attempts to reproduce their evaluation behaviour independently in Python.
-The most recent expert sytem ruleset is [cmd.lib.setup.t6.00a6](https://github.com/PSI-edu/spectroscopy-tetracorder/blob/main/tetracorder.cmds/tetracorder6.00a.cmds/cmd.lib.setup.t6.00a6). These rules have been parsed into json format, with some manual editing resulting in a [dataset](resources/tetracorder_rules_as_dict.json) that can be read by the python implementation  
+The most recent expert system ruleset is [cmd.lib.setup.t6.00a6](https://github.com/PSI-edu/spectroscopy-tetracorder/blob/main/tetracorder.cmds/tetracorder6.00a.cmds/cmd.lib.setup.t6.00a6). These rules have been parsed into json format, with some manual editing resulting in a [dataset](resources/tetracorder_rules_as_dict.json) that can be read by the python implementation  
 
 ## Reference spectra
 
@@ -36,13 +36,13 @@ The SQLite reference spectra database in this repository is derived from the lib
 
 ## Fidelity
 
-### Tetracorder 6.00 Cuprite95 validation test
+### Tetracorder 6.00 Cuprite95 validation tests
 
 #### Native Tetracorder run
 
-The reference run for this test was perfomed in a [tetracorder-lite](https://github.com/emit-sds/tetracorder-lite) docker container. Tetracorder-lite vendors the entire [authoritative Tetracorder and Specpr](https://github.com/PSI-edu/spectroscopy-tetracorder) ratfor build, with marginal difference to the original cmd files (a renamed material, and some different comments).
+The reference run for these tests was perfomed in a [tetracorder-lite](https://github.com/emit-sds/tetracorder-lite) docker container. Tetracorder-lite vendors the entire [authoritative Tetracorder and Specpr](https://github.com/PSI-edu/spectroscopy-tetracorder) ratfor build, with marginal difference to the original cmd files (a renamed material, and some different comments).
 
-The native run consumes the [Cuprite95 AVIRIS](https://popo.jpl.nasa.gov/1995_cuprite_RTGC_rfl_cube/) cube using the Tetracorder 6.00 command/rule configuration and writes separate output products for the enabled material groups and cases. The setup, physical conditions, disabled groups etc are all faithrully reproduced from the [testrun](https://github.com/PSI-edu/spectroscopy-tetracorder/tree/main/cuprite95) in the original Tetracorder, except this run used expert system 6.0 and the hosted run results use 5.26e1.
+The native run consumes the [Cuprite95 AVIRIS](https://popo.jpl.nasa.gov/1995_cuprite_RTGC_rfl_cube/) cube using the Tetracorder 6.00 command/rule configuration and writes separate output products for the enabled material groups and cases. The setup, physical conditions, disabled groups etc are all faithfully reproduced from the [testrun](https://github.com/PSI-edu/spectroscopy-tetracorder/tree/main/cuprite95) in the original Tetracorder, except this run used expert system 6.0 and the hosted run results use 5.26e1.
 
 Native Tetracoder internals:
 
@@ -58,11 +58,11 @@ Native Tetracoder internals:
 are all recorded.
 
 
-#### Python run
+#### Python runs
 
 ##### Cube preparation
 
-The python side test run perfomed the same cube preparation as the Tetracorder internals.
+The python side test runs were perfomed on the same cube, using the same preparation as the Tetracorder internals.
  - converts the native integer DN values to float32 and applies exactly the native Tetracorder scaling  
  ```cube = (dn.astype(np.float32) + np.float32(offset)) * np.float32(scale)```  
  - Pixels whose raw DN equals the native deleted-data sentinel are replaced by NaN  
@@ -74,133 +74,71 @@ The python side test run perfomed the same cube preparation as the Tetracorder i
 This ensures that `python-tetracorder` is supplied with the same cube, wavelengths, valid-band mask, physical conditions and rules used by the native run.
 
 ##### Library
-`python-tetracorder` has an internal GaussianConvolver and SQLite database of the required reference spectra, at their original library sampling, before any convolution. This convolver is perhaps not as robust as it could be, and certainly differs from the SpecPr convolution used to produce their sensor-specific convolution libraries.  
 
-As this is an algorithmic test only, it was decided to use the existing pre-convolved libraries, [s06av95a](https://github.com/PSI-edu/spectroscopy-tetracorder/blob/main/sl1/usgs/library06.conv/s06av95a) / [r06av95a](https://github.com/PSI-edu/spectroscopy-tetracorder/blob/main/sl1/usgs/rlib06/r06av95a), for the python side test run.
+The first test to establish algorithmic fidelity was ran by passing in the native convolved reference spectra. It is documented [here](tests/fidelity_test_specpr_preconvolved.md)  
 
-Instead of loading the spectral reference database and performing convolution in Python, the validation test supplies the already-convolved native SPECpr reference spectra directly to `MaterialEvaluator`.  Thus the subclassing of GroupEvaluator in the validation script, to avoid the convolution step.  
+The second test used a vendored convolve function from [tetracorder-lite](https://github.com/emit-sds/tetracorder-lite) on the SQLite database derived from the Tetracorder repository.  
 
-No evaluation functions in `python-tetracorder` are patched or replaced.
+As the vendored convolver requires fwhm data per reference, the database was updated to include that information in the samples table. The python code has also been adjusted to handle the new database format.
 
-Everything downstream of reference preparation is executed by the Python package, including:
+All python internals were used in this test; the SQLite database, the python convolver, `GroupEvaluator`, `MaterialEvaluator` and the `write_like_tetracorder()` method.
 
-- continuum and feature evaluation;
-- fit and band-depth calculation;
-- feature weighting;
-- material constraints;
-- diagnostic / required feature tests;
-- NOT tests;
-- group-0 handling;
-- group winner selection;
-- case triggering and case evaluation;
-- NVRES / red-edge evaluation;
-- physical-condition material disabling.
+The full test script is documented [here](tests/Full_python_test_run_script.py)
 
 All enabled groups and cases are evaluated. Group-0 materials are included in groups where the native configuration includes group 0.
 
 ### Comparison
 
-The full python run and comparison script is available [here](tests/test_package_native_inputs_native_refs.py)
-
-The Python and native Tetracorder outputs use different internal representations, so the Python results are first translated into the native Tetracorder output format before comparison.
-
-On the python side, for each group or case, python-tetracorder returns a resolved result containing spatial arrays:  
-
- - *winner* - the material identifier selected at each pixel;
- - *fit* - the floating-point fit value of the winning material;
- - *depth* - the floating-point band-depth value;
- - *fit_depth* - the combined fit-depth value.
-
-These are retained as NumPy arrays at Python numerical precision. Unlike native Tetracorder, Python does not create a separate output image for every material during evaluation.
-
 Native Tetracorder writes separate 8-bit products for each material, including:
 
-<material>.fit.gz
-<material>.depth.gz
-<material>.fd.gz
+ - `<material>.fit.gz`
+ - `<material>.depth.gz`
+ - `<material>.fd.gz`
 
-To make the Python result directly comparable, the validation script recreates these products in memory for each material.
-
-For a given material, the Python winner map is first used to retain values only where that material won:
-
-mine = winner == material
-
-All other pixels are set to zero.
-
-The floating-point Python values are then converted to the same unsigned 8-bit representation used by native Tetracorder.
-
-Fit values use:
-
-DN = nint(fit x 255)
-
-while depth and fit-depth use the material-specific native depth scale recorded by the Tetracorder run.
-
-The conversion reproduces native output behaviour by:  
- - applying the native scale;
- - converting non-finite values to zero;
- - rounding using the native nearest-integer convention;
- - clipping values to the range 0 - 255;
- - storing the result as uint8.
-
-The resulting Python arrays therefore represent the values that python-tetracorder would have written had it used the native Tetracorder byte-output convention.
-
-The corresponding native .fit.gz, .depth.gz, and .fd.gz files are decompressed and read directly as uint8 images.
-
-The native values are not rescaled back to floating point. Instead, the translated Python outputs are compared directly against the byte values written by Tetracorder.
-
+The `write_like_tetracorder()` method on `GroupEvaluator` emulates this output style.
 The comparison therefore evaluates both implementations in the same output space; comparing native uint8 output directly.
 
 Classification agreement is measured from pixels where the fit image is non-zero, while fit and depth agreement is assessed directly from the corresponding 8-bit values.
 
 ### Results  
 
-The python implementation is significantly slower - although there are optimisation that can be performed once behaviour is equivalent.
+The python implementation is significantly slower - although there are still optimisations that can be performed once behaviour is equivalent.
 
-Summary statistics are also calculated for each group and case. Materials present in the rules but without a corresponding native output file are reported as `without native output` and are excluded from the direct numerical comparison.
+Summary statistics are also calculated for each group and case. 
 
-The complete test comparison output is in [this file](tests/fidelity_test_specpr_preconvolved.md). Only a summary is presented here.
-
-#### Run summary
-
-| Item | Value |
-|---|---:|
-| Package run | 1053 s |
-| Materials disabled | 26 |
+The complete test comparison output is in [this file](tests/fidelity_test_full_python.md). Only a summary is presented here.
 
 
 #### Summary
 
-| Set | Materials | No native output | Native pixels | Python pixels | Jaccard | Fit exact |
-|---|---:|---:|---:|---:|---:|---:|
-| Group 1 | 140 | 20 | 573,079 | 573,079 | 1.0000 | 1.0000 |
-| Group 2 | 227 | 21 | 596,794 | 596,794 | 1.0000 | 1.0000 |
-| Group 3 | 4 | 0 | 550,506 | 550,506 | 1.0000 | 1.0000 |
-| Group 4 | 48 | 21 | 401,157 | 401,157 | 1.0000 | 0.9999 |
-| Group 5 | 35 | 20 | 7,265 | 7,265 | 1.0000 | 1.0000 |
-| Group 20 | 41 | 20 | 17,727 | 17,727 | 1.0000 | 0.9986 |
-| Group 21 | 40 | 20 | 17,726 | 17,726 | 1.0000 | 0.9986 |
-| Group 22 | 29 | 20 | 6,178 | 6,178 | 1.0000 | 1.0000 |
-| Group 37 | 29 | 20 | 6,178 | 6,178 | 1.0000 | 1.0000 |
-| Group 38 | 29 | 20 | 107,050 | 107,050 | 1.0000 | 1.0000 |
-| Case 1 | 2 | 0 | 528,969 | 528,969 | 1.0000 | 0.9999 |
-| Case 2 | 15 | 0 | 466,554 | 466,554 | 1.0000 | 1.0000 |
-| Case 3 | 1 | 0 | 432,034 | 432,034 | 1.0000 | 1.0000 |
-| Case 4 | 1 | 0 | 460,509 | 460,509 | 1.0000 | 1.0000 |
-| Case 5 | 1 | 0 | 514,984 | 514,984 | 1.0000 | 1.0000 |
-| Case 6 | 13 | 0 | 45,759 | 45,759 | 1.0000 | 1.0000 |
-  
 
-The Python implementation reproduced the native Tetracorder classifications very close to exactly. Across approximately 4.73 million classified group/case assignments, only three pixel-level winner differences are apparent from the reported material counts, equivalent to about 0.00006% of classifications. All reported group and case Jaccard scores round to 1.0000. Numerical fit outputs are also almost entirely identical after conversion to Tetracorder's native 8-bit format, with the lowest exact-fit agreement being 99.86%. The remaining differences therefore appear to be numerical precision effects rather than substantive differences in the classification algorithm.  
+| Group | Materials | Native only | Python only | Native pixels | Python pixels | Jaccard | Fit exact |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| case.ep-cal-chl | 13 | 0 | 0 | 45,759 | 45,759 | 1.0000 | 1.0000 |
+| case.red-edge | 2 | 0 | 0 | 528,969 | 528,969 | 1.0000 | 0.9996 |
+| case.veg.type | 15 | 0 | 0 | 466,554 | 466,554 | 1.0000 | 1.0000 |
+| group.1.5um-broad | 48 | 0 | 1 | 401,157 | 401,157 | 1.0000 | 1.0000 |
+| group.1um | 140 | 0 | 0 | 573,079 | 573,079 | 1.0000 | 0.9999 |
+| group.2um | 227 | 0 | 1 | 596,794 | 596,794 | 1.0000 | 1.0000 |
+| group.2um-broad | 35 | 0 | 0 | 7,265 | 7,265 | 1.0000 | 1.0000 |
+| group.ch4gas-2.3um | 29 | 0 | 0 | 6,178 | 6,178 | 1.0000 | 1.0000 |
+| group.co2gas-2um | 29 | 0 | 0 | 107,050 | 107,050 | 1.0000 | 0.9997 |
+| group.ree | 41 | 0 | 0 | 17,727 | 17,727 | 1.0000 | 0.9987 |
+| group.ree_g21 | 40 | 0 | 0 | 17,726 | 17,726 | 1.0000 | 0.9987 |
+| group.ree_samar | 29 | 0 | 0 | 6,178 | 6,178 | 1.0000 | 1.0000 |
+| group.veg | 7 | 0 | 0 | 1,958,033 | 1,958,033 | 1.0000 | 0.9999 |
+
+While there is minor degradation from the algorithmic fidelity test, incorporating the SQLite database and the tetrapy convolver, has had no impact on the material classification per pixel. The difference in fit exact (and depth exact) are attributed to floating point rounding, order of accumulation variations in the codebase, and exacerbated by the uint8 quantisation.  
+
+Native disables materials at setup and creates no output files for them (creatoutfiles.r:76), listing them in AAA.info/disabled-materials.txt. python-tetracorder reaches the same state during evaluation: a feature whose windows have no usable channels returns invalid, takes zero weight, and rejects the material if it is weak or must-have. Two materials - wollastonite_hs348.3b and potassium_nitrate - therefore appear as empty python outputs with no native counterpart. 
 
 At this stage, focus will move to optimisation of the code performance.
 
 ### Scope of the validation
 
-This test validates the Tetracorder numerical evaluation and decision pipeline downstream of reference-spectrum preparation against the native Tetracorder 6.00 Cuprite95 run.
+This test validates the Tetracorder numerical evaluation and decision pipeline and reference-spectrum preparation against the native Tetracorder 6.00 Cuprite95 run.
 
-It deliberately does not test whether the Python reference-library convolution reproduces SPECpr convolution. Reference-spectrum preparation is therefore a separate validation step.
-
-The purpose of this test is to determine whether, given the same target spectra, wavelength configuration, rules and convolved reference spectra, `python-tetracorder` reproduces the material classifications and numerical outputs of native Tetracorder 6.00.
+The purpose of this test is to determine whether `python-tetracorder` reproduces the material classifications of native Tetracorder 6.00.
 
 ## Next steps
 
@@ -208,9 +146,6 @@ The purpose of this test is to determine whether, given the same target spectra,
    - refactoring  
    - numba jit where possible  
    - caching  
- - convolution  
-   - the existing convolver needs re-writing, perhaps incorporating the [tetrapy](https://github.com/emit-sds/tetracorder-lite/tree/main/tetrapy) convolver instead.
-
 
 ## Scope
 

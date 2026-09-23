@@ -1,0 +1,57 @@
+python-tetracorder
+Copyright (c) 2026 Russell Rogers
+
+The original work in this repository is licensed under the GNU General Public
+License, version 3; see LICENSE.
+
+This repository also includes, or derives from, the third-party components
+below. Each is distributed under its own license. Those licenses govern the
+components they cover, and nothing in LICENSE changes them.
+
+
+Spectral convolution (tetrapy)
+------------------------------
+Location:  tetracorderp/conv/convolve.py
+Upstream:  https://github.com/emit-sds/tetracorder-lite
+           (tetrapy package, file tetracorder/conv/convolve.py)
+
+Copyright: (c) 2026 California Institute of Technology ("Caltech").
+           U.S. Government sponsorship acknowledged.
+License:   Apache License, Version 2.0; see licenses/LICENSE-APACHE-2.0.
+
+This file has been modified from the original: handling of specpr deleted
+points has been removed, as the reference data is sanitised before it reaches
+the convolver. The modification is marked in the file header.
+
+
+Tetracorder and specpr
+----------------------
+Relationship: this repository is an independent reimplementation in Python of
+           the Tetracorder expert system, and vendors modified Tetracorder command
+           files as its rule source.
+Upstream:  https://github.com/PSI-edu/spectroscopy-tetracorder
+Copyright: (c) 1975-2026 Roger N. Clark, Planetary Science Institute (PSI),
+           and colleagues named in the code.
+License:   GNU General Public License, version 3, plus the conditions in the
+           license.txt files throughout the upstream repository:
+             - redistributions must keep the copyright notice, conditions and
+               disclaimer;
+             - the names of Roger N. Clark, PSI and contributors may not be
+               used to endorse or promote derived products without prior
+               written permission;
+             - translations or recodings into other languages must be made
+               available, with source, for free.
+
+This repository is such a recoding, and is distributed with source under
+GPL-3.0 accordingly. Neither Roger N. Clark, PSI, Caltech, JPL nor NASA
+endorse this work, and nothing here should be read as implying that they do.
+
+
+Spectral libraries
+------------------
+Location:  resources/  (reference spectra, convolved to sensor resolution)
+Source:    Derived from the USGS splib06 and the companion sprlb06 research
+           library, as distributed with Tetracorder.
+Reference: Clark, R.N., et al., 2007, USGS digital spectral library splib06a:
+           U.S. Geological Survey, Digital Data Series 231,
+           https://doi.org/10.3133/ds231

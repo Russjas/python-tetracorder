@@ -1,8 +1,15 @@
 """
-This is vendored and edited from: https://github.com/emit-sds/tetracorder-lite.
-Original code is preserved but commented out. This function was originally intended to 
-work with the specbr binary library functions. In this codebase, the library is stored
-in a SQLite db, and pre-sanitised.
+Vendored from emit-sds/tetracorder-lite (tetrapy package),
+file tetracorder/conv/convolve.py at commit <sha>, retrieved <YYYY-MM-DD>.
+
+Copyright (c) 2026 California Institute of Technology ("Caltech").
+U.S. Government sponsorship acknowledged.
+Licensed under the Apache License, Version 2.0.
+See licenses/LICENSE-APACHE-2.0 and NOTICE.
+
+MODIFIED FROM THE ORIGINAL: handling of specpr deleted points has been
+removed; reference data is sanitised before it reaches this module.
+########################################################################
 
 Gaussian high-to-low resolution convolution (specpr function 17).
 
