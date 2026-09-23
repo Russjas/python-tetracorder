@@ -1,6 +1,6 @@
 """
 Vendored from emit-sds/tetracorder-lite (tetrapy package),
-file tetracorder/conv/convolve.py at commit <sha>, retrieved <YYYY-MM-DD>.
+file tetracorder/conv/convolve.py 
 
 Copyright (c) 2026 California Institute of Technology ("Caltech").
 U.S. Government sponsorship acknowledged.

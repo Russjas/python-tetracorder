@@ -102,7 +102,7 @@ Classification agreement is measured from pixels where the fit image is non-zero
 
 ### Results  
 
-The python implementation is significantly slower - although there are still optimisations that can be performed once behaviour is equivalent.
+The python implementation is significantly slower (900+s) - although there are still optimisations that can be performed once behaviour is equivalent.
 
 Summary statistics are also calculated for each group and case. 
 
@@ -171,3 +171,15 @@ There is **no guarantee or warranty** that the implementation is:
   
 Do not use results from this repository as the sole basis for scientific, commercial, exploration, environmental, safety, or other consequential decisions.
 
+## License
+
+python-tetracorder is licensed under the GNU General Public License, version 3;
+see [LICENSE](LICENSE).
+
+Third-party components keep their own licenses (details in [NOTICE](NOTICE)):
+
+| Component | Where | License |
+|---|---|---|
+| Spectral convolution, from [tetracorder-lite](https://github.com/emit-sds/tetracorder-lite) | `tetracorderp/conv/convolve.py` | Apache-2.0 (Caltech/JPL), modified |
+| Tetracorder command files and algorithm, from [spectroscopy-tetracorder](https://github.com/PSI-edu/spectroscopy-tetracorder) | rule source, `resources/` | GPL-3.0 + PSI conditions |
+| USGS splib06 / sprlb06 reference spectra | `resources/` | as distributed with Tetracorder |
