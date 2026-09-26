@@ -47,8 +47,8 @@ class MaterialEvaluator:
 
         self.rules, self.not_definitions = self._prepare_rules(rules, mode)
         self.disabled_materials = set(disabled_materials or ())
+        self._not_source_cache = {}
 
-        self.rules, self.not_definitions = self._prepare_rules(rules, mode)
         self.wavelengths = target_wavelengths
         self.fwhm = target_fwhm
         self.valid_bands = target_valid_bands
@@ -228,8 +228,21 @@ class MaterialEvaluator:
     def _native_not_source(self, source_rule_id, source_feature_id, target_spectra):
         """
         Fit and depth of a NOT source feature as native tp1mat leaves them in
-        zfit / zdepth.
+        zfit / zdepth. Cached per (target_spectra, source_rule_id,
+        source_feature_id): many materials in a ruleset veto against the same
+        common source, and the result is a deterministic function of those
+        three inputs.
+        """
+        key = (id(target_spectra), source_rule_id, source_feature_id)
+        if key in self._not_source_cache:
+            return self._not_source_cache[key]
 
+        result = self._native_not_source_uncached(source_rule_id, source_feature_id, target_spectra)
+        self._not_source_cache[key] = result
+        return result
+
+    def _native_not_source_uncached(self, source_rule_id, source_feature_id, target_spectra):
+        """
         tp1mat evaluates a material's features in rule order. When a weak,
         diagnostic or must-have feature is absent (depth / sign <= 1e-6) it
         zeroes that feature and every later feature, then returns. So the
@@ -420,8 +433,7 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
         try:
             target_cont = linear_feature_continuum(target, target_wavelengths,
                                                left_window, right_window,valid_bands=valid_bands)
-        except ValueError as e:
-            print("TARGET CONTINUUM ERROR:", e)
+        except ValueError:
             return None, "invalid_data"
         
     elif continuum == "convex":
@@ -679,7 +691,6 @@ def resolve_nvres_feature(
     nvres1mat feature-level processing for the nvres rules
     present in the current Tetracorder rule set.
     """
-    print("On the nvres path")
     result, status = fit_nvres_feature(
         reference_spectrum,
         ratio_spectrum,

@@ -620,7 +620,7 @@ write_plain_jpgs(run, "C:/Users/Hyperspectral/Documents/GitHub/python-tetracorde
 import re, numpy as np
 from pathlib import Path
 from matplotlib.image import imsave
-from src.config import VARIABLE_PRESETS
+from tetracorderp.config import VARIABLE_PRESETS
 
 support = Path(r"\\wsl.localhost\Ubuntu\home\hyperspectral\tetracorder-data\cuprite95\testrun1\cmds.color.support")
 master = "\n".join(l for l in (support / "davinci.master.colors").read_text().splitlines()
