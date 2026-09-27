@@ -33,6 +33,7 @@ import sqlite3
 
 import numpy as np
 from scipy.interpolate import CubicSpline
+from numba import njit
 
 from .config import VARIABLE_PRESETS
 
@@ -294,32 +295,37 @@ def _prepare(spectra, wavelengths, valid_bands):
 #               / n.astype(np.float32))
 #     return refl.astype(np.float32), wl.astype(np.float32), n
 # =============================================================================
+@njit(cache=True, error_model="numpy")
+def _window_mean_kernel(values, wav, channels):
+    P = values.shape[0]
+    refl = np.empty(P, dtype=np.float32)
+    wl = np.empty(P, dtype=np.float32)
+    n = np.zeros(P, dtype=np.intp)
+    for p in range(P):
+        rs = np.float32(0.0)
+        ws = np.float32(0.0)
+        k = 0
+        for c in channels:  # channel order, as the Fortran DO loop
+            v = values[p, c]
+            if np.isfinite(v):
+                rs += v
+                ws += wav[c]
+                k += 1
+        n[p] = k
+        refl[p] = rs / np.float32(k)  # 0/0 -> nan under error_model="numpy"
+        wl[p] = ws / np.float32(k)
+    return refl, wl, n
+
 
 def _window_mean(values, wav, mask):
     """
     REAL*4 means of reflectance and wavelength over mask (last axis),
     skipping NaN, as the bandmp continuum loops do. Returns means and counts.
-
-    Accumulates channel by channel in channel order (the Fortran DO loop),
-    touching only the masked channels.
     """
-    shape = values.shape[:-1]
-    refl_sum = np.zeros(shape, dtype=np.float32)
-    wl_sum = np.zeros(shape, dtype=np.float32)
-    n = np.zeros(shape, dtype=np.intp)
-
-    for c in np.flatnonzero(mask):
-        v = values[..., c]
-        good = np.isfinite(v)
-        refl_sum += np.where(good, v, np.float32(0))
-        wl_sum += np.where(good, np.float32(wav[c]), np.float32(0))
-        n += good
-
-    with np.errstate(invalid="ignore", divide="ignore"):
-        count = n.astype(np.float32)
-        refl = refl_sum / count
-        wl = wl_sum / count
-    return refl, wl, n
+    lead = values.shape[:-1]
+    flat = np.asarray(values, dtype=np.float32).reshape(-1, values.shape[-1])
+    refl, wl, n = _window_mean_kernel(flat, np.asarray(wav, dtype=np.float32), np.flatnonzero(mask))
+    return refl.reshape(lead), wl.reshape(lead), n.reshape(lead)
 
 def _remove_continuum(values, continuum, use):
     """rfobsc = rfobs / contin where valid and |contin| > 0.1e-20, else deleted."""
