@@ -18,6 +18,11 @@ from .tetracorder_ops import (linear_feature_continuum,
 from .config import RRATIO_REFERENCES
 from .convolve import Convolver
 
+def _zero_nan(x):
+    """Deleted (NaN) pixels contribute 0, as np.ma.filled(x, 0.0) did for masked ones."""
+    return np.where(np.isnan(x), 0.0, x)
+
+
 class MaterialEvaluator:
     """
     Evaluate individual Tetracorder materials through:
@@ -265,8 +270,8 @@ class MaterialEvaluator:
             valid = result["status"] == "valid"
 
             if valid:
-                fit = np.ma.filled(np.ma.asarray(result["mod_fit"], dtype=float), 0.0)
-                depth = np.ma.filled(np.ma.asarray(result["mod_depth"], dtype=float), 0.0)
+                fit = _zero_nan(np.asarray(result["mod_fit"], dtype=float))
+                depth = _zero_nan(np.asarray(result["mod_depth"], dtype=float))
                 if dead is None:
                     dead = np.zeros(fit.shape, dtype=bool)
                 if feature["role"] in {"weak", "diagnostic", "must_have"}:
@@ -554,7 +559,7 @@ def fit_nvres_feature(
     wavelengths = target_wavelengths[region]
     reference = reference[region]
     ratio_reference = ratio_reference[region]
-    target = np.ma.asarray(target)[..., region]
+    target = np.asarray(target)[..., region]
     valid = valid_bands[region]
 
     ratio_valid = (valid
@@ -585,14 +590,16 @@ def fit_nvres_feature(
     # ----------------------------------------------------------
 
     def paired_means(selected):
-        target_window = np.ma.masked_invalid(target[..., selected])
-        ratio_window = ratio_reference[selected]
-        ratio_data = np.broadcast_to(ratio_window, target_window.shape,)
-        joint_mask = (np.ma.getmaskarray(target_window) | ~np.isfinite(ratio_data))
-        target_window = np.ma.array(np.ma.getdata(target_window), mask=joint_mask,)
-        ratio_window = np.ma.array(ratio_data, mask=joint_mask,)
-
-        return (target_window.mean(axis=-1), ratio_window.mean(axis=-1),)
+        
+        target_window = target[..., selected]
+        ratio_window = np.broadcast_to(ratio_reference[selected], target_window.shape)
+        ok = np.isfinite(target_window) & np.isfinite(ratio_window)
+        count = ok.sum(axis=-1)
+        # MaskedArray.mean: float32 sum of filled(0), then * 1. / count -> float64; empty -> NaN
+        with np.errstate(divide="ignore", invalid="ignore"):
+            target_mean = np.where(ok, target_window, np.float32(0)).sum(axis=-1) * 1. / count
+            ratio_mean = np.where(ok, ratio_window, np.float32(0)).sum(axis=-1) * 1. / count
+        return target_mean, ratio_mean
 
     avlcu, avlcv = paired_means(left)
     avrcu, avrcv = paired_means(right)
@@ -620,10 +627,10 @@ def fit_nvres_feature(
 
         ratioed_target = (target / normalized_ratio)
 
-    ratioed_target = np.ma.masked_invalid(ratioed_target)
+    ratioed_target = np.where(np.isfinite(ratioed_target), ratioed_target, np.nan)
 
     # RRATIO-deleted channels are also unusable by bandmp.
-    ratioed_target[..., ~ratio_valid] = np.ma.masked
+    ratioed_target[..., ~ratio_valid] = np.nan
 
     # ----------------------------------------------------------
     # Ordinary Specpr band matching on the ratioed spectrum.
@@ -645,7 +652,7 @@ def fit_nvres_feature(
         return None, status
 
     # Preserve ordinary bandmp depth for debugging/parity testing.
-    band_depth = np.ma.asarray(result["depth"]).copy()
+    band_depth = result["depth"].copy()
 
     # ----------------------------------------------------------
     # Normalize the band depth for red-edge strength.
@@ -667,7 +674,7 @@ def fit_nvres_feature(
 
         normalized_depth = (band_depth * depth_factor)
 
-    normalized_depth = np.ma.masked_invalid(normalized_depth)
+    normalized_depth = np.where(np.isfinite(normalized_depth), normalized_depth, np.nan)
 
     result["nvres_band_depth"] = band_depth
     result["nvres_depth_factor"] = depth_factor
@@ -712,9 +719,9 @@ def resolve_nvres_feature(
             "reference_area": None,
         }
 
-    fit = np.ma.asarray(result["fit"]).copy()
+    fit = np.asarray(result["fit"]).copy()
 
-    depth = np.ma.asarray(result["depth"]).copy()
+    depth = np.asarray(result["depth"]).copy()
 
     # Current nvres rules contain only ct.
     for test in feature.get("tests", []):
@@ -795,12 +802,12 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
     
     tests = feature_dict.get("tests", [])
 
-    fit = np.ma.asarray(feat_fit["fit"]).copy()
-    depth = np.ma.asarray(feat_fit["depth"]).copy()
+    fit = np.asarray(feat_fit["fit"]).copy()
+    depth = np.asarray(feat_fit["depth"]).copy()
 
-    continuum = np.ma.asarray(feat_fit["continuum"])
-    left_continuum = np.ma.asarray(feat_fit["left_continuum"])
-    right_continuum = np.ma.asarray(feat_fit["right_continuum"])
+    continuum = np.asarray(feat_fit["continuum"])
+    left_continuum = np.asarray(feat_fit["left_continuum"])
+    right_continuum = np.asarray(feat_fit["right_continuum"])
 
     # Convenient lookup. A feature should only have one of each test type.
     tests_by_name = {test["test"]: test["values"] for test in tests}
@@ -971,7 +978,7 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
         sign = 1.0 if feat_fit["polarity"] == "absorption" else -1.0
         with np.errstate(invalid="ignore"):
             present = (depth / sign) > 1e-6
-        value = np.ma.where(present, continuum * depth, 0.0)
+        value = np.where(present, continuum * depth, 0.0)
 
         # TEMPORARY native Tetracorder bug emulation:
         # tp1mat.r incorrectly takes the LOWER r*bd fuzzy limit
@@ -1103,8 +1110,8 @@ def resolve_positive_material(rule_features, resolved_features):
 
             continue
 
-        fit = np.ma.asarray(result["mod_fit"])
-        depth = np.ma.asarray(result["mod_depth"])
+        fit = np.asarray(result["mod_fit"])
+        depth = np.asarray(result["mod_depth"])
 
         feature_sign = 1.0 if result["polarity"] == "absorption" else -1.0
         weight = feature_weights[f_id]
@@ -1112,24 +1119,25 @@ def resolve_positive_material(rule_features, resolved_features):
         # Tetracorder Ratfor:
         # xx = 1.0
         # if (bdepth / xfeat <= 0.1e-5) xx = 0.0
-        present = (depth / feature_sign) > 1e-6
+        with np.errstate(invalid="ignore"):
+            present = (depth / feature_sign) > 1e-6        # deleted (NaN) -> False
         xx = present.astype(float)
 
         # featimprt > 0 means W, D or M.
         # If enabled but the expected feature is not actually present, reject material.
         if role in {"weak", "diagnostic", "must_have"}:
-            rejected |= ~np.ma.filled(present, False)
+            rejected |= ~present
 
         # Tetracorder Ratfor excludes weak features from sumf/sumd/sumfd.
         if role != "weak":
             # This non-symettric application is faithful to
             # to the Tetracorder ratfor
-            sum_fit += np.ma.filled(fit * xx * weight, 0.0)
+            sum_fit += _zero_nan(fit * xx * weight)
 
             weighted_depth = depth * weight * feature_sign
 
-            sum_depth += np.ma.filled(weighted_depth, 0.0)
-            sum_fit_depth += np.ma.filled(weighted_depth * fit, 0.0)
+            sum_depth += _zero_nan(weighted_depth)
+            sum_fit_depth += _zero_nan(weighted_depth * fit)
 
     sum_fit[rejected] = 0.0
     sum_depth[rejected] = 0.0

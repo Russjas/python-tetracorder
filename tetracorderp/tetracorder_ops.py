@@ -146,7 +146,7 @@ def fuzzy_greater(value, thresholds):
     The input dtype is kept (float32 in -> REAL*4 arithmetic).
     """
     z1, z2 = (float(t) for t in thresholds)
-    x = np.asarray(np.ma.filled(np.ma.asarray(value), np.nan))
+    x = np.asarray(value)
     with np.errstate(invalid="ignore", divide="ignore"):
         return np.where(x < z1, 0.0,
                         np.where(x < z2, (x - z1) / (z2 - z1), 1.0))
@@ -162,7 +162,7 @@ def fuzzy_less(value, thresholds):
     e.g. "rcbblc< 0.8 0.9" is a hard cut at 0.8.
     """
     z1, z2 = (float(t) for t in thresholds)
-    x = np.asarray(np.ma.filled(np.ma.asarray(value), np.nan))
+    x = np.asarray(value)
     with np.errstate(invalid="ignore", divide="ignore"):
         return np.where(x > z1, 0.0,
                         np.where(x > z2, (x - z1) / (z2 - z1), 1.0))
@@ -250,7 +250,6 @@ def _wtochbin_uncached(wavelengths, w1, w2):
 
 
 def _prepare(spectra, wavelengths, valid_bands):
-    spectra = np.ma.filled(np.ma.asarray(spectra, dtype=np.float32), np.nan)
     spectra = np.asarray(spectra, dtype=np.float32)
     wavelengths = np.asarray(wavelengths, dtype=np.float32)
 
@@ -398,7 +397,7 @@ def linear_feature_continuum(
     return ContinuumFeature(
         continuum_type="linear",
         wavelengths=wav,
-        continuum_removed=np.ma.masked_invalid(continuum_removed),
+        continuum_removed=np.where(np.isfinite(continuum_removed), continuum_removed, np.nan),
         continuum=continuum,
         left_continuum=left_refl,
         right_continuum=right_refl,
@@ -489,7 +488,7 @@ def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_band
     return ContinuumFeature(
         continuum_type="curved",
         wavelengths=wav,
-        continuum_removed=np.ma.masked_invalid(continuum_removed),
+        continuum_removed=np.where(np.isfinite(continuum_removed), continuum_removed, np.nan),
         continuum=continuum,
         left_continuum=means[1],
         right_continuum=means[2],
@@ -543,10 +542,8 @@ def characterise_feature(
     if reference_wl.shape != target_wl.shape or not np.allclose(reference_wl, target_wl):
         raise ValueError("Reference and target feature wavelengths do not match.")
 
-    rflibc = np.asarray(np.ma.filled(np.ma.asarray(reference.continuum_removed,
-                                                   dtype=np.float32), np.nan))
-    rfobsc = np.asarray(np.ma.filled(np.ma.asarray(target.continuum_removed,
-                                                   dtype=np.float32), np.nan))
+    rflibc = np.asarray(reference.continuum_removed, dtype=np.float32)
+    rfobsc = np.asarray(target.continuum_removed, dtype=np.float32)
     if rflibc.ndim != 1:
         raise ValueError("Reference feature must be one-dimensional.")
     if rfobsc.shape[-1] != rflibc.size:
@@ -633,32 +630,10 @@ def characterise_feature(
     for c in (continuum, left_continuum, right_continuum):
         deleted |= ~((c >= _CONT_MIN) & (c <= _CONT_MAX))
 
-    fit = np.ma.masked_where(deleted, fit)
-    depth = np.ma.masked_where(deleted, depth)
-    fit_depth = np.ma.asarray(fit * depth, dtype=np.float32)
+    fit = np.where(deleted, np.nan, fit).astype(np.float32)
+    depth = np.where(deleted, np.nan, depth).astype(np.float32)
+    fit_depth = (fit * depth).astype(np.float32)
 
-    band_bottom = np.ma.asarray(continuum * (np.float32(1.0) - depth), dtype=np.float32)
-    reflectance_depth = np.ma.asarray(continuum * depth, dtype=np.float32)
-
-    # ------------------------------------------------------------------
-    # Continuum-shape ratios with the tp1mat clamps
-    #   lct/rct, rct/lct:   denominator >= 0.1e-6, numerator <= 0.1e20
-    #   shoulder ratios:    |denominator| < 0.1e-6 -> +0.1e-6,
-    #                       numerator <= 0.1e20
-    # ------------------------------------------------------------------
-    with np.errstate(divide="ignore", invalid="ignore"):
-        left_right_ratio = (np.minimum(left_continuum, _CONT_MAX)
-                            / np.maximum(right_continuum, _CONT_MIN))
-        right_left_ratio = (np.minimum(right_continuum, _CONT_MAX)
-                            / np.maximum(left_continuum, _CONT_MIN))
-
-        def shoulder(numerator_side, denominator_side):
-            den = denominator_side - band_bottom
-            den = np.ma.where(np.abs(den) < _CONT_MIN, _CONT_MIN, den)
-            return np.minimum(numerator_side - band_bottom, _CONT_MAX) / den
-
-        left_shoulder_ratio = shoulder(left_continuum, right_continuum)
-        right_shoulder_ratio = shoulder(right_continuum, left_continuum)
 
     return {
         "fit": fit,
@@ -673,13 +648,6 @@ def characterise_feature(
         "continuum": continuum,
         "left_continuum": left_continuum,
         "right_continuum": right_continuum,
-        "band_bottom": band_bottom,
-        "reflectance_depth": reflectance_depth,
-
-        "left_right_ratio": left_right_ratio,
-        "right_left_ratio": right_left_ratio,
-        "left_shoulder_ratio": left_shoulder_ratio,
-        "right_shoulder_ratio": right_shoulder_ratio,
 
         # getifeat weight area: band channels only
         "reference_area": float(np.nansum(np.abs(1.0 - rflibc[interior]))),
