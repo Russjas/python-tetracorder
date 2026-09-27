@@ -34,6 +34,43 @@ The most recent expert system ruleset is [cmd.lib.setup.t6.00a6](https://github.
 Tetracorder rules reference spectra from USGS spectral libraries. The most recent version of the USGS spectral library is available [here](https://www.usgs.gov/data/usgs-spectral-library-version-7-data). However, the Tetracorder rules refer to specific reference spectra from a previous version of this library, and mapping between them is not straightforward.
 The SQLite reference spectra database in this repository is derived from the libraries in the [Tetracorder repo](https://github.com/PSI-edu/spectroscopy-tetracorder). The database here is derived from the native libraries rather than the convolved variants.
 
+## Usage
+
+Install from a checkout:
+
+```bash
+pip install -e .
+```
+
+This installs the `tetracorderp` package. There is no re-exported top-level
+API yet, so import directly from the submodule you need. The entry point is
+`GroupEvaluator`: constructing it runs the full rule evaluation over your
+cube, and the writer methods emit results in various formats.
+
+```python
+from tetracorderp.group_evaluator import GroupEvaluator
+
+# cube: (lines, samples, bands) reflectance array, float
+# wavelengths, fwhm: 1D arrays, one entry per band
+run = GroupEvaluator(
+    target_spectra=cube,
+    target_wavelengths=wavelengths,
+    target_fwhm=fwhm,
+    mode="default",                 # see tetracorderp.config.VARIABLE_PRESETS
+    target_valid_bands=valid_bands, # optional bool mask, defaults to all-True
+)
+# Evaluation runs inside __init__; run.group_winners / run.case_winners
+# are already populated by the time the constructor returns.
+
+run.write_like_tetracorder("output_dir")  # native-style .fit.gz/.depth.gz/.fd.gz
+run.write_npz("results.npz")              # single compressed npz
+run.write_jpgs("jpgs_dir")                # classification map images
+```
+
+`reference_file` and `rules_file` default to the bundled
+`resources/tetracorder_rules_references.db` and
+`resources/tetracorder_rules_as_dict.json` if not supplied explicitly.
+
 ## Fidelity
 
 ### Tetracorder 6.00 Cuprite95 validation tests
@@ -146,6 +183,48 @@ The purpose of this test is to determine whether `python-tetracorder` reproduces
    - refactoring  
    - numba jit where possible  
    - caching  
+
+## Recent changes
+
+A packaging/quality/perf pass covered:
+
+- **Packaging fix**: `pyproject.toml` declared `packages = ["TetracorderP"]`,
+  which didn't match the real (lowercase) `tetracorderp/` package directory
+  and would not have installed correctly. Fixed, and added the previously
+  undeclared `matplotlib` dependency (used by `GroupEvaluator.write_jpgs` /
+  `write_plain_jpgs`).
+- **Bug fixes**: removed two stray debug `print()` calls left in
+  `material_evaluation.py` (`resolve_nvres_feature`, and the target-continuum
+  exception handler), and fixed a dead `from src.config import ...` import in
+  `tests/test_package_native_inputs_native_refs.py` (there is no `src`
+  module; it now imports from `tetracorderp.config`).
+- **Performance (caching only, no numerical behaviour change)**:
+  - `MaterialEvaluator.__init__` called `_prepare_rules()` twice, discarding
+    the first result — the duplicate call is removed.
+  - `_native_not_source()` (material_evaluation.py) re-derived a NOT clause's
+    referenced material/feature chain from scratch on every call. It's now
+    memoized per `(target_spectra, source_rule_id, source_feature_id)`, so
+    materials that veto against the same common source no longer repeat that
+    work.
+  - `_wtochbin()` (tetracorder_ops.py), a pure window→channel-index lookup,
+    is now memoized by `(wavelengths, w1, w2)`.
+  - A candidate fourth optimisation — vectorizing `_window_mean` — was
+    benchmarked and rejected: for realistic window sizes it was measured
+    2.5–50x *slower* than the current channel-by-channel loop (it processes
+    every band densely instead of only the masked channels), on top of
+    shifting output by a few ulp. The existing loop implementation stays.
+- **Docs**: added the `## Usage` section above.
+
+**Validation status, per this repo's `CLAUDE.md`:** these `tetracorderp/`
+changes have **not** been validated against `tests/Full_python_test_run_script.py`
+(the fidelity ground truth) — that script requires native-Tetracorder
+comparison artifacts (a Docker run's output) that weren't available in the
+environment these changes were made in. The caching changes are intended to
+be pure memoization with no numerical effect, and were checked with
+synthetic unit-level benchmarks and clean imports instead, but per
+`CLAUDE.md` rule 2, that gap should be stated explicitly rather than assumed
+away: **run the full fidelity script and compare fit/Jaccard numbers before
+trusting this in place of the pre-change behaviour.**
 
 ## Scope
 

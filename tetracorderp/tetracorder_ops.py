@@ -201,6 +201,9 @@ class ContinuumFeature:
 
 #========= specpr / bandmp helpers ============================================
 
+_WTOCHBIN_CACHE: dict = {}
+
+
 def _wtochbin(wavelengths, w1, w2):
     """
     specpr wtochbin in Tetracorder mode (ier=12): wavelength interval to a
@@ -210,7 +213,21 @@ def _wtochbin(wavelengths, w1, w2):
     from there on with wavelength <= w2. If that is a single channel the
     interval does not actually contain, the channel nearest w1 is used.
     Raises ValueError when w1 is beyond the last channel.
+
+    Cached on (wavelengths bytes, w1, w2): many features across materials
+    share identical window bounds, and wavelengths is fixed for a run.
     """
+    cache_key = (np.asarray(wavelengths).tobytes(), w1, w2)
+    cached = _WTOCHBIN_CACHE.get(cache_key)
+    if cached is not None:
+        return cached
+
+    result = _wtochbin_uncached(wavelengths, w1, w2)
+    _WTOCHBIN_CACHE[cache_key] = result
+    return result
+
+
+def _wtochbin_uncached(wavelengths, w1, w2):
     n = wavelengths.size
     for i in range(n):
         if w1 <= wavelengths[i]:

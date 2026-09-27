@@ -40,7 +40,8 @@ classifiers = [
 
 dependencies = [
     "numpy>=1.24",
-    "scipy>=1.10"
+    "scipy>=1.10",
+    "matplotlib>=3.5"
 ]
 
 
@@ -52,7 +53,7 @@ Upstream-Tetracorder = "https://github.com/PSI-edu/spectroscopy-tetracorder"
 
 
 [tool.setuptools]
-packages = ["TetracorderP"]
+packages = ["tetracorderp"]
 
 
 [tool.setuptools.data-files]
