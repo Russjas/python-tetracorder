@@ -17,7 +17,7 @@ from .config import NOGROUP0, VARIABLE_PRESETS, OUTPUT_DIRS
 class GroupEvaluator:
     def __init__(self, target_spectra, target_wavelengths, target_fwhm, mode = "default", target_valid_bands = None, reference_file = None, rules_file = None,
                  disabled_groups = None, disabled_cases = None, disabled_materials = None,
-                 temperature = None, pressure = None ):
+                 temperature = None, pressure = None, blocking = True ):
         self.temperature = temperature    # (min, max) Kelvin of the data set, or None
         self.pressure = pressure          # (min, max) bar of the data set, or None
         self.target =  target_spectra
@@ -45,7 +45,10 @@ class GroupEvaluator:
                 disabled_materials = self.disabled_materials)
         self.disabled_materials |= self._resolve_physical_and_disable()
         self.evaluator.disabled_materials = self.disabled_materials
-        self.group_winners, self.case_winners = self.evaluate()
+        if blocking:
+            self.group_winners, self.case_winners = self._evaluate_by_block()
+        else:
+            self.group_winners, self.case_winners = self.evaluate(self.target)
 
     def _resolve_physical_and_disable(self):
         """Materials whose declared temperature / pressure range excludes the data.
@@ -75,7 +78,7 @@ class GroupEvaluator:
                     break
         return disabled
 
-    def evaluate(self):
+    def evaluate(self, spectra):
 
         # Evaluate all of the materials that have rules provided. 
         # Any material exclusion rule logic could go here        
@@ -90,7 +93,7 @@ class GroupEvaluator:
             if mid in self.disabled_materials:
                 continue
             #print(f"Evaluating {count} of {len(self.evaluator.rules)}: {mid}")
-            result = self.evaluator.evaluate(mid, self.target)
+            result = self.evaluator.evaluate(mid, spectra, same_target=True)
             if rule["number"] == 0:
                 group0[mid] = result
             else:
@@ -150,7 +153,7 @@ class GroupEvaluator:
                 continue
             # evaluate those cases as if they were group rules
             # and store the results
-            cases.setdefault(case_num, {})[mid] = self.evaluator.evaluate(mid, self.target)
+            cases.setdefault(case_num, {})[mid] = self.evaluator.evaluate(mid, spectra, same_target=True)
 
         #evaluate cases to find case winners
         case_winners = {}
@@ -158,6 +161,85 @@ class GroupEvaluator:
         for case_num, case_results in cases.items():
             case_winners[case_num] = resolve_case(case_results, case_masks[case_num])
         return group_winners, case_winners
+
+
+    def _evaluate_by_block(self, block_lines=128):
+        """
+        Evaluate the cube in strips of whole lines and stitch the results back together along the line axis.
+
+        Correctness
+        -----------
+        Every step of the pipeline is per pixel. Evaluating a strip therefore gives exactly that strip's final answers, 
+        and stacking the strips back in order gives results identical to a single whole-cube evaluate(). 
+
+        Why this is expected to be substantially faster
+        -----------------------------------------------
+        The arithmetic is unchanged; the gain comes almost entirely from memory behaviour.
+
+        1. Working arrays stop streaming from main memory.
+           Each feature fit builds several pixels x channels temporaries: the valid-band-masked span, the continuum,
+           the continuum-removed spectrum, and the float64 masks and products for the bandmp least-squares sums.
+           Over the whole cube (i.e ~600k pixels, ~25 channels per span) each of these is tens to over a
+           hundred MB, far larger than any CPU cache. Every pass over them is limited by DRAM bandwidth, and each is
+           made and discarded thousands of times per run. For a strip of 64 lines (~39k pixels) the same arrays are
+           a few MB, small enough to stay in L2/L3 cache between one operation and the next.
+
+        2. Allocation gets cheaper.
+           Arrays of hundreds of MB are allocated and returned to the operating system individually, and every
+           fresh page is zeroed and faulted in on first touch. Strip-sized arrays are served and reused by the
+           allocator without that round trip.
+
+        3. The per-material results held until group resolution shrink.
+           evaluate() keeps every group material's fit, depth, fit_depth (float64) and rejected mask until the group
+           winners are resolved, then stacks them per group, which is another copy. Over the whole cube that is
+           several GB of live data; per strip it is a small fraction of that, so resolution works in cache as well.
+           (This is data that may later need to be retained, exposed or written TODO: consider writing intermediaries)
+
+        4. Early exits fire more often.
+           Materials skip work once no pixel is alive (e.g. the NOT vetoes stop as soon as every pixel has been
+           rejected), and cases are only evaluated when some pixel triggered them. Over a whole cube there is
+           almost always some pixel that keeps the work going; within a strip there often is not.
+
+        Costs and tuning
+        ----------------
+        The Python-level overhead of each material and feature call (rule lookups, window checks, small-array
+        bookkeeping) is paid once per strip instead of once per run, so very small strips give some of the gain
+        back. block_lines trades cache fit against that repeated overhead; time a few sizes (e.g. 16, 32, 64, 128)
+        on a representative cube. The only full-size arrays are the input cube (not copied when it is C-contiguous)
+        and the stitched outputs, which exist twice only momentarily while each key is concatenated.
+
+        The NOT-source cache holds pixel data for one set of spectra, and evaluate() passes same_target=True to reuse
+        it across materials, so it is cleared at the start of every strip. Nothing in it could carry over anyway.
+        """
+        blocks = []
+        for i0 in range(0, self.target.shape[0], block_lines):
+            spectra = np.ascontiguousarray(self.target[i0:i0 + block_lines])    # a view when the cube is C-contiguous TODO: update usage with comment about passing contiguous in
+            self.evaluator.cache_clear()   
+            group_winners, case_winners = self.evaluate(spectra)
+            blocks.append((spectra.shape[:-1], group_winners, case_winners))
+
+        return (self._stitch([(shape, g) for shape, g, _ in blocks]),
+                self._stitch([(shape, c) for shape, _, c in blocks]))
+
+    @staticmethod
+    def _stitch(block_results):
+        """
+        Stack each group's (or case's) per-strip results top to bottom. Groups appear in every strip; a case only
+        appears in strips where some pixel triggered it, so missing strips are filled with nothing detected.
+        """
+        keys = {key for _, results in block_results for key, result in results.items() if result is not None}
+        stitched = {}
+        for key in keys:
+            parts = {"winner": [], "fit": [], "depth": [], "fit_depth": []}
+            for shape, results in block_results:
+                result = results.get(key)
+                if result is None:
+                    result = {"winner": np.full(shape, None, dtype=object),
+                              "fit": np.zeros(shape), "depth": np.zeros(shape), "fit_depth": np.zeros(shape)}
+                for name in parts:
+                    parts[name].append(result[name])
+            stitched[key] = {name: np.concatenate(pieces, axis=0) for name, pieces in parts.items()}
+        return stitched
 
 
     def _find_files(self):

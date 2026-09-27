@@ -69,7 +69,16 @@ class MaterialEvaluator:
         self.rule_spectra = self._prepare_rule_spectra(references)
         self.rratio_spectra = self._prepare_rratio_spectra(references)
 
-    def evaluate(self, rule_id: str, target_spectra: np.ndarray) -> dict | None:
+
+    def cache_clear(self):
+        """Forget cached NOT-source results. Call before evaluating a new set of spectra with same_target=True."""
+        self._not_source_cache.clear()
+
+
+    def evaluate(self, rule_id: str, target_spectra: np.ndarray, same_target: bool = False) -> dict | None:
+
+        if not same_target:
+            self.cache_clear()
 
         if rule_id in self.disabled_materials:
             return None
@@ -233,12 +242,15 @@ class MaterialEvaluator:
     def _native_not_source(self, source_rule_id, source_feature_id, target_spectra):
         """
         Fit and depth of a NOT source feature as native tp1mat leaves them in
-        zfit / zdepth. Cached per (target_spectra, source_rule_id,
-        source_feature_id): many materials in a ruleset veto against the same
-        common source, and the result is a deterministic function of those
-        three inputs.
+        zfit / zdepth. Cached per (source_rule_id, source_feature_id): many
+        materials in a ruleset veto against the same common source.
+
+        The result also depends on target_spectra, which is deliberately not in
+        the key. Cache validity is a contract with the caller: evaluate() clears
+        the cache unless called with same_target=True, a promise that the pixels
+        are unchanged since the last cache_clear().
         """
-        key = (id(target_spectra), source_rule_id, source_feature_id)
+        key = (source_rule_id, source_feature_id)
         if key in self._not_source_cache:
             return self._not_source_cache[key]
 
@@ -353,9 +365,9 @@ class MaterialEvaluator:
 
     def evaluate_all(self, target_spectra: np.ndarray) -> dict:
         results = {}
-
+        self.cache_clear()
         for rule_id in self.rules:
-            results[rule_id] = self.evaluate(rule_id, target_spectra)
+            results[rule_id] = self.evaluate(rule_id, target_spectra, same_target=True)
 
         return results
 

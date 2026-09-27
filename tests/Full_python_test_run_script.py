@@ -7,6 +7,10 @@ import time
 import struct
 import importlib
 
+import io
+import cProfile
+import pstats
+
 import numpy as np
 
 REPO = Path(r"C:\Users\Hyperspectral\Documents\GitHub\python-tetracorder") # editable
@@ -46,7 +50,10 @@ FWHM_RECORD = 12
 LINES = slice(None)
 # This testrun calls the write_like_tetracorder() method, to produce
 # native-formatted outputs. This directory specifies where they are written
-PYTHON_OUTDIR = REPO / "scratch" / "test_runs" / "native_convolved"
+PYTHON_OUTDIR = REPO / "scratch" / "test_runs" / "profiling1-128lines"
+REPORT_TITLE = "# Fidelity test - profiling\n\n"
+REPORT_FILE = PYTHON_OUTDIR / "fidelity_test_profiling.md"
+PROFILE = True
 #%% =============== helper functions to derive details from the native run ====
 def wsl_path(path):
     """Map a Linux path recorded by Tetracorder native run onto the Windows WSL share."""
@@ -407,7 +414,10 @@ print("wavelengths/fwhm/cube bands match:",
 
 #%% ================ perform the python run ===================================
 
+profiler = cProfile.Profile() if PROFILE else None
 t0 = time.perf_counter()
+if profiler:
+    profiler.enable()
 run = GroupEvaluator(
     prepared_test_cube, wavelengths, fwhm, mode=MODE,
     target_valid_bands=valid_bands,
@@ -415,7 +425,22 @@ run = GroupEvaluator(
     disabled_groups=disabled_groups, disabled_cases=disabled_cases,
     temperature=scene_temperature, pressure=scene_pressure,
 )
-print(f"\npackage run: {time.perf_counter() - t0:.0f} s")
+if profiler:
+    profiler.disable()
+run_seconds = time.perf_counter() - t0
+
+if profiler:
+    PYTHON_OUTDIR.mkdir(parents=True, exist_ok=True)
+    profiler.dump_stats(PYTHON_OUTDIR / "run.prof")
+    buffer = io.StringIO()
+    stats = pstats.Stats(profiler, stream=buffer).strip_dirs()
+    buffer.write("==== by cumulative time (where time is spent, including callees) ====\n")
+    stats.sort_stats("cumulative").print_stats(50)
+    buffer.write("\n==== by self time (what is actually doing the work) ====\n")
+    stats.sort_stats("tottime").print_stats(50)
+    (PYTHON_OUTDIR / "profile.txt").write_text(buffer.getvalue(), encoding="utf-8")
+    print(f"profile written to {PYTHON_OUTDIR / 'profile.txt'}")
+print(f"\npackage run: {run_seconds:.0f} s")
 print(f"materials disabled: {len(run.disabled_materials)}")
 for mid in sorted(run.disabled_materials):
     rule = run.evaluator.rules[mid]
@@ -642,7 +667,7 @@ def format_report(group_results, summary):
 #%% =====--- compare python and native outputs ================================
 # write the tetracorder style outputs from the completed python run
 run.write_like_tetracorder(PYTHON_OUTDIR)
-
+#%%
 native_output_dirs = get_output_dirs(NATIVE_RUN)
 python_output_dirs = get_output_dirs(PYTHON_OUTDIR)
 
@@ -687,13 +712,20 @@ for dirname in sorted(common_dirs):
         "jaccard": jaccard,
         "fit_exact": fit_exact,
     })
-report = format_report(group_results, summary)
+
+run_table = ("## Run Summary\n\n"
+    "| Item | Value |\n"
+    "|---|---:|\n"
+    f"| Package run | {run_seconds:.0f} s |\n"
+    f"| Materials disabled | {len(run.disabled_materials)} |\n\n\n"
+)
+report = REPORT_TITLE + run_table + format_report(group_results, summary)
 
 # Console
 print(report)
 
 # Markdown
-REPORT_FILE = PYTHON_OUTDIR / "fidelity_test3.md"
+
 
 with open(REPORT_FILE, "w", encoding="utf-8",) as f:
     f.write(report)

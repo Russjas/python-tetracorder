@@ -1,10 +1,8 @@
-# Fidelity test - full python pipeline
-
-## Run summary
+# Fidelity test - evaluating in blocks
 
 | Item | Value |
 |---|---:|
-| Package run | 953 s |
+| Package run | 382 s |
 | Materials disabled | 26 |
 
 

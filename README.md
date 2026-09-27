@@ -195,6 +195,7 @@ exactly.
 | Caching and clean-up (@kevinhaoaus) | 781 s |
 | Numba kernel for `_window_mean` | 723 s |
 | `numpy.ma` removed from the evaluation path | 466 s |
+| Evaluating the full cube in blocks | 382 s |
 
 **Caching, packaging and clean-up** - contributed by [@kevinhaoaus](https://github.com/kevinhaoaus) in
 his [fork](https://github.com/kevinhaoaus/python-tetracorder). Thanks Kevin!
@@ -238,7 +239,33 @@ Masked arrays allocate a data array and a mask array for every operation, and th
   takes the 1e-13 floor, matching native tp1mat (which zeroes a deleted feature). Previously it used a stale
   pre-deletion depth. This changed no pixels on Cuprite95.
 
-The full fidelity report for this pass is in [tests/fidelity_test_remove_ma.md](tests/fidelity_test_remove_ma.md).
+
+**Cube evaluated in blocks**
+
+`GroupEvaluator` now evaluates the cube in strips of whole lines (`blocking=True` by default, 64 lines per strip) and
+stitches the results back together along the line axis.
+
+- Every step of the pipeline is per pixel, so each strip gives exactly that strip's final answers and the stitched
+  result is identical to a whole-cube evaluation. `evaluate()` now takes the spectra as an argument and is run once
+  per strip; `blocking=False` evaluates the whole cube in one call.
+- Groups appear in every strip. A case only appears in strips where some pixel's group winner triggered it, so
+  strips without it are filled with nothing detected when the results are stitched.
+- The gain (466 s to 382 s, about 18%) comes from memory behaviour, not arithmetic: the per-feature pixels x channels
+  temporaries and the per-material results held until group resolution are strip-sized, small enough to stay in CPU
+  cache, instead of cube-sized. Strips are views of the cube, so no full-size copy is made when it is C-contiguous.
+- Each strip repeats the static per-feature work (window checks, reference continuum, feature weights), which offsets
+  part of the gain; precomputing that once per run is the next step.
+
+The NOT-source cache was reworked to be safe with more than one set of spectra:
+
+- It was keyed on `id(target_spectra)`, and Python reuses the ids of freed arrays, so a later strip could silently
+  receive an earlier strip's NOT results.
+- `MaterialEvaluator.evaluate()` now takes `same_target=False` by default and clears the cache first, so direct calls
+  are always safe. `GroupEvaluator` passes `same_target=True` within a strip and calls `cache_clear()` between strips.
+  The key is now just `(source_rule_id, source_feature_id)`.
+
+
+The full fidelity report for this pass is in [tests/fidelity_test_blocking.md](tests/fidelity_test_blocking.md).
 
 ## Scope
 
