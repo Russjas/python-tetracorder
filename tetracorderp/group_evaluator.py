@@ -6,11 +6,13 @@ import gzip
 import re
 import json
 import functools
+from types import SimpleNamespace
 
 import numpy as np
 
 from .material_evaluation import MaterialEvaluator 
 from .config import NOGROUP0, VARIABLE_PRESETS, OUTPUT_DIRS
+from .tetracorder_ops import prepare_rules
 
 def to_dn(values, scale):
     """Tetracorder's 8-bit output: nint(value * scale) clipped to 0-255 (float32 product, as the Ratfor)."""
@@ -23,7 +25,13 @@ def fd_stretch(dn):
     d = np.asarray(dn, dtype=np.float64)
     return np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255)
 
-
+def _theme_rules(spec):
+    """Every rule id a theme spec reads, in any of its method layouts."""
+    rules = [rid for key in ("classes", "buffering_classes", "generating_classes")
+             for cls in spec.get(key, []) for rid in cls["rules"]]
+    rules += [channel["rule"] for channel in spec.get("channels", {}).values()]
+    rules += [layer["rule"] for layer in spec.get("layers", [])]
+    return rules
 
 class GroupEvaluator:
     def __init__(self, target_spectra, target_wavelengths, target_fwhm, mode = "default", target_valid_bands = None, reference_file = None, rules_file = None,
@@ -32,6 +40,7 @@ class GroupEvaluator:
         self.temperature = temperature    # (min, max) Kelvin of the data set, or None
         self.pressure = pressure          # (min, max) bar of the data set, or None
         self.target =  target_spectra
+        self.target_shape = tuple(np.shape(target_spectra)[:-1])   # (lines, samples) image, or (n,) flat spectra
         self.wavelengths = target_wavelengths
         self.fwhm = target_fwhm
         self.mode = mode
@@ -60,6 +69,67 @@ class GroupEvaluator:
             self.group_winners, self.case_winners = self._evaluate_by_block()
         else:
             self.group_winners, self.case_winners = self.evaluate(self.target)
+
+    @classmethod
+    def from_npz(cls, path, rules_file=None, shape=None):
+        """
+        Rebuild an evaluator from write_npz output, without re-running the evaluation.
+
+        Supports the writers and theme maps (write_like_tetracorder, theme_map, write_theme_image, write_jpgs, ...).
+        It holds no spectra and no reference library, so it cannot evaluate. rules_file defaults to the one recorded
+        in the npz if it still exists, else the packaged rules. shape is (lines, samples) for npz files written from a
+        flattened cube before write_npz recorded it.
+        """
+        with np.load(Path(path), allow_pickle=False) as z:
+            arrays = {key: z[key] for key in z.files}
+        meta = json.loads(str(arrays["meta"]))
+
+        self = cls.__new__(cls)
+        self.mode = meta["mode"]
+        self.temperature = tuple(meta["temperature_K"]) if meta["temperature_K"] else None
+        self.pressure = tuple(meta["pressure_bar"]) if meta["pressure_bar"] else None
+        self.disabled_groups = set(meta["disabled_groups"])
+        self.disabled_cases = set(meta["disabled_cases"])
+        self.disabled_materials = set(meta["disabled_materials"])
+        self.wavelengths = arrays["wavelengths"]
+        self.valid_bands = arrays["valid_bands"]
+        self.fwhm = None
+        self.reference_file = meta["reference_file"]
+        
+        if rules_file is None and "rules_json" in arrays:
+            self.rules_file = meta["rules_file"]  # provenance only; rules come from the npz
+            raw_rules = json.loads(arrays["rules_json"].tobytes().decode("utf-8"))
+        else:
+            self.rules_file = rules_file or (meta["rules_file"] if Path(meta["rules_file"]).is_file()
+                                             else self._find_file("tetracorder_rules_as_dict.json"))
+            with open(self.rules_file, encoding="utf-8") as f:
+                raw_rules = json.load(f)
+        rules = prepare_rules(raw_rules, mode=self.mode)["rules"]
+        self.evaluator = SimpleNamespace(rules=rules, disabled_materials=self.disabled_materials)
+
+        # shape: as recorded, or as requested if it holds the same pixels
+        stored = tuple(meta.get("shape") or arrays["group_1_fit"].shape)  # older npz files have no shape
+        shape = tuple(shape) if shape is not None else stored
+        if np.prod(shape) != np.prod(stored):
+            raise ValueError(f"shape {shape} does not hold the {int(np.prod(stored))} pixels in {path}")
+        self.target_shape = shape
+
+        materials = np.array([m or None for m in arrays["materials"]], dtype=object)    # code 0 = "" = no winner
+        self.group_winners, self.case_winners = {}, {}
+        for key in arrays:
+            match = re.fullmatch(r"(group|case)_(\d+)_material", key)
+            if not match:
+                continue
+            kind, number = match.group(1), int(match.group(2))
+            result = {"winner": materials[arrays[key]].reshape(shape)}
+            for plane in ("fit", "depth", "fit_depth"):
+                result[plane] = arrays[f"{kind}_{number}_{plane}"].reshape(shape)
+            (self.group_winners if kind == "group" else self.case_winners)[number] = result
+
+        self.target = np.empty(shape + (0,), dtype=np.float32)          # shape only; nothing reads the cube
+        return self
+
+
 
     def _resolve_physical_and_disable(self):
         """Materials whose declared temperature / pressure range excludes the data.
@@ -279,7 +349,13 @@ class GroupEvaluator:
                 return str(path)
 
         raise FileNotFoundError(f"Could not find required Tetracorder file: {filename}")
-
+    
+    def _require_image(self, method):
+        """Raise unless the results are an image, (lines, samples)."""
+        if len(self.target_shape) != 2:
+            raise ValueError(f"{method} needs image results (lines, samples), but this run has shape "
+                             f"{self.target_shape}. Evaluate a (lines, samples, bands) cube, or reload with "
+                             f"GroupEvaluator.from_npz(path, shape=(lines, samples)).")
     #==========writing functions =======================================================
 
     @functools.cached_property
@@ -326,57 +402,87 @@ class GroupEvaluator:
     def theme_map(self, theme):
         """
         Native colour-theme map (cmds.color.support/davinci.make.*) as a (lines, samples, 3) uint8 RGB array.
+        This method requires the array to have two "spatial" dimensions. This will raise if a flattened cube is passed 
+        in to the GroupEvaluator constructor.
 
-        Each pixel takes the summed RGB of every class listing its winning rule (mixtures blend, as emit8),
-        scaled by the winner's gamma-stretched fd DN; rules in the theme's "depth_input" use their raw depth
-        DN instead, as native reads those from .depth.gz. Pixels whose winner is not in the theme are black.
-
-        Available themes: '1micron-minerals-a', 'hematite+goethite.grain.size-a', 'water-a', 'veg,water,snow', 
-        'snow-grain-size-water.a', '2micron-minerals', '2micron-minerals-b4', '2micron-minerals-detail2', '2micron-mins-emit8', 
-        '2micron-minerals-muscovite-comp', 'prehnite-chlorite-mix+perchlorate', 'organics-veg-2um-a', 'pyroxene.2um.band.position', 
-        '1.5um.broadfeats', '1.9um.water.wave.position.a', '1.9um.water.band.position', '1.9um.water.sulfates.band.position', 
-        '1.9um.water.zeolites.band.position', '2.8um.oh.band.position', '3um.waterfeats', '3.5um.feat.position', 'ree.b-g21', 
-        'vegetation-cover-a', 'veg-spectral-type', 'acid-minerals-buffering-minerals.a', 'veg-water-rgb', 'red-edge-shift-a'
+        Each rule is read as native reads its file (.fd.gif by default, .fd.gz or .depth.gz where the script does),
+        0 where it did not win, from its own group or case; group-0 rules from the theme's group. The methods then
+        follow their scripts: classes add a * c/255 per class, acid_buffer overlays AGM on ABM with ratio-coloured
+        overlaps, rgb puts one rule per channel with a gain, binned paints full colour per DN bin.
         """
-        if theme not in self.postprocessing_lookups["COLOUR_THEMES"].keys():
-            raise ValueError(f"{theme} is not an accepted theme")
-        spec = self.postprocessing_lookups["COLOUR_THEMES"][theme]
-        if spec["method"] != "classes":
-            raise NotImplementedError(f"{theme}: method {spec['method']!r} not implemented yet")
-
-        rule_rgb = {}
-        for cls in spec["classes"]:
-            for rid in cls["rules"]:
-                rule_rgb[rid] = rule_rgb.get(rid, 0) + np.asarray(cls["rgb"], dtype=np.float64)
-
-        # the theme reads one group or case; group-0 rules arrive as winners inside it
+        themes = self.postprocessing_lookups["COLOUR_THEMES"]
+        if theme not in themes:
+            raise KeyError(f"unknown theme {theme!r}; available: {', '.join(themes)}")
+        spec = themes[theme]
+        self._require_image("theme_map")
+        method = spec["method"]
         rules = self.evaluator.rules
-        
-        sources = {(rules[rid]["kind"], int(rules[rid]["number"])) for rid in rule_rgb}
-        if len(sources) > 1:
-            sources -= {("group", 0)}             # group 0 rules win inside whichever group the theme is bounded to
-        if sources == {("group", 0)}:
-            sources = {("group", 1)}              # native reads group-0-only themes (water-a, snow...) from group.1um
-        if len(sources) != 1:
-            raise ValueError(f"{theme}: rules span {sorted(sources)}, expected one group or case")
-        
-        kind, number = sources.pop()
-        scaled = self.scale_like_tetracorder(kind, number)
-        if scaled is None:
-            raise ValueError(f"{theme}: {kind} {number} has no result (disabled, or nothing detected)")
+        shape = self.target.shape[:2] #TODO guard here to avoid trying to write flat cubes
 
-        winner = scaled["winner"]
-        strength = np.floor(fd_stretch(scaled["fd"]))                 # davinci byte() of the .fd.gif
-        for rid in spec.get("depth_input", []):
-            won = winner == rid
-            strength[won] = scaled["depth"][won]                      # native reads these from .depth.gz
+        # where group-0 rules are read from: the theme's one other group, else group 1 as native
+        theme_rules = _theme_rules(spec)
+        sources = {(rules[rid]["kind"], int(rules[rid]["number"])) for rid in theme_rules}
+        others = sources - {("group", 0)}
+        group0_source = others.pop() if len(others) == 1 else ("group", 1)
+        sources = {group0_source if s == ("group", 0) else s for s in sources}
+        if all(self.scale_like_tetracorder(kind, number) is None for kind, number in sources):
+            raise ValueError(f"{theme}: no result for {sorted(sources)} (disabled, or nothing detected)")
 
-        rgb = np.zeros(winner.shape + (3,), dtype=np.float64)
-        for rid, colour in rule_rgb.items():
-            won = winner == rid
-            if won.any():
-                rgb[won] = strength[won][:, None] * colour / 255.0
-        return np.clip(np.floor(rgb + 0.5), 0, 255).astype(np.uint8)  # byte(xcolor + 0.5)
+        def image(rid, product="fd_gif"):
+            """One rule's image as native reads .fd.gif / .fd.gz / .depth.gz; 0 where it did not win."""
+            kind, number = rules[rid]["kind"], int(rules[rid]["number"])
+            if (kind, number) == ("group", 0):
+                kind, number = group0_source
+            scaled = self.scale_like_tetracorder(kind, number)
+            if scaled is None:
+                return np.zeros(shape)                                   # native reads a missing file as 0
+            if product == "fd_gif":
+                plane = np.floor(fd_stretch(scaled["fd"]))               # davinci.image.to.gif -gamma, byte()
+            else:
+                plane = scaled[product].astype(np.float64)
+            return np.where(scaled["winner"] == rid, plane, 0.0)
+
+        def paint(classes):
+            """xcolor += a * (c / 255) per class, a = sum of the class's rule images."""
+            inputs = spec.get("rule_inputs", {})
+            xcolor = np.zeros(shape + (3,))
+            for cls in classes:
+                a = sum(image(rid, inputs.get(rid, "fd_gif")) for rid in cls["rules"])
+                xcolor += a[..., None] * (np.asarray(cls["rgb"], dtype=np.float64) / 255.0)
+            return xcolor
+
+        if method == "classes":
+            xcolor = paint(spec["classes"])
+
+        elif method == "acid_buffer":
+            abm, agm = paint(spec["buffering_classes"]), paint(spec["generating_classes"])
+            vabm, vagm = abm.sum(axis=2), agm.sum(axis=2)
+            overlap = {k: np.asarray(v, dtype=np.float64) for k, v in spec["overlap"].items() if k.startswith(("r", "o"))}
+            with np.errstate(divide="ignore", invalid="ignore"):
+                ratio = (vagm / vabm)[..., None]
+            mix = np.where(ratio < 0.33, overlap["ratio_lt_0.33"],
+                        np.where(ratio > 0.66, overlap["ratio_gt_0.66"], overlap["otherwise"]))
+            xcolor = abm.copy()                                          # ABM only, or nothing
+            only_agm, both = (vagm > 0) & (vabm == 0), (vagm > 0) & (vabm > 0)
+            xcolor[only_agm] = agm[only_agm]
+            xcolor[both] = ((vagm + vabm) / 6.0)[both][:, None] * mix[both] / 255.0
+
+        elif method == "rgb":
+            xcolor = np.stack([spec["channels"][c]["gain"] * image(spec["channels"][c]["rule"]) for c in "RGB"],
+                            axis=-1)
+
+        elif method == "binned":
+            xcolor = np.zeros(shape + (3,))
+            for layer in spec["layers"]:
+                dn = image(layer["rule"], spec.get("input", "fd_gif"))
+                for b in layer["bins"]:                                  # inclusive both ends, as native
+                    low, high = b["dn"]
+                    xcolor[(dn > 0) & (dn >= low) & (dn <= high)] += np.asarray(b["rgb"], dtype=np.float64)
+
+        else:
+            raise NotImplementedError(f"{theme}: method {method!r}")
+
+        return np.clip(np.floor(xcolor + 0.5), 0, 255).astype(np.uint8)  # byte(xcolor + 0.5)
 
     def write_theme_image(self, theme, path):
         """Write theme_map(theme) as a PNG, as native's color.results/<scene>_color-results_<theme>.png."""
@@ -385,6 +491,23 @@ class GroupEvaluator:
         path.parent.mkdir(parents=True, exist_ok=True)
         imsave(path, self.theme_map(theme))
 
+    @functools.cached_property
+    def _live_groups(self):
+        """Groups that write output: every group with rules, less group 0 and the disabled groups."""
+        return ({int(r["number"]) for r in self.evaluator.rules.values() if r["kind"] == "group"}
+                - {0} - self.disabled_groups)
+
+    def _output_targets(self, rid):
+        """(subdir, kind, number) for each directory write_like_tetracorder writes rule rid into; [] if none."""
+        if rid in self.disabled_materials:
+            return []
+        rule = self.evaluator.rules[rid]
+        number = int(rule["number"])
+        if rule["kind"] == "case":
+            return [] if number in self.disabled_cases else [(OUTPUT_DIRS["case"][number], "case", number)]
+        if number == 0:                                                  # group 0 goes into every group that takes it
+            return [(OUTPUT_DIRS["group"][g], "group", g) for g in sorted(self._live_groups - NOGROUP0)]
+        return [(OUTPUT_DIRS["group"][number], "group", number)] if number in self._live_groups else []
 
     def write_like_tetracorder(self, output_dir):
         """
@@ -395,28 +518,14 @@ class GroupEvaluator:
         """
         output_dir = Path(output_dir)
         rules = self.evaluator.rules
-        nl, ns = self.target.shape[:2]
+        nl, ns = self.target_shape if len(self.target_shape) == 2 else (1, int(np.prod(self.target_shape)))
         lblsiz = ns if ns >= 299 else ns * (299 // ns + 1)      # creatoutfiles.r
         
 
         # groups that write output, and those that take group 0 (cubecorder.r:448-468)
-        live_groups = {int(r["number"]) for r in rules.values() if r["kind"] == "group"} \
-            - {0} - set(self.disabled_groups)
-        takes_group0 = sorted(live_groups - NOGROUP0)
-
         for rid, rule in rules.items():
-            if rid in self.disabled_materials:
-                continue
-            number = int(rule["number"])
-            if rule["kind"] == "case":
-                if number in self.disabled_cases:
-                    continue
-                targets = [(OUTPUT_DIRS["case"][number], "case", number)]
-            elif number == 0:
-                targets = [(OUTPUT_DIRS["group"][g], "group", g) for g in takes_group0]
-            elif number in live_groups:
-                targets = [(OUTPUT_DIRS["group"][number], "group", number)]
-            else:
+            targets = self._output_targets(rid)                      # cubecorder.r:448-468
+            if not targets:
                 continue
             name = self.output_specs[rid][0]
 
@@ -449,6 +558,53 @@ class GroupEvaluator:
                         "sensor type = spectral data\nbyte order = 0\n"
                         "wavelength units = Micrometers\n")
 
+    def export_for_qgis(self, output_dir, cube_id_prefix=""):
+        """
+        Write an output directory laid out as Grant Boxer's Tetracorder for QGIS plugin (v1.14) reads a native 6.00
+        run with geology on:
+
+            <group|case dir>/<name>.{fit,depth,fd}.gz (+ .hdr)       write_like_tetracorder
+            cmds.abundances/lists.of.files.by.mineral/<list>.txt     T01 mineral layers (ABUNDANCE_LISTS)
+            geologic-groups/<prefix>-<group>-group-list.txt          T02 mineral-group layers
+            geologic-classifications/<prefix>-<class>-list.txt       T02 geologic-class layers
+
+        Lists name only rules that were written. Mineral lists take each file's DN scale from its rule rather than
+        native's lists, four of which are stale. Group and class lists come from RULE_LOOKUP_MATERIAL and
+        MATERIAL_CLASSIFICATIONS. Georeferencing comes from the reflectance cube, chosen in the plugin.
+        """
+        output_dir = Path(output_dir)
+        self.write_like_tetracorder(output_dir)
+        lookups = self.postprocessing_lookups
+        paths = {rid: [f"{subdir}/{self.output_specs[rid][0]}" for subdir, _, _ in targets]
+                 for rid in self.evaluator.rules if (targets := self._output_targets(rid))}
+
+        # T01: one list per mineral, native layout: path, DN scale, BD factor, band depth, title, library, record
+        mineral_dir = output_dir / "cmds.abundances" / "lists.of.files.by.mineral"
+        mineral_dir.mkdir(parents=True, exist_ok=True)
+        for name, entries in lookups["ABUNDANCE_LISTS"].items():
+            lines = [f"{path + '.depth.gz':<64} {255.0 / self.output_specs[e['rule']][1]:<6.4g} {e['bd_factor']:<6} "
+                     f"{e['band_depth']:<7} {e['title']:<32} {e['library']} {e['record']}"
+                     for e in entries for path in paths.get(e["rule"], [])]
+            (mineral_dir / f"{name}.txt").write_text("".join(line + "\n" for line in lines))
+
+        # T02: one list per mineral group and per geologic class, from the material lookups
+        groups, classes = {}, {}
+        lead = f"{cube_id_prefix}-" if cube_id_prefix else ""
+        for rid, rule_paths in paths.items():
+            for material in lookups["RULE_LOOKUP_MATERIAL"].get(rid) or []:
+                info = lookups["MATERIAL_CLASSIFICATIONS"].get(material) or {}
+                if info.get("material_group"):
+                    groups.setdefault(info["material_group"], set()).update(rule_paths)
+                if info.get("Classification"):
+                    classes.setdefault(info["Classification"], set()).update(rule_paths)
+        for folder, table, suffix in (("geologic-groups", groups, "-group"), ("geologic-classifications", classes, "")):
+            (output_dir / folder).mkdir(exist_ok=True)
+            for label, rule_paths in table.items():
+                lines = sorted(rule_paths) if suffix else [f"{label:>20}   {p}" for p in sorted(rule_paths)]
+                (output_dir / folder / f"{lead}{label}{suffix}-list.txt").write_text("".join(l + "\n" for l in lines))
+
+
+
     def write_npz(self, path):
         """
         Save every group and case result to one compressed .npz:
@@ -460,6 +616,7 @@ class GroupEvaluator:
             group_N_fit_depth    float32
             case_N_...           the same for each case
             wavelengths, valid_bands
+            rules_json           uint8, the rules file the run used (UTF-8 bytes)
             meta                 JSON string: mode, files, conditions, disabled lists
 
         Read back with np.load(path); no pickling is needed or allowed.
@@ -468,7 +625,8 @@ class GroupEvaluator:
         code = {mid: i for i, mid in enumerate(materials)}
         arrays = {"materials": np.array(materials, dtype=str),
                 "wavelengths": np.asarray(self.wavelengths, dtype=np.float32),
-                "valid_bands": np.asarray(self.valid_bands, dtype=bool)}
+                "valid_bands": np.asarray(self.valid_bands, dtype=bool),
+                 "rules_json": np.frombuffer(Path(self.rules_file).read_bytes(), dtype=np.uint8)}
 
         for kind, results in (("group", self.group_winners), ("case", self.case_winners)):
             for number, result in results.items():
@@ -484,6 +642,7 @@ class GroupEvaluator:
                         np.ma.filled(np.ma.asarray(result[key]), 0.0), dtype=np.float32)
 
         arrays["meta"] = np.array(json.dumps({
+            "shape": list(self.target_shape),
             "mode": self.mode,
             "rules_file": str(self.rules_file),
             "reference_file": str(self.reference_file),
@@ -496,75 +655,7 @@ class GroupEvaluator:
         np.savez_compressed(Path(path), **arrays)
 
 
-    def write_jpgs(self, output_dir, dpi=150):
-        from matplotlib.figure import Figure
-        from matplotlib.patches import Patch
-        from matplotlib import colormaps
-        output_dir = Path(output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-        rules = self.evaluator.rules
-        nl, ns = self.target.shape[:2]
-        cube = np.asarray(self.target, dtype=np.float32)[..., np.asarray(self.valid_bands, dtype=bool)]
-        grey = np.nanmean(np.where(cube > -1e30, cube, np.nan), axis=2)
-        lo, hi = np.nanpercentile(grey, (2, 98))
-        grey = np.nan_to_num(np.clip((grey - lo) / (hi - lo), 0, 1))
-        palette = np.vstack([colormaps[c].colors for c in ("tab20", "tab20b", "tab20c")])
-        palette = palette[np.ptp(palette, axis=1) > 0.1]          # greys would vanish into the background
-        for kind, results in (("group", self.group_winners), ("case", self.case_winners)):
-            for number, result in sorted(results.items()):
-                if result is None:
-                    continue
-                winner = np.asarray(result["winner"], dtype=object)
-                ids, counts = np.unique(winner[winner != None].astype(str), return_counts=True)  # noqa: E711
-                if ids.size == 0:
-                    continue
-                order = np.argsort(counts)[::-1]
-                rgb = np.repeat(grey[..., None], 3, axis=2)
-                handles = []
-                slots = [m for m, r in rules.items() if r["kind"] == kind
-                        and int(r["number"]) in ({number, 0} if kind == "group" else {number})]
-                fd_dn = self.scale_like_tetracorder(kind, number)["fd"]
-                for mid, n in zip(ids[order], counts[order]):
-                    colour = palette[slots.index(mid) % len(palette)]
-                    won = winner == mid
-                    name = self.output_specs[mid][0]
-                    w = (fd_stretch(fd_dn[won]) / 255.0)[:, None]
-                    rgb[won] = rgb[won] * (1 - w) + colour * w      # gen.fd.gif.images gamma
-                    handles.append(Patch(color=colour, label=f"{name}  ({n} px)"))
-                fig = Figure(figsize=(8 * ns / nl + 3, 8))
-                ax = fig.subplots()
-                ax.imshow(np.clip(rgb, 0, 1), interpolation="nearest")
-                ax.set_axis_off()
-                ax.set_title(f"{kind} {number}: {OUTPUT_DIRS[kind][number]}")
-                ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.01, 1),
-                            fontsize=7, frameon=False)
-                fig.savefig(output_dir / f"{kind}{number:02d}_{OUTPUT_DIRS[kind][number].split('.', 1)[1]}.jpg",
-                            dpi=dpi, bbox_inches="tight", pil_kwargs={"quality": 95})
-
-    def write_plain_jpgs(self, output_dir):
-           from matplotlib import colormaps
-           from matplotlib.image import imsave
-           output_dir = Path(output_dir)
-           output_dir.mkdir(parents=True, exist_ok=True)
-           rules = self.evaluator.rules
-           nl, ns = self.target.shape[:2]
-           palette = np.vstack([colormaps[c].colors for c in ("tab20", "tab20b", "tab20c")])
-           palette = palette[np.ptp(palette, axis=1) > 0.1]          # same colours as write_jpgs
-           for kind, results in (("group", self.group_winners), ("case", self.case_winners)):
-               for number, result in sorted(results.items()):
-                   if result is None:
-                       continue
-                   winner = np.asarray(result["winner"], dtype=object)
-                   slots = [m for m, r in rules.items() if r["kind"] == kind
-                            and int(r["number"]) in ({number, 0} if kind == "group" else {number})]
-                   fd_dn = self.scale_like_tetracorder(kind, number)["fd"]
-                   rgb = np.zeros((nl, ns, 3))
-                   for mid in set(winner[winner != None]):  # noqa: E711
-                       won = winner == mid
-                       w = (fd_stretch(fd_dn[won]) / 255.0)[:, None]
-                       rgb[won] = palette[slots.index(mid) % len(palette)] * w      # gen.fd.gif.images gamma
-                   imsave(output_dir / f"{kind}{number:02d}_{OUTPUT_DIRS[kind][number].split('.', 1)[1]}.jpg",
-                          np.clip(rgb, 0, 1), pil_kwargs={"quality": 95})
+    
 
 def resolve_group(group_results, group0=None):
 
