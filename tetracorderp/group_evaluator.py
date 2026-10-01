@@ -5,12 +5,23 @@ from pathlib import Path
 import gzip
 import re
 import json
+import functools
 
 import numpy as np
 
 from .material_evaluation import MaterialEvaluator 
 from .config import NOGROUP0, VARIABLE_PRESETS, OUTPUT_DIRS
 
+def to_dn(values, scale):
+    """Tetracorder's 8-bit output: nint(value * scale) clipped to 0-255 (float32 product, as the Ratfor)."""
+    x = np.asarray(values, dtype=np.float32) * np.asarray(scale, dtype=np.float32)
+    return np.clip(np.floor(np.nan_to_num(x).astype(np.float64) + 0.5), 0, 255).astype(np.uint8)
+
+
+def fd_stretch(dn):
+    """Gamma stretch native applies to fd DN before display (davinci.image.to.gif -gamma), 0-255 float."""
+    d = np.asarray(dn, dtype=np.float64)
+    return np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255)
 
 
 
@@ -270,7 +281,111 @@ class GroupEvaluator:
         raise FileNotFoundError(f"Could not find required Tetracorder file: {filename}")
 
     #==========writing functions =======================================================
-    
+
+    @functools.cached_property
+    def output_specs(self):
+        """rule id -> (output base name, depth/fd scale) from "8 DN 255 = x" in the rule's output block."""
+        specs = {}
+        for rid, rule in self.evaluator.rules.items():
+            lines = [l.split("\\#")[0].strip() for l in rule["output_raw"].splitlines()]
+            lines = [l for l in lines if l]
+            dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
+            value = VARIABLE_PRESETS[self.mode].get(value, value)
+            specs[rid] = (lines[1].split()[0], int(dn) / float(value))
+        return specs
+
+    def scale_like_tetracorder(self, kind, number):
+        """
+        One group's or case's winners as Tetracorder's 8-bit DNs, each pixel scaled by its own winner's rule:
+        {"winner": object array of rule ids, "fit": uint8, "depth": uint8, "fd": uint8}, or None if no result.
+        Cached; winners do not change after evaluation.
+        """
+        cache = self.__dict__.setdefault("_scaled", {})
+        if (kind, number) not in cache:
+            result = (self.group_winners if kind == "group" else self.case_winners).get(number)
+            if result is None:
+                cache[(kind, number)] = None
+            else:
+                winner = np.asarray(result["winner"], dtype=object)
+                depth_scale = np.zeros(winner.shape, dtype=np.float32)
+                for rid in set(winner[winner != None]):  # noqa: E711
+                    depth_scale[winner == rid] = self.output_specs[rid][1]
+                planes = {"fit": ("fit", 255.0), "depth": ("depth", depth_scale), "fd": ("fit_depth", depth_scale)}
+                scaled = {"winner": winner}
+                for plane, (key, scale) in planes.items():
+                    scaled[plane] = to_dn(np.ma.filled(np.ma.asarray(result[key], dtype=np.float32), 0.0), scale)
+                cache[(kind, number)] = scaled
+        return cache[(kind, number)]
+
+    @functools.cached_property
+    def postprocessing_lookups(self):
+        """postprocessing_lookups.json: material classes, origins and colour themes, keyed on rule id."""
+        with open(self._find_file("postprocessing_lookups.json")) as f:
+            return json.load(f)
+
+    def theme_map(self, theme):
+        """
+        Native colour-theme map (cmds.color.support/davinci.make.*) as a (lines, samples, 3) uint8 RGB array.
+
+        Each pixel takes the summed RGB of every class listing its winning rule (mixtures blend, as emit8),
+        scaled by the winner's gamma-stretched fd DN; rules in the theme's "depth_input" use their raw depth
+        DN instead, as native reads those from .depth.gz. Pixels whose winner is not in the theme are black.
+
+        Available themes: '1micron-minerals-a', 'hematite+goethite.grain.size-a', 'water-a', 'veg,water,snow', 
+        'snow-grain-size-water.a', '2micron-minerals', '2micron-minerals-b4', '2micron-minerals-detail2', '2micron-mins-emit8', 
+        '2micron-minerals-muscovite-comp', 'prehnite-chlorite-mix+perchlorate', 'organics-veg-2um-a', 'pyroxene.2um.band.position', 
+        '1.5um.broadfeats', '1.9um.water.wave.position.a', '1.9um.water.band.position', '1.9um.water.sulfates.band.position', 
+        '1.9um.water.zeolites.band.position', '2.8um.oh.band.position', '3um.waterfeats', '3.5um.feat.position', 'ree.b-g21', 
+        'vegetation-cover-a', 'veg-spectral-type', 'acid-minerals-buffering-minerals.a', 'veg-water-rgb', 'red-edge-shift-a'
+        """
+        if theme not in self.postprocessing_lookups["COLOUR_THEMES"].keys():
+            raise ValueError(f"{theme} is not an accepted theme")
+        spec = self.postprocessing_lookups["COLOUR_THEMES"][theme]
+        if spec["method"] != "classes":
+            raise NotImplementedError(f"{theme}: method {spec['method']!r} not implemented yet")
+
+        rule_rgb = {}
+        for cls in spec["classes"]:
+            for rid in cls["rules"]:
+                rule_rgb[rid] = rule_rgb.get(rid, 0) + np.asarray(cls["rgb"], dtype=np.float64)
+
+        # the theme reads one group or case; group-0 rules arrive as winners inside it
+        rules = self.evaluator.rules
+        
+        sources = {(rules[rid]["kind"], int(rules[rid]["number"])) for rid in rule_rgb}
+        if len(sources) > 1:
+            sources -= {("group", 0)}             # group 0 rules win inside whichever group the theme is bounded to
+        if sources == {("group", 0)}:
+            sources = {("group", 1)}              # native reads group-0-only themes (water-a, snow...) from group.1um
+        if len(sources) != 1:
+            raise ValueError(f"{theme}: rules span {sorted(sources)}, expected one group or case")
+        
+        kind, number = sources.pop()
+        scaled = self.scale_like_tetracorder(kind, number)
+        if scaled is None:
+            raise ValueError(f"{theme}: {kind} {number} has no result (disabled, or nothing detected)")
+
+        winner = scaled["winner"]
+        strength = np.floor(fd_stretch(scaled["fd"]))                 # davinci byte() of the .fd.gif
+        for rid in spec.get("depth_input", []):
+            won = winner == rid
+            strength[won] = scaled["depth"][won]                      # native reads these from .depth.gz
+
+        rgb = np.zeros(winner.shape + (3,), dtype=np.float64)
+        for rid, colour in rule_rgb.items():
+            won = winner == rid
+            if won.any():
+                rgb[won] = strength[won][:, None] * colour / 255.0
+        return np.clip(np.floor(rgb + 0.5), 0, 255).astype(np.uint8)  # byte(xcolor + 0.5)
+
+    def write_theme_image(self, theme, path):
+        """Write theme_map(theme) as a PNG, as native's color.results/<scene>_color-results_<theme>.png."""
+        from matplotlib.image import imsave
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        imsave(path, self.theme_map(theme))
+
+
     def write_like_tetracorder(self, output_dir):
         """
         Write every enabled material's fit, depth and fd images as Tetracorder
@@ -296,35 +411,22 @@ class GroupEvaluator:
             if rule["kind"] == "case":
                 if number in self.disabled_cases:
                     continue
-                targets = [(OUTPUT_DIRS["case"][number], self.case_winners.get(number))]
+                targets = [(OUTPUT_DIRS["case"][number], "case", number)]
             elif number == 0:
-                targets = [(OUTPUT_DIRS["group"][g], self.group_winners.get(g))
-                        for g in takes_group0]
+                targets = [(OUTPUT_DIRS["group"][g], "group", g) for g in takes_group0]
             elif number in live_groups:
-                targets = [(OUTPUT_DIRS["group"][number], self.group_winners.get(number))]
+                targets = [(OUTPUT_DIRS["group"][number], "group", number)]
             else:
                 continue
+            name = self.output_specs[rid][0]
 
-            # output block: "output=fit depth fd" / "<name>" / "8 DN 255 = <value>"
-            lines = [l.split("\\#")[0].strip() for l in rule["output_raw"].splitlines()]
-            lines = [l for l in lines if l]
-            name = lines[1].split()[0]
-            dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
-            value = VARIABLE_PRESETS[self.mode].get(value, value)
-            depth_scale = int(dn) / float(value)
-
-            for subdir, result in targets:
+            for subdir, kind, num in targets:
                 (output_dir / subdir).mkdir(parents=True, exist_ok=True)
-                won = (np.asarray(result["winner"], dtype=object) == rid
-                    if result is not None else np.zeros((nl, ns), dtype=bool))
+                scaled = self.scale_like_tetracorder(kind, num)
 
-                for plane, key, scale, suffix in (("fit", "fit", 255.0, "FITS"),
-                                                ("depth", "depth", depth_scale, "DEPTHS"),
-                                                ("fd", "fit_depth", depth_scale, "F*D")):
-                    values = (np.ma.filled(np.ma.asarray(result[key], dtype=np.float32), 0.0)
-                            if result is not None else np.zeros((nl, ns), np.float32))
-                    x = np.where(won, values, 0.0).astype(np.float32) * np.float32(scale)
-                    image = np.clip(np.floor(np.nan_to_num(x).astype(np.float64) + 0.5), 0, 255)
+                for plane, suffix in (("fit", "FITS"), ("depth", "DEPTHS"), ("fd", "F*D")):
+                    image = (np.where(scaled["winner"] == rid, scaled[plane], 0).astype(np.uint8)
+                            if scaled is not None else np.zeros((nl, ns), np.uint8))
 
                     path = output_dir / subdir / f"{name}.{plane}"
                     title = f"{rule['output_title']:<40}{suffix}"
@@ -421,17 +523,12 @@ class GroupEvaluator:
                 handles = []
                 slots = [m for m, r in rules.items() if r["kind"] == kind
                         and int(r["number"]) in ({number, 0} if kind == "group" else {number})]
-                fd = np.ma.filled(np.ma.asarray(result["fit_depth"], dtype=np.float32), 0.0)
+                fd_dn = self.scale_like_tetracorder(kind, number)["fd"]
                 for mid, n in zip(ids[order], counts[order]):
                     colour = palette[slots.index(mid) % len(palette)]
                     won = winner == mid
-                    lines = [l.split("\\#")[0].strip() for l in rules[mid]["output_raw"].splitlines()]
-                    lines = [l for l in lines if l]
-                    name = lines[1].split()[0]
-                    dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
-                    value = VARIABLE_PRESETS[self.mode].get(value, value)
-                    d = np.clip(np.floor(fd[won] * (int(dn) / float(value)) + 0.5), 0, 255)
-                    w = (np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255) / 255.0)[:, None]
+                    name = self.output_specs[mid][0]
+                    w = (fd_stretch(fd_dn[won]) / 255.0)[:, None]
                     rgb[won] = rgb[won] * (1 - w) + colour * w      # gen.fd.gif.images gamma
                     handles.append(Patch(color=colour, label=f"{name}  ({n} px)"))
                 fig = Figure(figsize=(8 * ns / nl + 3, 8))
@@ -460,16 +557,11 @@ class GroupEvaluator:
                    winner = np.asarray(result["winner"], dtype=object)
                    slots = [m for m, r in rules.items() if r["kind"] == kind
                             and int(r["number"]) in ({number, 0} if kind == "group" else {number})]
-                   fd = np.ma.filled(np.ma.asarray(result["fit_depth"], dtype=np.float32), 0.0)
+                   fd_dn = self.scale_like_tetracorder(kind, number)["fd"]
                    rgb = np.zeros((nl, ns, 3))
                    for mid in set(winner[winner != None]):  # noqa: E711
                        won = winner == mid
-                       lines = [l.split("\\#")[0].strip() for l in rules[mid]["output_raw"].splitlines()]
-                       lines = [l for l in lines if l]
-                       dn, value = re.match(r"\d+\s+DN\s+(\d+)\s*=\s*(\S+)", lines[2]).groups()
-                       value = VARIABLE_PRESETS[self.mode].get(value, value)
-                       d = np.clip(np.floor(fd[won] * (int(dn) / float(value)) + 0.5), 0, 255)
-                       w = (np.clip(d * 7.5 * 0.08 ** np.sqrt(d / 400.0), 0, 255) / 255.0)[:, None]
+                       w = (fd_stretch(fd_dn[won]) / 255.0)[:, None]
                        rgb[won] = palette[slots.index(mid) % len(palette)] * w      # gen.fd.gif.images gamma
                    imsave(output_dir / f"{kind}{number:02d}_{OUTPUT_DIRS[kind][number].split('.', 1)[1]}.jpg",
                           np.clip(rgb, 0, 1), pil_kwargs={"quality": 95})

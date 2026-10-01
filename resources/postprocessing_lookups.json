@@ -1,0 +1,5123 @@
+{
+  "GEOLOGICAL_ORIGIN_NAMES": {
+    "G01": "lacustrine_marine",
+    "G02": "evaporite_playa",
+    "G03": "metamorphic",
+    "G04": "hydrothermal",
+    "G05": "pedogenic_weathering",
+    "G06": "igneous",
+    "G07": "biogenic",
+    "G08": "organic",
+    "G09": "man_made",
+    "G10": "water_liquid_ice",
+    "G11": "fire_thermal"
+  },
+  "GEOLOGICAL_ORIGIN_CHANNELS": {
+    "generic_soil": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "acid_mine_drainage": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "actinolite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "adularia": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "albite": [0, 0, 9, 9, 0, 9, 0, 0, 0, 0, 0],
+    "algea": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "aliphatic": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "almandine": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "alunite_hydrothermal": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "alunite_hydroth_pedog": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "natroalunite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "ammonioalunite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "ammonillsmectite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "ammoniojarosite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "amphibole": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "analcime": [9, 0, 0, 9, 0, 9, 0, 0, 0, 0, 0],
+    "anorthite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "antigorite": [9, 9, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "aragonite": [9, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "augite": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "axinite": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "azurite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "beidellite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "benzene": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "biotite": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "black_Mn_Coating": [0, 0, 0, 5, 0, 0, 9, 0, 0, 0, 0],
+    "bloedite": [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "bronzite": [0, 0, 0, 9, 0, 9, 0, 0, 0, 0, 0],
+    "brucite": [0, 0, 9, 9, 9, 0, 0, 0, 0, 0, 0],
+    "buddingtonite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "butlerite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "bytownite": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "calcite": [9, 2, 9, 1, 9, 9, 9, 0, 0, 0, 0],
+    "carnallite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "chalcedony": [9, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "chalcopyrite": [0, 0, 0, 9, 0, 9, 0, 0, 0, 0, 0],
+    "chlorite": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "chlorophyll": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "chromite": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "chrysocolla": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "chrysotile": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "cinnabar": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "clinochlore": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "clintonite": [0, 0, 9, 9, 9, 9, 0, 0, 0, 0, 0],
+    "co2_gas": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "co2_ice": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "co2_trapped": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "colemanite": [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "cookeite": [0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0],
+    "copiapite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "coquimbite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "cronstedtite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "cummingtonite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "cuprite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "cyanide": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "cyanide-CdK": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "cyanide-KFe": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "cyanide-NiK": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "cyanide-trihydrate": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "cyanide-ZnK": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "datolite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "diaspore": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "dickite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "pyroxene_diopside": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "dolomite": [9, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "dry_grass": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "dry_wood": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "dust_WTC": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "elbaite": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "endellite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "enstatite": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "epidote": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "eugsterite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+_chlorite.thuringite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+fe3+_hematite_weath": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "fe2+fe3+mix": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "fe2+fe3+_water_RTsludge": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_actinolite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_almandine": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_amphibole": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_axinite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_basalt": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_carbonate": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_chlor+clinochlor": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_chlorite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_clinochlore": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_jadeite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_nrw.cu": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_staurolite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_sulfate_butlerite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe2+generic_vbroad": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "fe3+bearing1": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "fe3+_ferrihydrite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "fiberglass": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "gasolene_unleaded": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "gibbsite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "goethite": [9, 0, 0, 8, 9, 0, 0, 0, 0, 0, 0],
+    "goethite_smallgrain": [9, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "grossular": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "gypsum": [0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "halloysite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "hectorite": [9, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "hedenbergite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "hematite": [0, 0, 0, 8, 9, 0, 0, 0, 0, 0, 0],
+    "hematite_smallgrain": [0, 0, 0, 0, 9, 0, 1, 0, 0, 0, 0],
+    "hornblende": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "howlite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "hydrated_basaltic_glass": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "hydrogrossular": [0, 0, 9, 0, 9, 9, 0, 0, 0, 0, 0],
+    "pyroxene_hypersthene": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "illite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "jarosite": [9, 9, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "kaolinite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "kaolinite_wxl": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "kaolinite_pxl": [9, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "kieserite": [0, 9, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "lazurite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "lepidocrosite": [9, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "lepidolite": [0, 0, 0, 9, 0, 9, 0, 0, 0, 0, 0],
+    "lizardite": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "maghemite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "magnesite": [0, 0, 9, 9, 9, 0, 9, 0, 0, 0, 0],
+    "hydromagnesite": [0, 0, 9, 9, 9, 0, 9, 0, 0, 0, 0],
+    "malachite": [0, 0, 9, 0, 9, 0, 0, 0, 0, 0, 0],
+    "manganese": [0, 0, 0, 0, 9, 0, 9, 0, 0, 0, 0],
+    "margarite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "mascagnite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "methane_gas": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "methane_ice": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "microcline": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "mirabilite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "montmorillonite": [9, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "muscovite": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "nacrite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "natrolite": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "neodymium_oxide": [0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0],
+    "niter": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "nitrobenzene": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "nontronite": [9, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "nonyne": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "olivine": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "organic_plastic_green": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "organic_plastic_blue": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "organic_plastic_pvc": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "organic_plastic-pete": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "organic_plastic-hdpe": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "organic_plastic-vinyl": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "organic_fiberglass": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "organic_polystyrene": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "orthoclase": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "organic_paint": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "palygorskite": [9, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "paragonite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "pectolite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "pentene": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "perchlorate": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "peroxide": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "phlogopite": [0, 0, 9, 9, 0, 9, 0, 0, 0, 0, 0],
+    "pyroxene_pigeonite": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "pinnoite": [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "pitchlimonite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "polyhalite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "portlandite": [0, 9, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "potassium_nitrate": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "prehnite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "propylzone": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "pyridine": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "pyrite": [0, 0, 9, 0, 9, 9, 0, 0, 0, 0, 0],
+    "pyrolusite": [9, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "pyrophyllite": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "quartz": [0, 0, 0, 9, 0, 9, 0, 0, 0, 0, 0],
+    "rhodochrosite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "rhodonite": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "richterite": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "riebeckite": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "rivadavite": [0, 9, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "roscoelite": [0, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "rutile": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "samarium_oxide": [0, 0, 0, 0, 9, 9, 0, 0, 0, 0, 0],
+    "saponite": [9, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "saponite_or_talc": [9, 0, 0, 9, 9, 0, 0, 0, 0, 0, 0],
+    "schwertmannite": [0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "sepiolite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "serpentine": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "siderite": [5, 5, 9, 2, 9, 0, 0, 0, 0, 0, 0],
+    "smaragdite": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "smectite": [9, 9, 9, 0, 9, 0, 0, 0, 0, 0, 0],
+    "sodium_nitrate": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "sphalerite": [0, 0, 0, 9, 0, 9, 0, 0, 0, 0, 0],
+    "starkeyite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "staurolite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "strontinite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "sulfur": [0, 0, 9, 0, 0, 9, 9, 0, 0, 0, 0],
+    "syngenite": [9, 9, 9, 0, 9, 0, 9, 0, 0, 0, 0],
+    "szomolnokite": [9, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0],
+    "talc": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "thuringite": [9, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0],
+    "toluene": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "topaz": [0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0],
+    "tremolite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "tremolite_or_talc": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "trichloroethane": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "trichloroethylene": [0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0],
+    "ulexite": [0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "uralite": [0, 0, 9, 0, 0, 9, 0, 0, 0, 0, 0],
+    "vegetation_photosyn": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "vegetation_nonphotosyn": [0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0],
+    "water_ice": [0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0],
+    "water_liquid": [0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0],
+    "witherite": [0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0],
+    "wollastonite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "zoisite": [0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0],
+    "zunyite": [0, 0, 9, 9, 0, 0, 0, 0, 0, 0, 0]
+  },
+  "MATERIAL_CLASSIFICATIONS": {
+
+    "acid_mine_drainage": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "actinolite": {
+      "Classification": "inosilicate",
+      "material_group": "amphibole"
+    },
+    "adularia": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "albite": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "algea": {
+      "Classification": "biologic",
+      "material_group": "organic"
+    },
+    "almandine": {
+      "Classification": "nesosilicate",
+      "material_group": "garnet"
+    },
+    "alunite": {
+      "Classification": "sulfate",
+      "material_group": "alunite"
+    },
+    "alunite_hydrothermal": {
+      "Classification": "sulfate",
+      "material_group": "alunite"
+    },
+    "alunite_hydroth_pedog": {
+      "Classification": "sulfate",
+      "material_group": "alunite"
+    },
+    "natroalunite": {
+      "Classification": "sulfate",
+      "material_group": "alunite"
+    },
+    "ammonioalunite": {
+      "Classification": "sulfate",
+      "material_group": "alunite"
+    },
+    "ammonillsmectite": {
+      "Classification": "phyllosilicate",
+      "material_group": "smectite"
+    },
+    "ammoniojarosite": {
+      "Classification": "sulfate",
+      "material_group": "alunite"
+    },
+    "amphibole": {
+      "Classification": "inosilicate",
+      "material_group": "amphibole"
+    },
+    "analcime": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "anorthite": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "antigorite": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "aragonite": {
+      "Classification": "carbonate",
+      "material_group": "calcite"
+    },
+    "augite": {
+      "Classification": "inosilicate",
+      "material_group": "pyroxene"
+    },
+    "axinite": {
+      "Classification": "cyclosilicate",
+      "material_group": "axinite"
+    },
+    "azurite": {
+      "Classification": "carbonate",
+      "material_group": "dolomite"
+    },
+    "beidellite": {
+      "Classification": "phyllosilicate",
+      "material_group": "smectite"
+    },
+    "benzene": {
+      "Classification": "aromatic_hydrocarbon",
+      "material_group": "organic"
+    },
+    "biotite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "black_Mn_Coating": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "bloedite": {
+      "Classification": "sulfate",
+      "material_group": "bloedite"
+    },
+    "bronzite": {
+      "Classification": "inosilicate",
+      "material_group": "pyroxene"
+    },
+    "brucite": {
+      "Classification": "hydroxide",
+      "material_group": "brucite"
+    },
+    "buddingtonite": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "butlerite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "bytownite": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "calcite": {
+      "Classification": "carbonate",
+      "material_group": "calcite"
+    },
+    "carnallite": {
+      "Classification": "halide",
+      "material_group": null
+    },
+    "chalcedony": {
+      "Classification": "tectosilicate",
+      "material_group": "quartz"
+    },
+    "chalcopyrite": {
+      "Classification": "sulfide",
+      "material_group": null
+    },
+    "chlorite": {
+      "Classification": "phyllosilicate",
+      "material_group": "chlorite"
+    },
+    "chlorophyll": {
+      "Classification": "biologic",
+      "material_group": "organic"
+    },
+    "chromite": {
+      "Classification": "oxide",
+      "material_group": "spinel"
+    },
+    "chrysocolla": {
+      "Classification": "phyllosilicate",
+      "material_group": null
+    },
+    "chrysotile": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "cinnabar": {
+      "Classification": "sulfide",
+      "material_group": null
+    },
+    "clinochlore": {
+      "Classification": "phyllosilicate",
+      "material_group": null
+    },
+    "clintonite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "co2_gas": {
+      "Classification": "oxide",
+      "material_group": "oxide"
+    },
+    "co2_ice": {
+      "Classification": "oxide",
+      "material_group": "oxide"
+    },
+    "co2_trapped": {
+      "Classification": "oxide",
+      "material_group": "oxide"
+    },
+    "colemanite": {
+      "Classification": "borate",
+      "material_group": null
+    },
+    "cookeite": {
+      "Classification": "phyllosilicate",
+      "material_group": "chlorite"
+    },
+    "copiapite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "coquimbite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "cronstedtite": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "cummingtonite": {
+      "Classification": "inosilicate",
+      "material_group": "amphibole"
+    },
+    "cuprite": {
+      "Classification": "oxide",
+      "material_group": null
+    },
+    "cyanide": {
+      "Classification": "nitrile",
+      "material_group": "nitrile"
+    },
+    "cyanide-CdK": {
+      "Classification": "nitrile",
+      "material_group": "nitrile"
+    },
+    "cyanide-KFe": {
+      "Classification": "nitrile",
+      "material_group": "nitrile"
+    },
+    "cyanide-NiK": {
+      "Classification": "nitrile",
+      "material_group": "nitrile"
+    },
+    "cyanide-trihydrate": {
+      "Classification": "nitrile",
+      "material_group": "nitrile"
+    },
+    "cyanide-ZnK": {
+      "Classification": "nitrile",
+      "material_group": "nitrile"
+    },
+    "datolite": {
+      "Classification": "nesosilicate",
+      "material_group": "borosilicate"
+    },
+    "diaspore": {
+      "Classification": "hydroxide",
+      "material_group": "diaspore"
+    },
+    "dickite": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "pyroxene_diopside": {
+      "Classification": "inosilicate",
+      "material_group": "pyroxene"
+    },
+    "dolomite": {
+      "Classification": "carbonate",
+      "material_group": "dolomite"
+    },
+    "dry_grass": {
+      "Classification": "biologic",
+      "material_group": "organic"
+    },
+    "dry_wood": {
+      "Classification": "biologic",
+      "material_group": "organic"
+    },
+    "dust_WTC": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "elbaite": {
+      "Classification": "cyclosilicate",
+      "material_group": "tourmaline"
+    },
+    "endellite": {
+      "Classification": "phyllosilicate",
+      "material_group": null
+    },
+    "enstatite": {
+      "Classification": "inosilicate",
+      "material_group": "pyroxene"
+    },
+    "epidote": {
+      "Classification": "sorosilicate",
+      "material_group": "epidote"
+    },
+    "eugsterite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "fe2+_chlorite.thuringite": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+fe3+_hematite_weath": {
+      "Classification": "generic_fe2+fe3+",
+      "material_group": null
+    },
+    "fe2+fe3+mix": {
+      "Classification": "generic_fe2+fe3+",
+      "material_group": null
+    },
+    "fe2+fe3+_water_RTsludge": {
+      "Classification": "generic_fe2+fe3+",
+      "material_group": null
+    },
+    "fe2+generic_actinolite": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_almandine": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_amphibole": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_axinite": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_basalt": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_carbonate": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_chlor+clinochlor": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_chlorite": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_clinochlore": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_jadeite": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_nrw.cu": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_staurolite": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_sulfate_butlerite": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe2+generic_vbroad": {
+      "Classification": "generic_fe2+",
+      "material_group": null
+    },
+    "fe3+bearing1": {
+      "Classification": "generic_fe3+",
+      "material_group": null
+    },
+    "fe3+_ferrihydrite": {
+      "Classification": "oxide",
+      "material_group": null
+    },
+    "fiberglass": {
+      "Classification": "manmade",
+      "material_group": "organic"
+    },
+    "gasolene_unleaded": {
+      "Classification": "manmade",
+      "material_group": "organic"
+    },
+    "gibbsite": {
+      "Classification": "hydroxide",
+      "material_group": null
+    },
+    "goethite": {
+      "Classification": "hydroxide",
+      "material_group": "diaspore"
+    },
+    "goethite_smallgrain": {
+      "Classification": "hydroxide",
+      "material_group": "diaspore"
+    },
+    "grossular": {
+      "Classification": "nesosilicate",
+      "material_group": "garnet"
+    },
+    "gypsum": {
+      "Classification": "sulfate",
+      "material_group": "gypsum"
+    },
+    "halloysite": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "hectorite": {
+      "Classification": "phyllosilicate",
+      "material_group": "smectite"
+    },
+    "hedenbergite": {
+      "Classification": "inosilicate",
+      "material_group": "pyroxene"
+    },
+    "hematite": {
+      "Classification": "oxide",
+      "material_group": "hematite"
+    },
+    "hematite_smallgrain": {
+      "Classification": "oxide",
+      "material_group": "hematite"
+    },
+    "hornblende": {
+      "Classification": "inosilicate",
+      "material_group": "amphibole"
+    },
+    "howlite": {
+      "Classification": "borate",
+      "material_group": "borate"
+    },
+    "hydrated_basaltic_glass": {
+      "Classification": "glass",
+      "material_group": null
+    },
+    "hydrogrossular": {
+      "Classification": "nesosilicate",
+      "material_group": "garnet"
+    },
+    "pyroxene_hypersthene": {
+      "Classification": "inosilicate",
+      "material_group": "pyroxene"
+    },
+    "illite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "jarosite": {
+      "Classification": "sulfate",
+      "material_group": "alunite"
+    },
+    "kaolinite": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "kaolinite_wxl": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "kaolinite_pxl": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "kieserite": {
+      "Classification": "sulfate",
+      "material_group": "kieserite"
+    },
+    "lazurite": {
+      "Classification": "tectosilicate",
+      "material_group": "sodalite"
+    },
+    "lepidocrosite": {
+      "Classification": "hydroxide",
+      "material_group": null
+    },
+    "lepidolite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "lizardite": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "maghemite": {
+      "Classification": "oxide",
+      "material_group": "hematite"
+    },
+    "magnesite": {
+      "Classification": "carbonate",
+      "material_group": "calcite"
+    },
+    "hydromagnesite": {
+      "Classification": "carbonate",
+      "material_group": "calcite"
+    },
+    "malachite": {
+      "Classification": "carbonate",
+      "material_group": "malachite-rosasite"
+    },
+    "margarite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "mascagnite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "methane_gas": {
+      "Classification": "aliphatichydrocarbon",
+      "material_group": "organic"
+    },
+    "methane_ice": {
+      "Classification": "aliphatichydrocarbon",
+      "material_group": "organic"
+    },
+    "microcline": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "mirabilite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "montmorillonite": {
+      "Classification": "phyllosilicate",
+      "material_group": "smectite"
+    },
+    "muscovite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "nacrite": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "natrolite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "neodymium_oxide": {
+      "Classification": "element",
+      "material_group": "element"
+    },
+    "niter": {
+      "Classification": "nitrate",
+      "material_group": null
+    },
+    "nitrobenzene": {
+      "Classification": "aromatic_hydrocarbon",
+      "material_group": "organic"
+    },
+    "nontronite": {
+      "Classification": "phyllosilicate",
+      "material_group": "smectite"
+    },
+    "nonyne": {
+      "Classification": "alkyne_hydrocarbon",
+      "material_group": "organic"
+    },
+    "olivine": {
+      "Classification": "nesosilicate",
+      "material_group": "olivine"
+    },
+    "organic_plastic_green": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_plastic_blue": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_plastic_pvc": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_plastic-pete": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_plastic-hdpe": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_plastic-vinyl": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_fiberglass": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_polystyrene": {
+      "Classification": "organic",
+      "material_group": "organic-plastic"
+    },
+    "organic_paint": {
+      "Classification": "organic",
+      "material_group": "organic-paint"
+    },
+    "orthoclase": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "palygorskite": {
+      "Classification": "phyllosilicate",
+      "material_group": "palygorskite"
+    },
+    "paragonite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "pectolite": {
+      "Classification": "inosilicate",
+      "material_group": "wollastonite"
+    },
+    "pentene": {
+      "Classification": "aliphatichydrocarbon",
+      "material_group": "organic"
+    },
+    "perchlorate": {
+      "Classification": "perchlorate",
+      "material_group": "perchlorate"
+    },
+    "peroxide": {
+      "Classification": "peroxide",
+      "material_group": "peroxide"
+    },
+    "phlogopite": {
+      "Classification": "phyllosilicate",
+      "material_group": "biotite"
+    },
+    "pyroxene_pigeonite": {
+      "Classification": "inosilicate",
+      "material_group": "pyroxene"
+    },
+    "pinnoite": {
+      "Classification": "borate",
+      "material_group": null
+    },
+    "pitchlimonite": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "polyhalite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "portlandite": {
+      "Classification": "hydroxide",
+      "material_group": "brucite"
+    },
+    "potassium_nitrate": {
+      "Classification": "nitrate",
+      "material_group": null
+    },
+    "prehnite": {
+      "Classification": "phyllosilicate",
+      "material_group": null
+    },
+    "pyridine": {
+      "Classification": "aromatic_hydrocarbon",
+      "material_group": "organic"
+    },
+    "pyrite": {
+      "Classification": "sulfide",
+      "material_group": "pyrite"
+    },
+    "pyrolusite": {
+      "Classification": "oxide",
+      "material_group": "rutile"
+    },
+    "pyrophyllite": {
+      "Classification": "phyllosilicate",
+      "material_group": "pyrophyllite-talc"
+    },
+    "quartz": {
+      "Classification": "tectosilicate",
+      "material_group": "silica"
+    },
+    "rhodochrosite": {
+      "Classification": "carbonate",
+      "material_group": "calcite"
+    },
+    "rhodonite": {
+      "Classification": "inosilicate",
+      "material_group": "rhodonite"
+    },
+    "richterite": {
+      "Classification": "inosilicate",
+      "material_group": null
+    },
+    "riebeckite": {
+      "Classification": "inosilicate",
+      "material_group": "amphibole"
+    },
+    "rivadavite": {
+      "Classification": "borate",
+      "material_group": null
+    },
+    "roscoelite": {
+      "Classification": "phyllosilicate",
+      "material_group": "mica"
+    },
+    "rutile": {
+      "Classification": "oxide",
+      "material_group": "rutile"
+    },
+    "samarium_oxide": {
+      "Classification": "element",
+      "material_group": "element"
+    },
+    "saponite": {
+      "Classification": "phyllosilicate",
+      "material_group": "smectite"
+    },
+    "saponite_or_talc": {
+      "Classification": "phyllosilicate",
+      "material_group": "smectite"
+    },
+    "schwertmannite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "sepiolite": {
+      "Classification": "phyllosilicate",
+      "material_group": "sepiolite"
+    },
+    "serpentine": {
+      "Classification": "phyllosilicate",
+      "material_group": "kaolinite-serpentine"
+    },
+    "siderite": {
+      "Classification": "carbonate",
+      "material_group": "calcite"
+    },
+    "smaragdite": {
+      "Classification": "inosilicate",
+      "material_group": null
+    },
+    "smectite": {
+      "Classification": "smectite",
+      "material_group": "smectite"
+    },
+    "sodium_nitrate": {
+      "Classification": "nitrate",
+      "material_group": "nitrate"
+    },
+    "sphalerite": {
+      "Classification": "sulfide",
+      "material_group": "sphalerite"
+    },
+    "starkeyite": {
+      "Classification": "sulfate",
+      "material_group": "rozenite"
+    },
+    "staurolite": {
+      "Classification": "nesosilicate",
+      "material_group": "staurolite"
+    },
+    "strontianite": {
+      "Classification": "carbonate",
+      "material_group": "aragonite"
+    },
+    "sulfur": {
+      "Classification": "element",
+      "material_group": "element"
+    },
+    "syngenite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "szomolnokite": {
+      "Classification": "sulfate",
+      "material_group": "kieserite"
+    },
+    "talc": {
+      "Classification": "phyllosilicate",
+      "material_group": "pyrophyllite-talc"
+    },
+    "thuringite": {
+      "Classification": "phyllosilicate",
+      "material_group": "chlorite"
+    },
+    "toluene": {
+      "Classification": "aromatic_hydrocarbon",
+      "material_group": "organic"
+    },
+    "topaz": {
+      "Classification": "nesosilicate",
+      "material_group": null
+    },
+    "tremolite": {
+      "Classification": "inosilicate",
+      "material_group": "amphibole"
+    },
+    "tremolite_or_talc": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "trichloroethane": {
+      "Classification": "aliphatichydrocarbon",
+      "material_group": "organic"
+    },
+    "trichloroethylene": {
+      "Classification": "alkene_hydrocarbon",
+      "material_group": "organic"
+    },
+    "ulexite": {
+      "Classification": "borate",
+      "material_group": null
+    },
+    "uralite": {
+      "Classification": "inosilicate",
+      "material_group": "amphibole"
+    },
+    "vegetation_photosyn": {
+      "Classification": "biologic",
+      "material_group": "organic"
+    },
+    "vegetation_nonphotosyn": {
+      "Classification": "biologic",
+      "material_group": "organic"
+    },
+    "water_ice": {
+      "Classification": "water_ice",
+      "material_group": "oxide"
+    },
+    "water_liquid": {
+      "Classification": "water_liquid",
+      "material_group": "oxide"
+    },
+    "witherite": {
+      "Classification": "carbonate",
+      "material_group": "aragonite"
+    },
+    "wollastonite": {
+      "Classification": "inosilicate",
+      "material_group": "wollastonite"
+    },
+    "zoisite": {
+      "Classification": "sorosilicate",
+      "material_group": "epidote"
+    },
+    "zunyite": {
+      "Classification": "sorosilicate",
+      "material_group": null
+    },
+    "copper_precipitate": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "copper_sulfate": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "desert.varnish": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "generic_soil": {
+      "Classification": "mixture",
+      "material_group": null
+    },
+    "magnetite": {
+      "Classification": "oxide",
+      "material_group": "spinel"
+    },
+    "neodymium": {
+      "Classification": "element",
+      "material_group": "rare_earth_element"
+    },
+    "oh2.81um_ref_tourmaline": {
+      "Classification": "cyclosilicate",
+      "material_group": "tourmaline"
+    },
+    "oh2.82um_ref_psilomelane": {
+      "Classification": "oxide",
+      "material_group": null
+    },
+    "oh2.83um_ref_thenardite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "organic_trace_3.42um": {
+      "Classification": "aliphatichydrocarbon",
+      "material_group": "organic"
+    },
+    "vermiculite": {
+      "Classification": "phyllosilicate",
+      "material_group": "vermiculite"
+    },
+    "anhydrite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "barite": {
+      "Classification": "sulfate",
+      "material_group": "barite"
+    },
+    "bassanite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "beryl": {
+      "Classification": "cyclosilicate",
+      "material_group": "beryl"
+    },
+    "brick": {
+      "Classification": "manmade",
+      "material_group": null
+    },
+    "celestite": {
+      "Classification": "sulfate",
+      "material_group": "barite"
+    },
+    "chabazite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "clinoptilolite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "epsomite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "erionite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "heulandite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "kainite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "laumontite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "meionite": {
+      "Classification": "tectosilicate",
+      "material_group": "scapolite"
+    },
+    "melanterite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "mesolite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "mizzonite": {
+      "Classification": "tectosilicate",
+      "material_group": "scapolite"
+    },
+    "mordenite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "opal": {
+      "Classification": "tectosilicate",
+      "material_group": "silica"
+    },
+    "sanidine": {
+      "Classification": "tectosilicate",
+      "material_group": "feldspar"
+    },
+    "scolecite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "sillimanite": {
+      "Classification": "nesosilicate",
+      "material_group": null
+    },
+    "stilbite": {
+      "Classification": "tectosilicate",
+      "material_group": "zeolite"
+    },
+    "thenardite": {
+      "Classification": "sulfate",
+      "material_group": null
+    },
+    "tourmaline": {
+      "Classification": "cyclosilicate",
+      "material_group": "tourmaline"
+    }
+  },
+  "RULE_LOOKUP_MATERIAL": {
+    "vegetation1": ["vegetation_photosyn"],
+    "vegetation.dry+green": ["vegetation_photosyn", "vegetation_nonphotosyn"],
+    "snow.and.ice-77k": ["water_ice"],
+    "h2o-frost+ice-drops3-100k": ["water_ice"],
+    "h2o-frost+ice-drops1-100k": ["water_ice"],
+    "snow.and.ice-170k": ["water_ice"],
+    "snow.and.ice-248k": ["water_ice"],
+    "snow-ice-1mm-273k": ["water_ice"],
+    "snow-ice-3mm-273k": ["water_ice"],
+    "snow-ice-10mm-273k": ["water_ice"],
+    "snow-ice-3mm+0.1water-273k": ["water_ice", "water_liquid"],
+    "snow-ice-3mm+0.2water-273k": ["water_ice", "water_liquid"],
+    "snow-ice-3mm+0.3water-273k": ["water_ice", "water_liquid"],
+    "snow-ice-10mm+0.3water-273k": ["water_ice", "water_liquid"],
+    "snow.melting.1a": ["water_ice", "water_liquid"],
+    "snow.melting.3": ["water_ice", "water_liquid"],
+    "snow.melting.8": ["water_ice", "water_liquid"],
+    "snow.slush.9": ["water_ice", "water_liquid"],
+    "snow.slush.16": ["water_ice", "water_liquid"],
+    "snow.melting1a+0.5veg": ["water_ice", "water_liquid", "vegetation_photosyn"],
+    "snow.melting9+0.5veg": ["water_ice", "water_liquid", "vegetation_photosyn"],
+    "snow.melting16+0.5veg": ["water_ice", "water_liquid", "vegetation_photosyn"],
+    "water.high.chlorophyll": ["water_liquid"],
+    "water.high.chlorophyll2": ["water_liquid"],
+    "water.low.chlorophyll": ["water_liquid"],
+    "water.low.chlorophyll-turquoise": ["water_liquid"],
+    "water.low.chlorophyll-blue1": ["water_liquid"],
+    "water.turquoise-shallow": ["water_liquid"],
+    "water-20C-10cm-path-model": ["water_liquid"],
+    "water-20C-30cm-path-model": ["water_liquid"],
+    "water-20C-100cm-path-model": ["water_liquid"],
+    "water-20C-10cm-path+chlrph-g": ["water_liquid"],
+    "water-20C-100cm-path+chlrph-g": ["water_liquid"],
+    "water-20C-300cm-path+chlrph-g": ["water_liquid"],
+    "water-20C-100cm-path+chlrph-a": ["water_liquid"],
+    "water.red.algae": ["water_liquid", "algea"],
+    "water+mont300gpl": ["water_liquid", "generic_soil"],
+    "water+mont100gpl": ["water_liquid", "generic_soil"],
+    "water+mont100gpl+0.5veg": ["water_liquid", "generic_soil"],
+    "water+mont50gpl": ["water_liquid", "generic_soil"],
+    "water+mont50gpl+0.5veg": ["water_liquid", "generic_soil"],
+    "water+mont16.5gpl": ["water_liquid", "generic_soil"],
+    "water+mont5.01gpl": ["water_liquid", "generic_soil"],
+    "water+mont1.67gpl": ["water_liquid", "generic_soil"],
+    "water+mont0.5gpl": ["water_liquid", "generic_soil"],
+    "dry_long_grass-thick": ["vegetation_nonphotosyn"],
+    "white_pvc_pipe": ["organic_plastic_pvc"],
+    "green_plastic_tarp": ["organic_plastic_green"],
+    "green_plastic_tarp_1um": ["organic_plastic_green"],
+    "hematite.fine.gr.gds76": ["hematite_smallgrain"],
+    "goethite.medgr.ws222": ["goethite"],
+    "goethite+qtz.medgr.gds240": ["goethite"],
+    "goethite.fingr.mpcma2": ["goethite"],
+    "goethite.medcoarsegr.mpc": ["goethite"],
+    "goethite.coarsegr.ws222": ["goethite"],
+    "goethite.thincoat": ["goethite_smallgrain"],
+    "goeth+jarosite.amx11": ["goethite", "jarosite"],
+    "hematite.med.gr.gds27": ["hematite"],
+    "hematite.thincoat": ["hematite_smallgrain"],
+    "hematite.fine.gr.fe2602": ["hematite"],
+    "hematite.fine.gr.ws161": ["hematite"],
+    "hematite.lg.gr.br25a": ["hematite"],
+    "hematite.med.gr.br25b": ["hematite"],
+    "hematite.lg.gr.br25c": ["hematite"],
+    "nanohematite.BR34b2": ["hematite_smallgrain"],
+    "hematite-nano+goethite-fg-amix": ["hematite_smallgrain", "goethite_smallgrain"],
+    "nanohematite.BR34b2b": ["hematite_smallgrain"],
+    "hematite.lg.gr.br34c": ["hematite"],
+    "goethite.lepidocrosite": ["lepidocrosite"],
+    "fe3+_hematite.nano.KP58610-400nm": ["hematite_smallgrain"],
+    "fe3+_hematite.nano-0.3+quartz": ["hematite_smallgrain"],
+    "fe3+_goethite.nano-70nm": ["goethite_smallgrain"],
+    "fe3+_goethite.nano0.05+quartz": ["goethite_smallgrain"],
+    "fe3+_hematite.1+goethite.9-hg1": ["hematite_smallgrain", "goethite_smallgrain"],
+    "fe3+_hematite.2+goethite.8-hg2": ["hematite_smallgrain", "goethite_smallgrain"],
+    "fe3+_hematite.3+goethite.7-hg3": ["hematite_smallgrain", "goethite_smallgrain"],
+    "fe3+_hematite.1+goethite.4+qtz": ["hematite_smallgrain", "goethite_smallgrain"],
+    "fe3+_hematite.4+goethite.1+qtz": ["hematite_smallgrain", "goethite_smallgrain"],
+    "pyrite": ["pyrite"],
+    "schwertmannite": ["schwertmannite"],
+    "Mn-Coating": ["black_Mn_Coating"],
+    "AMD.assemb1": ["acid_mine_drainage"],
+    "AMD.assemb2": ["acid_mine_drainage"],
+    "nh3jarosite-scr-nhj": ["ammoniojarosite"],
+    "jarosite-na-gds100": ["jarosite"],
+    "jarosite-na-gds101": ["jarosite"],
+    "jarosite-k-90c-gds98": ["jarosite"],
+    "kjarosite200": ["jarosite"],
+    "jarosite-K-JR2501": ["jarosite"],
+    "jarosite-na-nmnh95074-1": ["jarosite"],
+    "jarosite-H3O-SJ-1": ["jarosite"],
+    "jarosite_br34a2": ["jarosite"],
+    "jarosite-thinfilm-GDS243": ["jarosite"],
+    "chlor+muscphy": ["chlorite", "muscovite"],
+    "Fe2++goeth+musc": ["goethite", "muscovite"],
+    "chlor+goeth.propylzone": ["chlorite", "goethite"],
+    "generic.Fe2+nrw.cummingtonite": ["cummingtonite"],
+    "generic.Fe2+nrw.actinolite": ["actinolite"],
+    "generic.Fe2+nrw.hs-actinolite": ["actinolite"],
+    "pyroxene.hypersthene.pyx02.e.g1": ["pyroxene_hypersthene"],
+    "fe2+pyroxene.diopside": ["pyroxene_diopside"],
+    "generic.Fe2+med.jadeite": ["fe2+generic_jadeite"],
+    "pigeonite": ["pyroxene_pigeonite"],
+    "epidote.gds26.a.g1": ["epidote"],
+    "fe3+bearing1": ["fe3+bearing1"],
+    "ferrihydrite": ["fe3+_ferrihydrite"],
+    "nontronite.ng-1.a.g1": ["nontronite"],
+    "generic.Fe2+brd.br5a_actinolite": ["fe2+generic_actinolite"],
+    "Fe2+_and_hematite_br5b": ["fe2+fe3+mix"],
+    "generic.Fe2+brd.br22c_actinolite": ["fe2+generic_actinolite"],
+    "fe2+br33a_bioqtzmonz_epidote": ["epidote"],
+    "generic.Fe2+brd.br36a_chlorite": ["fe2+generic_chlorite"],
+    "Fe2+_hematite_weathering": ["fe2+fe3+_hematite_weath"],
+    "generic.Fe2+basalt_br46b": ["fe2+generic_basalt"],
+    "generic.Fe2+.broad_br60b": ["actinolite", "dolomite"],
+    "generic.Fe2+.vbroad_br20": ["fe2+generic_vbroad"],
+    "RTsludge": ["fe2+fe3+_water_RTsludge"],
+    "chlorite.clinochlor": ["clinochlore"],
+    "chlorite.Felow.clinochlor": ["fe2+generic_clinochlore"],
+    "chlorite.thuringite.smr-15.c.g1": ["fe2+_chlorite.thuringite"],
+    "azurite.ws316.g1": ["azurite"],
+    "pitchlimonite": ["pitchlimonite"],
+    "malachite.hs254.3b.g1": ["malachite"],
+    "bluefflor": ["copper_sulfate"],
+    "greenslime": ["copper_precipitate"],
+    "olivine-lrg-gr": ["olivine"],
+    "olivine-fine-gr": ["olivine"],
+    "rhodochrosite": ["rhodochrosite"],
+    "siderite1": ["fe2+generic_carbonate"],
+    "riebeckite": ["fe2+generic_amphibole"],
+    "coquimbite": ["coquimbite"],
+    "copiapite": ["copiapite"],
+    "chrysocolla.hs297.3b.g1": ["chrysocolla"],
+    "neodymium_oxide_g1": ["neodymium_oxide"],
+    "samarium_oxide_g1": ["samarium_oxide"],
+    "axinite": ["fe2+generic_axinite"],
+    "staurolite": ["fe2+generic_staurolite"],
+    "almandine": ["fe2+generic_almandine"],
+    "augite": ["augite"],
+    "pyroxene.bronzite.hs9.3b.g1": ["bronzite"],
+    "butlerite": ["fe2+generic_sulfate_butlerite"],
+    "feldspar.bytownite": ["bytownite"],
+    "chalcopyrite": ["chalcopyrite"],
+    "chromite": ["chromite"],
+    "cinnabar": ["cinnabar"],
+    "cuprite": ["cuprite"],
+    "desert.varnish1": ["desert.varnish"],
+    "desert.varnish2": ["desert.varnish"],
+    "enstatite": ["enstatite"],
+    "hedenbergite": ["hedenbergite"],
+    "lazurite": ["lazurite"],
+    "maghemite": ["maghemite"],
+    "magnetite": ["magnetite"],
+    "manganite": ["pyrolusite"],
+    "microcline": ["microcline"],
+    "albite_hs143": ["albite"],
+    "orthoclase": ["orthoclase"],
+    "inosilicate_pectolite": ["pectolite"],
+    "mn2+_rhodonite": ["rhodonite"],
+    "sulfur": ["sulfur"],
+    "dryveg.grass.long": ["vegetation_nonphotosyn"],
+    "dryveg.grass.golden": ["vegetation_nonphotosyn"],
+    "dryveg.wood": ["vegetation_nonphotosyn"],
+    "plastic.tarp1": ["organic_plastic_blue"],
+    "plastic.Vinyl": ["organic_plastic-vinyl"],
+    "fiberglass.roofing": ["organic_fiberglass"],
+    "plastic.polystyrene": ["organic_polystyrene"],
+    "plastic.pete": ["organic_plastic-pete"],
+    "plastic.pete2": ["organic_plastic-pete"],
+    "plastic.hdpe.1": ["organic_plastic-hdpe"],
+    "paint.1": ["organic_paint"],
+    "plastic.pete3": ["organic_plastic-pete"],
+    "plastic.pete4": ["organic_plastic-pete"],
+    "kalun150c": ["alunite_hydrothermal"],
+    "kalun250c": ["alunite_hydrothermal"],
+    "kalun450c": ["alunite_hydrothermal"],
+    "naalun150c": ["alunite_hydrothermal"],
+    "naalun300c": ["alunite_hydrothermal"],
+    "naalun450c": ["alunite_hydrothermal"],
+    "na82alun100c": ["alunite_hydrothermal"],
+    "natroalun+dickite": ["natroalunite", "dickite"],
+    "na63alun300c": ["alunite_hydrothermal"],
+    "na40alun400c": ["alunite_hydrothermal"],
+    "alunNa03": ["alunite_hydroth_pedog"],
+    "alunNa56450c": ["alunite_hydrothermal"],
+    "alunNa78.450c": ["alunite_hydrothermal"],
+    "alun35K65Na.low": ["alunite_hydroth_pedog"],
+    "alun73K27Na.low": ["alunite_hydroth_pedog"],
+    "alun66K34Na.low": ["alunite_hydroth_pedog"],
+    "muscovite-med-Al": ["muscovite"],
+    "calcite.33+kaol.33+mus-AMXr2": ["calcite", "kaolinite", "muscovite"],
+    "muscovite-medhigh-Al": ["muscovite"],
+    "paragonite": ["paragonite"],
+    "illite": ["illite"],
+    "illite.gds4": ["illite"],
+    "muscovite-low-Al": ["muscovite"],
+    "muscoviteFerich": ["muscovite"],
+    "kaolwxl": ["kaolinite_wxl"],
+    "kaolpxl": ["kaolinite_pxl"],
+    "halloy": ["halloysite"],
+    "kaolgrp_nacrite": ["nacrite"],
+    "dickite": ["dickite"],
+    "gypsum": ["gypsum"],
+    "kaolin.5+smect.5": ["kaolinite", "smectite"],
+    "kaolin.3+smect.7": ["kaolinite", "smectite"],
+    "montna": ["montmorillonite"],
+    "montmorillonite_fe": ["montmorillonite"],
+    "montca": ["montmorillonite"],
+    "hydrated_basaltic_glass": ["hydrated_basaltic_glass"],
+    "sulfate_kieserite": ["kieserite"],
+    "sulfate_szomolnokite": ["szomolnokite"],
+    "sulfate_szomolnokite_heated": ["szomolnokite"],
+    "sulfate-bloedite": ["bloedite"],
+    "perchlorate_mg": ["perchlorate"],
+    "perchlorate_na": ["perchlorate"],
+    "beidellite_gds123": ["beidellite"],
+    "beidellite_gds124": ["beidellite", "montmorillonite"],
+    "chalcedony": ["chalcedony"],
+    "diaspore.hs416.3b.g2": ["diaspore"],
+    "pyrophyllite": ["pyrophyllite"],
+    "kaol.75+pyroph.25": ["kaolinite_wxl", "pyrophyllite"],
+    "pyroph.5+mont0.5": ["pyrophyllite", "montmorillonite"],
+    "pyroph.5+alunit.5": ["alunite_hydrothermal", "pyrophyllite"],
+    "alunite+pyrophyl": ["alunite_hydrothermal", "pyrophyllite"],
+    "pyroph+tr.musc": ["pyrophyllite", "muscovite"],
+    "musc+pyroph": ["muscovite", "pyrophyllite"],
+    "alunite+musc+pyroph": ["alunite_hydrothermal", "muscovite", "pyrophyllite"],
+    "alunite.5+kaol.5": ["alunite_hydrothermal", "kaolinite"],
+    "kaol.75+alun.25": ["kaolinite", "alunite_hydrothermal"],
+    "Kalun+kaol.intmx": ["kaolinite", "alunite_hydrothermal"],
+    "Na-alun+kaol.intmx": ["kaolinite", "alunite_hydrothermal"],
+    "kaolin.5+muscov.medAl": ["kaolinite", "muscovite"],
+    "kaolin.5+muscov.medhighAl": ["kaolinite_wxl", "muscovite"],
+    "kaolin+musc.intimat": ["kaolinite", "muscovite"],
+    "musc+jarosite.intimat": ["muscovite", "jarosite"],
+    "gypsum+jar+illite.intmix": ["gypsum", "jarosite", "illite"],
+    "gyp+jar+musc.amix": ["gypsum", "jarosite", "muscovite"],
+    "gyp+jar+musc+dick.amix": ["gypsum", "jarosite", "muscovite", "dickite"],
+    "musc+gyp+jar+dick.amix": ["muscovite", "gypsum", "jarosite", "dickite"],
+    "dick+musc+gyp+jar.amix": ["dickite", "muscovite", "gypsum", "jarosite"],
+    "alunite.5+musc.5": ["alunite", "muscovite"],
+    "alunite.33+kaol.33+musc.33": ["alunite", "kaolinite", "muscovite"],
+    "muscovite+chlorite": ["muscovite", "chlorite"],
+    "ammonillsmec": ["ammonillsmectite"],
+    "buddington": ["buddingtonite"],
+    "buddington.namont": ["buddingtonite", "montmorillonite"],
+    "buddington.namont2": ["buddingtonite", "montmorillonite"],
+    "ammonalun": ["ammonioalunite"],
+    "ammonjaros": ["ammoniojarosite"],
+    "dolomite": ["dolomite"],
+    "actinolite": ["actinolite"],
+    "amphibole": ["amphibole"],
+    "biotite_HS28.3B": ["biotite"],
+    "biotite-phlogopite-P23-5": ["biotite", "phlogopite"],
+    "chlorite-skarn": ["chlorite"],
+    "chlorite": ["chlorite"],
+    "prehnite+.50chlorite": ["prehnite", "chlorite"],
+    "prehnite+.67chlorite": ["prehnite", "chlorite"],
+    "prehnite+.75chlorite": ["prehnite", "chlorite"],
+    "aragonite": ["aragonite"],
+    "clinochlore.gds158": ["clinochlore"],
+    "clinochlore.nmnh83369": ["clinochlore"],
+    "clinochlore.fe.gds157": ["clinochlore"],
+    "clinochlore.fe.sc-cca-1": ["clinochlore"],
+    "cookeite-CAr-1.a": ["cookeite"],
+    "cookeite-CAr-1.c": ["cookeite"],
+    "chlorite.thuringite.smr-15.b.g2": ["thuringite"],
+    "epidote.gds26.a.g2": ["epidote"],
+    "hornblende": ["hornblende"],
+    "jarosite-Na": ["jarosite"],
+    "jarosite-K": ["jarosite"],
+    "jarosite-lowT": ["jarosite"],
+    "phlogopite": ["phlogopite"],
+    "tremolite.or.talc": ["tremolite_or_talc"],
+    "talc.crsgrnd": ["talc"],
+    "talc.fngrnd": ["talc"],
+    "talc+calcite.parkcity": ["talc", "calcite"],
+    "talc+carbonate.parkcity": ["dolomite", "calcite", "talc"],
+    "calcite+0.2Ca-mont": ["calcite", "montmorillonite"],
+    "magnesite": ["magnesite", "hydromagnesite"],
+    "calcite.ws272.g2": ["calcite"],
+    "calcite+dolomite.5": ["calcite", "dolomite"],
+    "dolo+.5ca-mont": ["dolomite", "montmorillonite"],
+    "calcite.25+dolom.25+Na-mont.5": ["calcite", "dolomite", "montmorillonite"],
+    "calcite.25+dolom.25+Ca-mont.5": ["calcite", "dolomite", "montmorillonite"],
+    "siderite": ["siderite"],
+    "nontronite.ng-1.a.g2": ["nontronite"],
+    "hectorite": ["hectorite"],
+    "saponite.or.talc": ["saponite"],
+    "sepiolite": ["sepiolite"],
+    "calcite+0.2Na-mont": ["calcite", "montmorillonite"],
+    "calcite+0.5Ca-mont": ["calcite", "montmorillonite"],
+    "calcite+0.3muscovite": ["calcite", "muscovite"],
+    "drygrass+.17Na-mont": ["vegetation_nonphotosyn", "montmorillonite"],
+    "dolomite.5+Na-mont.5": ["dolomite", "montmorillonite"],
+    "calcite.33+Ca-mont.67": ["calcite", "montmorillonite"],
+    "calcite+0.2kaolwxl": ["calcite", "kaolinite"],
+    "calcite0.7+kaol0.3": ["calcite", "kaolinite"],
+    "clintonite": ["clintonite"],
+    "palygorskite": ["palygorskite"],
+    "zoisite": ["zoisite"],
+    "elbaite": ["elbaite"],
+    "gibbsite": ["gibbsite"],
+    "niter": ["niter"],
+    "topaz": ["topaz"],
+    "rhodochrosite.hs338.3b.g2": ["rhodochrosite"],
+    "witherite": ["witherite"],
+    "prehnite.gds613": ["prehnite"],
+    "prehnite+muscovite": ["prehnite", "muscovite"],
+    "Pinnoite": ["pinnoite"],
+    "polyhalite": ["polyhalite"],
+    "rivadavite": ["rivadavite"],
+    "howlite": ["howlite"],
+    "ulexite": ["ulexite"],
+    "white.crust": ["starkeyite"],
+    "analcime": ["analcime"],
+    "brucite": ["brucite"],
+    "carnallite": ["carnallite"],
+    "colemanite": ["colemanite"],
+    "datolite": ["datolite"],
+    "hydrogrossular": ["hydrogrossular"],
+    "lepidolite": ["lepidolite"],
+    "margarite": ["margarite"],
+    "mascagnite": ["mascagnite"],
+    "mirabilite-wet_soil": ["mirabilite"],
+    "natrolite": ["natrolite"],
+    "richterite": ["richterite"],
+    "chrysotile.coarse-fibrous": ["chrysotile"],
+    "chrysotile.med-fine-fibrous": ["chrysotile"],
+    "chrysotile.fine-fibrous": ["chrysotile"],
+    "cronstedtite_M3542": ["cronstedtite"],
+    "illite.roscoelite": ["roscoelite"],
+    "strontianite": ["strontianite"],
+    "syngenite": ["syngenite"],
+    "chrysocolla.hs297.3b.g2": ["chrysocolla"],
+    "azurite.ws316.g2": ["azurite"],
+    "malachite.hs254.3b.g2": ["malachite"],
+    "cyanide-CdK": ["cyanide-CdK"],
+    "cyanide-NiK": ["cyanide-NiK"],
+    "cyanide-trihydrate": ["cyanide-trihydrate"],
+    "cyanide-KFe": ["cyanide-KFe"],
+    "cyanide-ZnK": ["cyanide-ZnK"],
+    "plastic.grnhs.roof": ["organic_plastic_green"],
+    "benzene+montswy": ["montmorillonite", "benzene"],
+    "trichlor": ["montmorillonite", "trichloroethane"],
+    "toluene+montswy": ["montmorillonite", "toluene"],
+    "unleaded.gas": ["montmorillonite", "gasolene_unleaded"],
+    "tce": ["montmorillonite", "trichloroethylene"],
+    "zunyite": ["zunyite"],
+    "sulfate-mix_gypsum.trace.dust+debris-WTC01-2": ["gypsum"],
+    "gypsum.trace.dust+debris-WTC01-28": ["gypsum"],
+    "chrysotile.gypsum.wtc01-8": ["gypsum", "chrysotile"],
+    "portlandite": ["portlandite"],
+    "potassium_nitrate": ["potassium_nitrate"],
+    "sodium_nitrate": ["sodium_nitrate"],
+    "vermiculite_GDS458": ["vermiculite"],
+    "vermiculite_ALB4SA00": ["vermiculite"],
+    "vermiculite_WS682": ["vermiculite"],
+    "vermiculite_WS681": ["vermiculite"],
+    "methane-gas-2.37um-experimental": ["methane_gas"],
+    "vegetation.map": ["vegetation_photosyn"],
+    "vegetation.weak.map": ["vegetation_photosyn"],
+    "vegetation.dry+green.g3": ["vegetation_photosyn", "vegetation_nonphotosyn"],
+    "vegetation.dry_nonphotosyn": ["vegetation_nonphotosyn"],
+    "anorthite_hs201.3b": ["anorthite"],
+    "bytownite_hs106.3b": ["bytownite"],
+    "microcline_hs103.3b": ["microcline"],
+    "magnetite_hs195.3b": ["magnetite"],
+    "sphalerite_s26-341_1.5um": ["sphalerite"],
+    "rutile_hs126.3b": ["rutile"],
+    "wollastonite_hs348.3b": ["wollastonite"],
+    "olivine_fo91_gds71.b": ["olivine"],
+    "olivine_fo89_gds70.a": ["olivine"],
+    "olivine_fo89_gds70.c": ["olivine"],
+    "olivine_fo89_gds70.d": ["olivine"],
+    "olivine_fo66_ki3054": ["olivine"],
+    "olivine_fo60_ki3189": ["olivine"],
+    "olivine_fo80_hs285.4b": ["olivine"],
+    "olivine_fo18_ki3377": ["olivine"],
+    "g4-fe2+generic_chlor+muscphy": ["chlorite", "muscovite"],
+    "g4-fe2+generic_chlorite.clinochlor": ["fe2+generic_chlor+clinochlor"],
+    "g4-fe2+generic_brd.br5a_actinolite": ["fe2+generic_actinolite"],
+    "g4-fe2+generic_brd.br22c_actinolite": ["fe2+generic_actinolite"],
+    "g4-fe2+generic_vbroad_br20": ["fe2+generic_vbroad"],
+    "g4-generic.Fe2+nrw.cummingtonite": ["fe2+generic_nrw.cu"],
+    "diaspore.hs416.3b.g5": ["diaspore"],
+    "pyroxene.augite": ["augite"],
+    "pyroxene.bronzite.hs9.3b.g5": ["bronzite"],
+    "pyroxene.enstatite": ["enstatite"],
+    "pyroxene.hypersthene.pyx02.e.g5": ["pyroxene_hypersthene"],
+    "pyroxene.pigeonite": ["pyroxene_pigeonite"],
+    "g5-water.1a-mix": ["water_liquid"],
+    "eugsterite.2.5um.water": ["eugsterite"],
+    "adularia_2.5um": ["adularia"],
+    "naalun450c.2.5um": ["alunite_hydrothermal"],
+    "analcime.2.5um": ["analcime"],
+    "calcite.2.5um": ["calcite"],
+    "dolomite.2.5um": ["dolomite"],
+    "magnesite.2.5um": ["magnesite", "hydromagnesite"],
+    "siderite.2.5um": ["siderite"],
+    "rhodochrosite.hs338.3b.g2.2.5um": ["rhodochrosite"],
+    "witherite.2.5um": ["witherite"],
+    "strontianite.2.5um": ["strontianite"],
+    "goethite_3.17um": ["goethite_smallgrain"],
+    "grossular_3.17um": ["grossular"],
+    "jarosite_3.18um": ["jarosite"],
+    "oh2.72um_ref_pyrophyllite": ["pyrophyllite"],
+    "oh2.75um_ref_muscovite_gds113": ["muscovite"],
+    "oh2.76um_ref_illite_gds4": ["illite"],
+    "oh2.81um_ref_tourmaline": ["oh2.81um_ref_tourmaline"],
+    "oh2.83um_ref_thenardite": ["oh2.83um_ref_thenardite"],
+    "oh2.82um_ref_psilomelane": ["oh2.82um_ref_psilomelane"],
+    "organic_3.237d_aromatic-benzene_curvc": ["benzene"],
+    "organic_trace_aliphatic1_curvc": ["organic_trace_3.42um"],
+    "carbonate_calcite_3.5um_curvc": ["calcite"],
+    "carbonate_dolomite_3.5um_curvc": ["dolomite"],
+    "carbonate_trace_3.5um_curvc": ["calcite"],
+    "carbonate_trace-b_3.4um.curv": ["calcite"],
+    "carbonate_trace-c_3.4um.curvc": ["calcite"],
+    "carbonate_trace-c2b_3.4um.curvc": ["calcite"],
+    "carbonate_trace-calcdolo_3.4um.curvc": ["calcite", "dolomite"],
+    "carbonate_magnesite+hydromagnesite_curvc": ["magnesite", "hydromagnesite"],
+    "nitrate_niter_3.6um_curvc": ["niter"],
+    "co2_ice-on-moon62231.curvc": ["co2_ice"],
+    "CO2_ice g0.0300cm.curvc": ["co2_ice"],
+    "CO2_ice g0.1000cm.curvc": ["co2_ice"],
+    "organic.3.41um.nonyne_curvc": ["nonyne"],
+    "organic.3.37um.pentene_curvc": ["pentene"],
+    "organic.3.24um.pyridine_curvc": ["pyridine"],
+    "organic.3.25um.nitrobenzene_curvc": ["nitrobenzene"],
+    "hydrogen_peroxide.3.52um_curvc": ["peroxide"],
+    "organic_3.237d_aromatic-benzene_linc": ["benzene"],
+    "organic_trace_aliphatic1_linc": ["organic_trace_3.42um"],
+    "carbonate_calcite_3.5um_linc": ["calcite"],
+    "carbonate_dolomite_3.5um_linc": ["dolomite"],
+    "carbonate_trace_3.5um_linc": ["calcite"],
+    "carbonate_trace-b_3.4um_linc": ["calcite"],
+    "carbonate_trace-c_3.4um_linc": ["calcite"],
+    "carbonate_trace-c2b_3.4um.linc": ["calcite"],
+    "carbonate_trace-calcdolo_3.4um_linc": ["calcite", "dolomite"],
+    "magnesite+hydromagnesite_linc": ["magnesite", "hydromagnesite"],
+    "nitrate_niter_3.6um_linc": ["niter"],
+    "co2_ice-on-moon62231_linc": ["co2_ice"],
+    "CO2_ice g0.0300cm_linc": ["co2_ice"],
+    "CO2_ice g0.1000cm_linc": ["co2_ice"],
+    "organic.3.41um.nonyne_linc": ["nonyne"],
+    "organic.3.37um.pentene_linc": ["pentene"],
+    "organic.3.24um.pyridine_linc": ["pyridine"],
+    "organic.3.25um.nitrobenzene_linc": ["nitrobenzene"],
+    "hydrogen_peroxide.3.52um_linc": ["peroxide"],
+    "oh_1.397_mica-phlogopite": ["phlogopite"],
+    "oh_1.383_amphibole-richterite": ["richterite"],
+    "oh_1.378_phyllo-ksg-chrysotile": ["chrysotile"],
+    "oh_1.381_phyllo-ksg-dickite": ["dickite"],
+    "oh_1.388_phyllo-chlorite": ["chlorite"],
+    "oh_1.385_phyllo-ksg-nacrite": ["nacrite"],
+    "oh_1.390_phyllo-ksg-endellite": ["endellite"],
+    "oh_1.392_amphibole-tremolite": ["tremolite"],
+    "oh_1.392_smectite-saponite": ["saponite"],
+    "oh_1.392_phyllo-ksg-lizardite": ["lizardite"],
+    "oh_1.393_phyllo-serpentine": ["serpentine"],
+    "oh_1.393_phyllo-talc": ["talc"],
+    "oh_1.394_phyllo-pyrophyllite": ["pyrophyllite"],
+    "oh_1.395_phyllo-ksg-antigorite": ["antigorite"],
+    "oh_1.396_amphibole-actinolite": ["actinolite"],
+    "oh_1.398_phyllo-clinochlore": ["clinochlore"],
+    "oh_1.396_amphibole-uralite": ["uralite"],
+    "oh_1.398_amphibole-smaragdit": ["smaragdite"],
+    "oh_1.398-phyllo-kaolinite-wxl": ["kaolinite_wxl"],
+    "oh_1.400_phyllo-chlorgrp-cookeite": ["cookeite"],
+    "oh_1.401_mica-lepidolite": ["lepidolite"],
+    "oh_1.406_silica-opal": ["opal"],
+    "oh_1.408_mica-paragonite": ["paragonite"],
+    "oh_1.409_mica-lepidolite": ["lepidolite"],
+    "oh_1.4106_kaolin.5+muscov.medhighAl": ["kaolinite_wxl", "muscovite"],
+    "oh_1.413_phyllo-kaolinite-pxl": ["kaolinite_pxl"],
+    "oh_1.432_phyllo-vermiculite": ["vermiculite"],
+    "ohb_1.385_phyllo-nacrite": ["nacrite"],
+    "ohb_1.398_phyllo-kaolinite-wxl": ["kaolinite_wxl"],
+    "ohb_1.400_phyllo-cookeite": ["cookeite"],
+    "ohb_1.406_nesosil-topaz": ["topaz"],
+    "ohb_1.406_tectosil-opal": ["opal"],
+    "ohb_1.408_mica-paragonite": ["paragonite"],
+    "ohb_1.409_phyllo-lepidolite": ["lepidolite"],
+    "ohb_1.409_smectite-sauconite": ["smectite"],
+    "ohb_1.410_phyllo-chrysocolla": ["chrysocolla"],
+    "ohb_1.410_kaolgrp-halloysite": ["halloysite"],
+    "ohb_1.410_mica-margarite": ["margarite"],
+    "ohb_1.4106_kaolin.5+muscov.medhighAl": ["kaolinite_wxl", "muscovite"],
+    "ohb_1.410_mica-muscovite": ["muscovite"],
+    "ohb_1.411_smectite-montmor-swy": ["montmorillonite"],
+    "ohb_1.413_kaolgrp-kaolinite-pxl": ["kaolinite_pxl"],
+    "ohb_1.413_nesosil-hydrogross": ["hydrogrossular"],
+    "ohb_1.414_smectite-hectorite": ["hectorite"],
+    "ohb_1.416_phyllo-sepiolite": ["sepiolite"],
+    "ohb_1.416_mica-roscoelite": ["roscoelite"],
+    "ohb_1.416_mica-illite": ["illite"],
+    "ohb_1.416_smectite-montmor-saz": ["montmorillonite"],
+    "ohb_1.417_phyllo-palygorsk": ["palygorskite"],
+    "ohb_1.418_mica_muscovite": ["muscovite"],
+    "ohb_1.418_zeolite_mordonite": ["mordenite"],
+    "ohb_1.419_zeolite-stilbite": ["stilbite"],
+    "ohb_1.419_zeolite-clinpt": ["clinoptilolite"],
+    "ohb_1.422_zeolite-heuland": ["heulandite"],
+    "ohb_1.423_scapolute-meionite": ["meionite"],
+    "ohb_1.424_smectite-nontronite": ["nontronite"],
+    "ohb_1.425_scapolite-mizzonite": ["mizzonite"],
+    "ohb_1.425_sulfate-alunite": ["alunite"],
+    "ohb_1.429_sodalite-lazurite": ["lazurite"],
+    "ohb_1.431_zeolite-laumontite": ["laumontite"],
+    "ohb_1.431_cyclosil-elbaite": ["elbaite"],
+    "ohb_1.435_tourmaline": ["tourmaline"],
+    "ohb_1.438_sulfate-alunite-na": ["natroalunite"],
+    "ohb_1.424_zeolite-analcime": ["analcime"],
+    "ohb_1.436_sulfate-eugsterite": ["eugsterite"],
+    "ohb_1.440_zeolite-scolecite": ["scolecite"],
+    "ohb_1.447_sulfate-gypsum": ["gypsum"],
+    "ohb_1.449_sulfate-schwertm": ["schwertmannite"],
+    "ohb_1.450_sulfate-copiapite": ["copiapite"],
+    "ohb_1.432_phyllo-vermiculite": ["vermiculite"],
+    "ohb_1.455_zeolite-natrolite": ["natrolite"],
+    "ohb_1.451_hydroxide-gibbsite": ["gibbsite"],
+    "ohc_1.451_hydroxide-gibbsite": ["gibbsite"],
+    "ohc_1.455_zeolite-natrolite": ["natrolite"],
+    "ohc_1.464_sulfate-bloedite": ["bloedite"],
+    "ohc_1.469_sulfate-jarosite-k": ["jarosite"],
+    "ohc_1.471_sulfate-jarosite-k": ["jarosite"],
+    "ohc_1.471_nesisil-datolite": ["datolite"],
+    "ohc_1.478_sulfate-jarosite-na90c": ["jarosite"],
+    "ohc_1.479_sulfate-jarosite-na200c": ["jarosite"],
+    "ohc_1.480_phyllo-prehnite": ["prehnite"],
+    "water_1.896_beryl": ["beryl"],
+    "water_1.902_silica-opal": ["opal"],
+    "water_1.903_smectite-saponite": ["saponite"],
+    "water_1.906_montmor-na": ["montmorillonite"],
+    "water_1.907_smectite-nontronite": ["nontronite"],
+    "water_1.908_smectite-beidell": ["beidellite"],
+    "water_1.908_phyllo-illite": ["illite"],
+    "water_1.909_mont-saz": ["montmorillonite"],
+    "water_1.910_halloysite": ["halloysite"],
+    "water_1.910_zeolite-clinopt": ["clinoptilolite"],
+    "water_1.910_stonwplaya": ["generic_soil"],
+    "water_1.910_zeolite-mordonite": ["mordenite"],
+    "water_1.912_zeolite-analcime": ["analcime"],
+    "water_1.916_nesosil-sillim": ["sillimanite"],
+    "water_1.917_zeolite-heuland": ["heulandite"],
+    "water_1.920_sulfate-bassanite": ["bassanite"],
+    "water_1.918_perchlorate-mg": ["perchlorate"],
+    "water_1.923_chert": ["quartz"],
+    "water_1.924_perchlorate-na": ["perchlorate"],
+    "water_broad_1.927_veg": ["vegetation_photosyn"],
+    "water_1.929_sulfate-epsomite": ["epsomite"],
+    "water_1.931_narrow-cheatgrass": ["vegetation_photosyn"],
+    "water_1.932_sulfate-eusgterite": ["eugsterite"],
+    "water_1.940_zeolite-natrolite": ["natrolite"],
+    "water_1.941_zeolite-natrolite": ["natrolite"],
+    "water_1.941_zeolite-scolecite": ["scolecite"],
+    "water_1.942_sulfate-schwert": ["schwertmannite"],
+    "water_1.943_sulfate-gypsum": ["gypsum"],
+    "water_1.943_brick": ["brick"],
+    "water_1.944_sulfate-polyhalite": ["polyhalite"],
+    "water_1.946_sulfate-copiapite": ["copiapite"],
+    "water_1.951_sulfate-bloedite": ["bloedite"],
+    "water_1.960_sulfate-butler": ["butlerite"],
+    "water_1.964_sulfate-feso4": ["melanterite"],
+    "water_1.971_sulfate-kainite": ["kainite"],
+    "water_1.980_salt-carnallite": ["carnallite"],
+    "water_1.981_sulfate-coquimb": ["coquimbite"],
+    "water_1.991_sulfate-syngite": ["syngenite"],
+    "h20_ice_2.02um-77k-a": ["water_ice"],
+    "water_2.073_sulfate-kieserite": ["kieserite"],
+    "water_2.060_sulfate_szomoln": ["szomolnokite"],
+    "water_2.093_sulfate_szomoln": ["szomolnokite"],
+    "water_2.122_nh4-buddingt": ["buddingtonite"],
+    "water_2.130_sulfate_kieserite": ["kieserite"],
+    "water_2.136_nh4-mascagnite": ["mascagnite"],
+    "ree_nd_neodymium_oxide": ["neodymium_oxide"],
+    "ree_nd_neodymium_oxide-0.6um": ["neodymium_oxide"],
+    "ree_nd_ancylite": ["neodymium"],
+    "ree_nd_bastnaesite": ["neodymium"],
+    "ree_nd_chlorapatite": ["neodymium"],
+    "ree_nd_fluorapatite": ["neodymium"],
+    "ree_nd_monazite_gds947": ["neodymium"],
+    "ree_nd_monazite_gds957": ["neodymium"],
+    "ree_nd_parisite": ["neodymium"],
+    "ree_nd_pyromorphite": ["neodymium"],
+    "ree_nd_xenotime": ["neodymium"],
+    "ree_nd_xenotime+monazite": ["neodymium"],
+    "ree_samarium_oxide": ["samarium_oxide"],
+    "ree_nd_neodymium_oxide_g21": ["neodymium_oxide"],
+    "ree_nd_ancylite_g21": ["neodymium"],
+    "ree_nd_bastnaesite_g21": ["neodymium"],
+    "ree_nd_chlorapatite_g21": ["neodymium"],
+    "ree_nd_fluorapatite_g21": ["neodymium"],
+    "ree_nd_monazite_gds947_g21": ["neodymium"],
+    "ree_nd_monazite_gds957_g21": ["neodymium"],
+    "ree_nd_parisite_g21": ["neodymium"],
+    "ree_nd_pyromorphite_g21": ["neodymium"],
+    "ree_nd_xenotime_g21": ["neodymium"],
+    "ree_nd_xenotime+monazite_g21": ["neodymium"],
+    "ree_samarium_oxide_g21": ["samarium_oxide"],
+    "samarium_oxide1": ["samarium_oxide"],
+    "carbonate_calcite_4um_linc": ["calcite"],
+    "carbonate_dolomite_4um_linc": ["dolomite"],
+    "carbonate_trace_4um_linc": ["calcite"],
+    "carbonate_trace-b_4um_linc": ["calcite"],
+    "carbonate_trace-c_4um_linc": ["calcite"],
+    "carbonate_trace-calcdolo_4um_linc": ["calcite", "dolomite"],
+    "magnesite+hydromagnesite_4umlinc": ["magnesite", "hydromagnesite"],
+    "nitrate_niter_4.1um_linc": ["niter"],
+    "trapped-co2-4.24um_ref-beryl": ["co2_trapped"],
+    "trapped-co2-4.26um_ref-cordierite": ["co2_trapped"],
+    "trapped-co2-4.265um_ref-apatite": ["co2_trapped"],
+    "trapped-co2-4.268um_ref-microcline": ["co2_trapped"],
+    "trapped-co2-4.265um_ref-perthite": ["co2_trapped"],
+    "trapped-co2-4.269um_ref-rutile": ["co2_trapped"],
+    "trapped-co2-4.31um_ref-topaz": ["co2_trapped"],
+    "trapped-co2-4.34um_ref-sillimanite": ["co2_trapped"],
+    "feldspar_adularia-4.5um": ["adularia"],
+    "sulfate_alunite-na82-4.5um": ["alunite"],
+    "sulfate_alunite-na83-4.5um": ["alunite"],
+    "sulfate_alunite-na03-4.5um": ["alunite"],
+    "sulfate_alunite--nh4-j-4.5um": ["alunite"],
+    "sulfate_alunite-400c-4.5um": ["alunite"],
+    "sulfate_alunite-na56-4.5um": ["alunite"],
+    "sulfate_anhydrite-4.5um": ["anhydrite"],
+    "sulfate_barite-4.5um": ["barite"],
+    "sulfate_bassanite-4.5um": ["bassanite"],
+    "phyllosilicate_beidellite+montmor-4.5um": ["beidellite", "montmorillonite"],
+    "sulfate_bloedite-4.5um": ["bloedite"],
+    "sulfate_butlerite-4.5um": ["butlerite"],
+    "carbonate_calcite-4.67um": ["calcite"],
+    "sulfate_celestite-4.5um": ["celestite"],
+    "zeolite_chabazitemix-4.5um": ["chabazite"],
+    "cyanide_cyanide-cap-4.5um": ["cyanide-CdK"],
+    "cyanide_cyanide-nik-4.5um": ["cyanide-NiK"],
+    "cyanide_cyanide-znk-4.5um": ["cyanide-ZnK"],
+    "carbonate_dolomite-4.63um": ["dolomite"],
+    "silicate_elbaite-4.5um": ["elbaite"],
+    "sulfate_epsomite-4.5um": ["epsomite"],
+    "zeolite_erionitemix-4.5um": ["erionite"],
+    "sulfate_eugsterite-4.5um": ["eugsterite"],
+    "sulfate_gypsum-4.5um": ["gypsum"],
+    "fe3+_hematite_a-4.5um": ["hematite"],
+    "fe3+_hematite_c-4.5um": ["hematite"],
+    "zeolite_heulandite-4.5um": ["heulandite"],
+    "sulfate_kainite-4.5um": ["kainite"],
+    "sulfate_kieserite-4.5um": ["kieserite"],
+    "zeolite_laumontite-4.5um": ["laumontite"],
+    "phyllosilicate_lepidolite-4.5um": ["lepidolite"],
+    "carbonate_magnesite-4.59um": ["magnesite", "hydromagnesite"],
+    "zeolite_mesolite-4.5um": ["mesolite"],
+    "sulfate_mirabilite-4.5um": ["mirabilite"],
+    "zeolite_natrolite-4.5um-nmnh": ["natrolite"],
+    "zeolite_natrolite-4.5um-hs168": ["natrolite"],
+    "sulfate_polyhalite-4.5um": ["polyhalite"],
+    "carbonate_rhodochrosite-4.69um": ["rhodochrosite"],
+    "feldspar_sanidine-4.5um": ["sanidine"],
+    "zeolite_scolecite-4.5um": ["scolecite"],
+    "phyllosilicate_sepiolite-4.5um": ["sepiolite"],
+    "carbonate_siderite-4.65um": ["siderite"],
+    "carbonate_strontianite-4.70um": ["strontianite"],
+    "sulfate_syngenite-4.5um": ["syngenite"],
+    "sulfate_thenardite-4.5um": ["thenardite"],
+    "carbonate_witherite-4.74um": ["witherite"],
+    "methane-gas-2.37um_g37-experimental": ["methane_gas"],
+    "co2-gas-2um_g38-experimental": ["co2_gas"],
+    "red.edge.shift.1": ["vegetation_photosyn"],
+    "red.edge.shift.2": ["vegetation_photosyn"],
+    "vegetation.type1": ["vegetation_photosyn"],
+    "vegetation.type2": ["vegetation_photosyn"],
+    "vegetation.type3": ["vegetation_photosyn"],
+    "vegetation.type4": ["vegetation_photosyn"],
+    "vegetation.type5": ["vegetation_photosyn"],
+    "vegetation.type6": ["vegetation_photosyn"],
+    "vegetation.type7": ["vegetation_photosyn"],
+    "vegetation.type8": ["vegetation_photosyn"],
+    "vegetation.type9": ["vegetation_photosyn"],
+    "vegetation.type10": ["vegetation_photosyn"],
+    "vegetation.type11": ["vegetation_photosyn"],
+    "vegetation.type12": ["vegetation_photosyn"],
+    "vegetation.type13": ["vegetation_photosyn"],
+    "vegetation.type14": ["vegetation_photosyn"],
+    "vegetation.type15": ["vegetation_photosyn"],
+    "veg0.9um.band": ["vegetation_photosyn"],
+    "veg1.2um.band": ["vegetation_photosyn"],
+    "veg1.4um.band": ["vegetation_photosyn"],
+    "calcite.ws272.c6": ["calcite"],
+    "epidote.gds26.a.c6": ["epidote"],
+    "ripidolite": ["chlorite"],
+    "CEC-D.33Ep66Ca": ["epidote", "calcite"],
+    "CEC-E.66Ep33Ca": ["epidote", "calcite"],
+    "CEC-G.20Ch60Ep20Ca": ["chlorite", "epidote", "calcite"],
+    "CEC-H.60Ch20Ep20Ca": ["chlorite", "epidote", "calcite"],
+    "CEC-I.20Ch20Ep60Ca": ["chlorite", "epidote", "calcite"],
+    "CEC-J.33Ch66Ca": ["chlorite", "calcite"],
+    "CEC-K.60Ch20Ep20Ca:": ["chlorite", "epidote", "calcite"],
+    "CEC-L.66Ch33Ep": ["chlorite", "epidote"],
+    "CEC-M.33Ch66Ep": ["chlorite", "epidote"],
+    "CEC-N.33Ch33Ep33Ca": ["chlorite", "epidote", "calcite"],
+    "calcite.2.3+2.5um": ["calcite"],
+    "dolomite.2.3+2.5um": ["dolomite"],
+    "magnesite.2.3+2.5um": ["magnesite", "hydromagnesite"],
+    "siderite.2.3+2.5um": ["siderite"],
+    "rhodochrosite.hs338.3b.g2.2.3+2.5um": ["rhodochrosite"],
+    "witherite.2.3+2.5um": ["witherite"],
+    "strontianite.2.3+2.5um": ["strontianite"]
+  },
+    "COLOUR_THEMES": {
+    "1micron-minerals-a": {
+      "method": "classes",
+      "native_script": "davinci.make.1micron-mins.color.a",
+      "title": "Fe2+ and Fe3+ minerals, 1 um region",
+      "key_image": "key_1um-map.fe2+,fe3+.a-1200w.png",
+      "classes": [
+        {
+          "section": "Fe2+, Fe3+ minerals",
+          "label": "Fe2+ Minerals",
+          "note": "generic Fe2+ bands",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "generic.Fe2+nrw.cummingtonite",
+            "generic.Fe2+nrw.actinolite",
+            "generic.Fe2+nrw.hs-actinolite",
+            "generic.Fe2+med.jadeite",
+            "generic.Fe2+brd.br5a_actinolite",
+            "generic.Fe2+brd.br22c_actinolite",
+            "generic.Fe2+brd.br36a_chlorite",
+            "generic.Fe2+basalt_br46b",
+            "generic.Fe2+.broad_br60b",
+            "generic.Fe2+.vbroad_br20"
+          ]
+        },
+        {
+          "section": "Fe2+, Fe3+ minerals",
+          "label": "Fe2+ Minerals",
+          "note": "hypersthene",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "pyroxene.hypersthene.pyx02.e.g1"
+          ]
+        },
+        {
+          "section": "Fe2+, Fe3+ minerals",
+          "label": "Fe2+ Minerals",
+          "note": "siderite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "siderite1"
+          ]
+        },
+        {
+          "section": "Fe2+, Fe3+ minerals",
+          "label": "Fe2+, Fe3+ Mixtures",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "Fe2+_hematite_weathering",
+            "Fe2++goeth+musc"
+          ]
+        },
+        {
+          "section": "Fe2+, Fe3+ minerals",
+          "label": "Fe3+ Mixtures",
+          "colour": "c_flesh",
+          "rgb": [255, 200, 155],
+          "rules": [
+            "AMD.assemb1",
+            "AMD.assemb2",
+            "goeth+jarosite.amx11"
+          ]
+        },
+        {
+          "section": null,
+          "label": "nano-Hematite - nano-Goethite Mixtures",
+          "colour": "c_salmon",
+          "rgb": [255, 170, 170],
+          "rules": [
+            "hematite-nano+goethite-fg-amix",
+            "fe3+_hematite.1+goethite.9-hg1",
+            "fe3+_hematite.2+goethite.8-hg2",
+            "fe3+_hematite.3+goethite.7-hg3",
+            "fe3+_hematite.1+goethite.4+qtz",
+            "fe3+_hematite.4+goethite.1+qtz"
+          ]
+        },
+        {
+          "section": "Fe2+, Fe3+ minerals",
+          "label": "Fe3+ Iron Sulphates",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "copiapite"
+          ]
+        },
+        {
+          "section": "Fe2+, Fe3+ minerals",
+          "label": "Fe3+ Jarosite",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "nh3jarosite-scr-nhj",
+            "jarosite-na-gds100",
+            "jarosite-na-gds101",
+            "jarosite-k-90c-gds98",
+            "kjarosite200",
+            "jarosite-K-JR2501",
+            "jarosite-na-nmnh95074-1",
+            "jarosite-H3O-SJ-1",
+            "jarosite_br34a2",
+            "jarosite-thinfilm-GDS243"
+          ]
+        },
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, coarse and medium grained",
+          "note": "key shows mud-yellow and army-green swatches; script uses c_mudyellow for both",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "goethite.coarsegr.ws222",
+            "goethite.medcoarsegr.mpc"
+          ]
+        },
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, coarse and medium grained",
+          "note": "key shows mud-yellow and army-green swatches; script uses c_mudyellow for both",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "goethite.medgr.ws222",
+            "goethite+qtz.medgr.gds240"
+          ]
+        },
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, fine grained",
+          "colour": "c_gold",
+          "rgb": [255, 210, 0],
+          "rules": [
+            "goethite.fingr.mpcma2"
+          ]
+        },
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, nano and thin coating",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "goethite.thincoat",
+            "fe3+_goethite.nano-70nm",
+            "fe3+_goethite.nano0.05+quartz"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, coarse grained",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "hematite.lg.gr.br25a",
+            "hematite.lg.gr.br25c",
+            "hematite.lg.gr.br34c"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, medium grained",
+          "colour": "c_redpink",
+          "rgb": [255, 125, 125],
+          "rules": [
+            "hematite.med.gr.gds27",
+            "hematite.med.gr.br25b"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, fine grained",
+          "colour": "c_deeppink",
+          "rgb": [235, 0, 180],
+          "rules": [
+            "hematite.fine.gr.fe2602",
+            "hematite.fine.gr.gds76",
+            "hematite.fine.gr.ws161"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, nano",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "nanohematite.BR34b2",
+            "nanohematite.BR34b2b",
+            "fe3+_hematite.nano.KP58610-400nm",
+            "fe3+_hematite.nano-0.3+quartz",
+            "hematite.thincoat"
+          ]
+        }
+      ]
+    },
+    "hematite+goethite.grain.size-a": {
+      "method": "classes",
+      "native_script": "davinci.make.hematite+goethite.grain.size.a",
+      "title": "Goethite, Hematite grain size",
+      "key_image": "key_hematite+goethite.grain.size.a-wide.png",
+      "classes": [
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, coarse grained",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "goethite.coarsegr.ws222",
+            "goethite.medcoarsegr.mpc"
+          ]
+        },
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, medium grained",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "goethite.medgr.ws222",
+            "goethite+qtz.medgr.gds240"
+          ]
+        },
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, fine grained",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "goethite.fingr.mpcma2"
+          ]
+        },
+        {
+          "section": "Fe3+ hydroxide",
+          "label": "Goethite, nano and thin coating",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "goethite.thincoat",
+            "fe3+_goethite.nano-70nm",
+            "fe3+_goethite.nano0.05+quartz"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, coarse grained",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "hematite.lg.gr.br25a",
+            "hematite.lg.gr.br25c",
+            "hematite.lg.gr.br34c"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, medium grained",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "hematite.med.gr.gds27",
+            "hematite.med.gr.br25b"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, fine grained",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "hematite.fine.gr.fe2602",
+            "hematite.fine.gr.gds76",
+            "hematite.fine.gr.ws161"
+          ]
+        },
+        {
+          "section": "Fe3+ oxide",
+          "label": "Hematite, nano",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "nanohematite.BR34b2",
+            "nanohematite.BR34b2b",
+            "fe3+_hematite.nano.KP58610-400nm",
+            "fe3+_hematite.nano-0.3+quartz",
+            "hematite.thincoat",
+            "hematite-nano+goethite-fg-amix"
+          ]
+        }
+      ]
+    },
+    "water-a": {
+      "method": "classes",
+      "native_script": "davinci.make.water.color.a",
+      "title": "Water and Water Contaminants",
+      "key_image": "key_water.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Water, low chlorophyll or deep shadow",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "water.low.chlorophyll",
+            "water.low.chlorophyll-blue1",
+            "water.turquoise-shallow",
+            "water-20C-10cm-path-model",
+            "water-20C-30cm-path-model",
+            "water-20C-100cm-path-model"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, trace sediment (reference: 0.5 grams/liter)",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "water+mont0.5gpl",
+            "water.low.chlorophyll-turquoise"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, high chlorophyll",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "water.high.chlorophyll",
+            "water.high.chlorophyll2",
+            "water-20C-10cm-path+chlrph-g",
+            "water-20C-100cm-path+chlrph-g",
+            "water-20C-300cm-path+chlrph-g",
+            "water-20C-100cm-path+chlrph-a"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, low sediment (reference: 1.7 grams/liter)",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "water+mont1.67gpl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, medium sediment (reference: 5 grams/liter)",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "water+mont5.01gpl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, high sediment (reference: 16.5 grams/liter)",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "water+mont16.5gpl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, very high sediment (reference: 100 grams/liter)",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "water+mont100gpl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, very high sediment (reference: 300 grams/liter)",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "water+mont300gpl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, Fe3+ sediment, possible algae",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "water.red.algae"
+          ]
+        }
+      ]
+    },
+    "veg,water,snow": {
+      "method": "classes",
+      "native_script": "davinci.make-veg,water,snow.a",
+      "title": "Water, Snow and Vegetation",
+      "key_image": "key_veg,water,snow.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Water or deep shadow",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "water.low.chlorophyll",
+            "water.high.chlorophyll",
+            "water.high.chlorophyll2",
+            "water.low.chlorophyll-blue1",
+            "water.turquoise-shallow",
+            "water.low.chlorophyll-turquoise"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, trace sediment",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "water+mont0.5gpl",
+            "water+mont1.67gpl",
+            "water+mont5.01gpl",
+            "water-20C-10cm-path-model"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water plus sediment or shallow water",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "water+mont16.5gpl",
+            "water+mont50gpl",
+            "water-20C-10cm-path-model",
+            "water-20C-30cm-path-model",
+            "water-20C-100cm-path-model"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Wet ground",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "water+mont100gpl",
+            "water+mont300gpl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, Fe3+ sediment, possible algae",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "water.red.algae"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Snow",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "snow.and.ice-77k",
+            "h2o-frost+ice-drops1-100k",
+            "h2o-frost+ice-drops3-100k",
+            "snow.and.ice-170k",
+            "snow-ice-1mm-273k",
+            "snow-ice-3mm-273k",
+            "snow-ice-10mm-273k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Melting snow 1",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "snow.melting.1a",
+            "snow.melting.3",
+            "snow.melting.8",
+            "snow-ice-3mm+0.1water-273k",
+            "snow-ice-3mm+0.2water-273k",
+            "snow-ice-3mm+0.3water-273k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Melting snow 2",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "snow.slush.16",
+            "snow.slush.9",
+            "snow-ice-10mm+0.3water-273k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Vegetation + wet or snowy ground",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "snow.melting9+0.5veg",
+            "snow.melting16+0.5veg",
+            "snow.melting1a+0.5veg",
+            "water-20C-10cm-path+chlrph-g",
+            "water-20C-100cm-path+chlrph-g",
+            "water-20C-300cm-path+chlrph-g",
+            "water-20C-100cm-path+chlrph-a"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Green vegetation",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "vegetation1"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Dry + green vegetation",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "vegetation.dry+green"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Vegetation + wet ground",
+          "colour": "c_yellowgreen",
+          "rgb": [190, 255, 0],
+          "rules": [
+            "water+mont100gpl+0.5veg",
+            "water+mont50gpl+0.5veg"
+          ]
+        }
+      ]
+    },
+    "snow-grain-size-water.a": {
+      "method": "classes",
+      "native_script": "davinci.snow-grain-size-water.a",
+      "title": "Snow Grain Size, Snow Melting, Water and Vegetation",
+      "key_image": "key_snow-grain-size-water.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Cold Fine-Grained Snow and Ice Blocks",
+          "colour": "c_white",
+          "rgb": [255, 255, 255],
+          "rules": [
+            "snow.and.ice-77k",
+            "h2o-frost+ice-drops3-100k",
+            "h2o-frost+ice-drops1-100k",
+            "snow.and.ice-170k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Warm, Fine-Grained Snow (~1 mm and smaller)",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "snow-ice-1mm-273k",
+            "snow.and.ice-248k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Warm, Medium-Grained Snow (~3 mm)",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "snow-ice-3mm-273k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Warm, Large-Grained Snow (~10 mm and larger)",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "snow-ice-10mm-273k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Snow, Trace Melting",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "snow.melting.1a",
+            "snow.melting.3"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Snow, Significant Melting",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "snow.melting.8",
+            "snow.slush.9",
+            "snow-ice-3mm+0.1water-273k",
+            "snow-ice-3mm+0.2water-273k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Snow, Major Melting",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "snow-ice-3mm+0.3water-273k",
+            "snow.slush.16",
+            "snow-ice-10mm+0.3water-273k"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Melting snow + Vegetation",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "snow.melting1a+0.5veg",
+            "snow.melting9+0.5veg",
+            "snow.melting16+0.5veg"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water, Relatively Clear",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "water.high.chlorophyll",
+            "water.low.chlorophyll",
+            "water.low.chlorophyll-turquoise",
+            "water.low.chlorophyll-blue1",
+            "water.turquoise-shallow"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water + Sediment",
+          "colour": "c_salmon",
+          "rgb": [255, 170, 170],
+          "rules": [
+            "water+mont16.5gpl",
+            "water+mont5.01gpl",
+            "water+mont1.67gpl",
+            "water+mont0.5gpl",
+            "water-20C-10cm-path-model",
+            "water-20C-30cm-path-model",
+            "water-20C-100cm-path-model"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water + Significant Sediment",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "water.red.algae",
+            "water+mont300gpl",
+            "water+mont100gpl",
+            "water+mont50gpl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Water + Sediment + Vegetation",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "water-20C-10cm-path+chlrph-g",
+            "water.high.chlorophyll2",
+            "water-20C-100cm-path+chlrph-g",
+            "water-20C-300cm-path+chlrph-g",
+            "water-20C-100cm-path+chlrph-a",
+            "water+mont100gpl+0.5veg",
+            "water+mont50gpl+0.5veg"
+          ]
+        }
+      ]
+    },
+    "2micron-minerals": {
+      "method": "classes",
+      "native_script": "davinci.make.2micron-mins.color.a",
+      "title": "Phyllosilicates, Sulfates, and other OH-bearing Minerals, 2-2.5-micron region absorption map",
+      "key_image": "key_2micron-mins_labels_a.png",
+      "classes": [
+        {
+          "section": "Montmorillonite Group",
+          "label": "2.2-micron Montmorillonite Group",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "beidellite_gds123",
+            "beidellite_gds124",
+            "montna"
+          ]
+        },
+        {
+          "section": "Montmorillonite Group",
+          "label": "2.3-micron Montmorillonite Group",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "nontronite.ng-1.a.g2",
+            "montmorillonite_fe"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Other Phyllosilicates",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "biotite_HS28.3B",
+            "palygorskite",
+            "muscovite-low-Al",
+            "muscovite-med-Al",
+            "muscovite-medhigh-Al",
+            "illite",
+            "paragonite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Hydrated Silica",
+          "colour": "c_white",
+          "rgb": [255, 255, 255],
+          "rules": [
+            "chalcedony",
+            "hydrated_basaltic_glass"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Kaolinite Group",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "halloy",
+            "kaolpxl",
+            "kaolwxl",
+            "dickite",
+            "kaolgrp_nacrite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Kaolin-Alunite Mixtures",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "alunite.5+kaol.5",
+            "Kalun+kaol.intmx",
+            "kaol.75+alun.25",
+            "Na-alun+kaol.intmx",
+            "alunite.33+kaol.33+musc.33"
+          ]
+        },
+        {
+          "section": "Alunite",
+          "label": "K-Alunite",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "alun35K65Na.low",
+            "alun66K34Na.low",
+            "alun73K27Na.low",
+            "kalun150c",
+            "kalun250c",
+            "kalun450c"
+          ]
+        },
+        {
+          "section": "Alunite",
+          "label": "Na-Alunite",
+          "colour": "c_lightpink",
+          "rgb": [255, 205, 255],
+          "rules": [
+            "alunNa03",
+            "alunNa56450c",
+            "alunNa78.450c",
+            "na40alun400c",
+            "na63alun300c",
+            "na82alun100c",
+            "naalun150c",
+            "naalun300c",
+            "naalun450c",
+            "ammonalun"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Alunite + Other",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "alunite.5+musc.5",
+            "alunite+musc+pyroph",
+            "alunite+pyrophyl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Kaolin + Other",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "calcite0.7+kaol0.3",
+            "kaol.75+pyroph.25",
+            "kaolin.3+smect.7",
+            "kaolin.5+muscov.medAl",
+            "kaolin.5+muscov.medhighAl",
+            "kaolin.5+smect.5",
+            "kaolin+musc.intimat",
+            "calcite.33+kaol.33+mus-AMXr2"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Jarosite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "jarosite-K",
+            "jarosite-lowT",
+            "jarosite-Na"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Other Sulfates",
+          "note": "RESTORED sulfate-bloedite: native script names non-existent sulfate_bloedite, so native never shows it",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "sulfate_kieserite",
+            "sulfate_szomolnokite",
+            "sulfate_szomolnokite_heated",
+            "gypsum",
+            "sulfate-bloedite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Perchlorate + other 2.4-micron features",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "perchlorate_mg",
+            "perchlorate_na",
+            "portlandite"
+          ]
+        }
+      ],
+      "depth_input": [
+        "kaolgrp_nacrite"
+      ]
+    },
+    "2micron-minerals-b4": {
+      "method": "classes",
+      "native_script": "davinci.make.2micron-mins.color.b4",
+      "title": "Clays, Carbonates, Sulfates, other",
+      "key_image": "key_2um-mins-b4-layout-1200w.png",
+      "classes": [
+        {
+          "section": "Carbonates",
+          "label": "Calcite",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "aragonite",
+            "calcite.ws272.g2"
+          ]
+        },
+        {
+          "section": "Carbonates",
+          "label": "Mixtures with Calcite",
+          "colour": "c_gold",
+          "rgb": [255, 210, 0],
+          "rules": [
+            "calcite+0.2Ca-mont",
+            "calcite+0.2kaolwxl",
+            "calcite+0.2Na-mont",
+            "calcite+0.3muscovite",
+            "calcite+0.5Ca-mont",
+            "calcite0.7+kaol0.3",
+            "calcite.25+dolom.25+Ca-mont.5",
+            "calcite.25+dolom.25+Na-mont.5",
+            "calcite.33+Ca-mont.67",
+            "calcite+dolomite.5",
+            "calcite.33+kaol.33+mus-AMXr2"
+          ]
+        },
+        {
+          "section": "Carbonates",
+          "label": "Other Carbonates",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "dolo+.5ca-mont",
+            "dolomite.5+Na-mont.5",
+            "dolomite",
+            "magnesite",
+            "malachite.hs254.3b.g2",
+            "rhodochrosite.hs338.3b.g2",
+            "siderite",
+            "strontianite",
+            "azurite.ws316.g2"
+          ]
+        },
+        {
+          "section": "Sulfates",
+          "label": "Gypsum",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "gypsum"
+          ]
+        },
+        {
+          "section": "Sulfates",
+          "label": "Mixtures with Gypsum",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "gyp+jar+musc.amix",
+            "gyp+jar+musc+dick.amix",
+            "gypsum+jar+illite.intmix",
+            "gypsum.trace.dust+debris-WTC01-28",
+            "sulfate-mix_gypsum.trace.dust+debris-WTC01-2"
+          ]
+        },
+        {
+          "section": "Sulfates",
+          "label": "Other Sulfates",
+          "note": "RESTORED sulfate-bloedite: native script names non-existent sulfate_bloedite, so native never shows it",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "alunite.33+kaol.33+musc.33",
+            "alunite.5+kaol.5",
+            "alunite.5+musc.5",
+            "alunite+musc+pyroph",
+            "alun35K65Na.low",
+            "alun66K34Na.low",
+            "alun73K27Na.low",
+            "kalun150c",
+            "kalun250c",
+            "kalun450c",
+            "alunNa03",
+            "alunNa56450c",
+            "alunNa78.450c",
+            "na40alun400c",
+            "na63alun300c",
+            "na82alun100c",
+            "naalun150c",
+            "naalun300c",
+            "naalun450c",
+            "ammonalun",
+            "sulfate_kieserite",
+            "sulfate_szomolnokite",
+            "sulfate_szomolnokite_heated",
+            "jarosite-K",
+            "jarosite-lowT",
+            "jarosite-Na",
+            "sulfate-bloedite"
+          ]
+        },
+        {
+          "section": "Clays",
+          "label": "Illite / Muscovite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "illite",
+            "illite.gds4",
+            "illite.roscoelite",
+            "ammonillsmec"
+          ]
+        },
+        {
+          "section": "Clays",
+          "label": "Illite / Muscovite Mixtures",
+          "note": "also holds the pure low/med/medhigh-Al muscovites",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "muscovite-low-Al",
+            "muscovite-med-Al",
+            "muscovite-medhigh-Al",
+            "musc+gyp+jar+dick.amix",
+            "musc+jarosite.intimat",
+            "muscovite+chlorite",
+            "muscoviteFerich",
+            "musc+pyroph"
+          ]
+        },
+        {
+          "section": "Clays",
+          "label": "Kaolinite group",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "kaolpxl",
+            "kaolwxl",
+            "dickite",
+            "halloy",
+            "kaolgrp_nacrite"
+          ]
+        },
+        {
+          "section": "Clays",
+          "label": "Mixtures with Kaolinite",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "kaol.75+alun.25",
+            "kaol.75+pyroph.25",
+            "kaolin.3+smect.7",
+            "kaolin.5+muscov.medAl",
+            "kaolin.5+muscov.medhighAl",
+            "kaolin.5+smect.5",
+            "kaolin+musc.intimat"
+          ]
+        },
+        {
+          "section": "Clays",
+          "label": "Montmorillonite group",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "beidellite_gds123",
+            "beidellite_gds124",
+            "montca",
+            "montmorillonite_fe",
+            "montna",
+            "nontronite.ng-1.a.g2"
+          ]
+        },
+        {
+          "section": "Clays",
+          "label": "Mixtures with Mont. group",
+          "colour": "c_redpink",
+          "rgb": [255, 125, 125],
+          "rules": [
+            "benzene+montswy",
+            "drygrass+.17Na-mont"
+          ]
+        },
+        {
+          "section": "Other Minerals",
+          "label": "Chlorites, Serpentines, other",
+          "colour": "c_white",
+          "rgb": [255, 255, 255],
+          "rules": [
+            "chlorite",
+            "chlorite-skarn",
+            "chlorite.thuringite.smr-15.b.g2",
+            "clinochlore.gds158",
+            "amphibole",
+            "chrysotile.coarse-fibrous",
+            "chrysotile.fine-fibrous",
+            "chrysotile.gypsum.wtc01-8",
+            "chrysotile.med-fine-fibrous",
+            "cronstedtite_M3542",
+            "richterite",
+            "tremolite.or.talc",
+            "talc+calcite.parkcity",
+            "talc+carbonate.parkcity",
+            "talc.crsgrnd",
+            "talc.fngrnd"
+          ]
+        },
+        {
+          "section": "Other Minerals",
+          "label": "Zeolites",
+          "colour": "c_flesh",
+          "rgb": [255, 200, 155],
+          "rules": [
+            "natrolite",
+            "analcime"
+          ]
+        }
+      ],
+      "depth_input": [
+        "kaolgrp_nacrite"
+      ]
+    },
+    "2micron-minerals-detail2": {
+      "method": "classes",
+      "native_script": "davinci.make.2micron-mins-detail2.a",
+      "title": "Muscovite Composition, Carbonates, other",
+      "key_image": "key_2micron-mins-detail2-layout-1200w.png",
+      "classes": [
+        {
+          "section": "Carbonates",
+          "label": "Calcite",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "aragonite",
+            "calcite.ws272.g2"
+          ]
+        },
+        {
+          "section": "Carbonates",
+          "label": "Mixtures with Calcite",
+          "colour": "c_yellowgreen",
+          "rgb": [190, 255, 0],
+          "rules": [
+            "calcite+0.2Ca-mont",
+            "calcite+0.2kaolwxl",
+            "calcite+0.2Na-mont",
+            "calcite+0.3muscovite",
+            "calcite+0.5Ca-mont",
+            "calcite0.7+kaol0.3",
+            "calcite.33+Ca-mont.67",
+            "calcite.33+kaol.33+mus-AMXr2"
+          ]
+        },
+        {
+          "section": "Carbonates",
+          "label": "Dolomite and mixtures with Dolomite",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "dolomite",
+            "calcite.25+dolom.25+Ca-mont.5",
+            "calcite.25+dolom.25+Na-mont.5",
+            "calcite+dolomite.5",
+            "dolo+.5ca-mont",
+            "dolomite.5+Na-mont.5"
+          ]
+        },
+        {
+          "section": "Carbonates",
+          "label": "Other Carbonates",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "magnesite",
+            "malachite.hs254.3b.g2",
+            "rhodochrosite.hs338.3b.g2",
+            "siderite",
+            "strontianite",
+            "azurite.ws316.g2"
+          ]
+        },
+        {
+          "section": "Muscovites",
+          "label": "High Aluminum",
+          "note": "rules are the medium-high Al muscovites",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "muscovite-medhigh-Al",
+            "kaolin.5+muscov.medhighAl"
+          ]
+        },
+        {
+          "section": "Muscovites",
+          "label": "Medium Aluminum",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "muscovite-med-Al",
+            "kaolin.5+muscov.medAl"
+          ]
+        },
+        {
+          "section": "Muscovites",
+          "label": "Low Aluminum",
+          "note": "also holds Fe-rich muscovite",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "muscovite-low-Al",
+            "muscoviteFerich"
+          ]
+        },
+        {
+          "section": "Muscovites",
+          "label": "Paragonite",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "paragonite"
+          ]
+        },
+        {
+          "section": "Muscovites",
+          "label": "Illite / Muscovite Mixtures",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "illite",
+            "illite.gds4",
+            "illite.roscoelite",
+            "musc+gyp+jar+dick.amix",
+            "musc+jarosite.intimat",
+            "muscovite+chlorite",
+            "musc+pyroph"
+          ]
+        },
+        {
+          "section": "Other Minerals",
+          "label": "Pyrophyllite",
+          "colour": "c_flesh",
+          "rgb": [255, 200, 155],
+          "rules": [
+            "pyrophyllite",
+            "alunite+musc+pyroph",
+            "alunite+pyrophyl",
+            "pyroph+tr.musc",
+            "pyroph.5+mont0.5"
+          ]
+        },
+        {
+          "section": "Other Minerals",
+          "label": "Epidote",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "epidote.gds26.a.g2"
+          ]
+        },
+        {
+          "section": "Other Minerals",
+          "label": "Kaolinite group",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "kaolpxl",
+            "kaolwxl",
+            "dickite",
+            "halloy",
+            "kaolgrp_nacrite",
+            "kaol.75+alun.25",
+            "kaol.75+pyroph.25",
+            "kaolin.3+smect.7",
+            "kaolin.5+smect.5",
+            "kaolin+musc.intimat"
+          ]
+        },
+        {
+          "section": "Other Minerals",
+          "label": "Chlorites, Amphiboles, Serpentines, Talc",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "chlorite",
+            "chlorite-skarn",
+            "chlorite.thuringite.smr-15.b.g2",
+            "clinochlore.gds158",
+            "amphibole",
+            "chrysotile.coarse-fibrous",
+            "chrysotile.fine-fibrous",
+            "chrysotile.gypsum.wtc01-8",
+            "chrysotile.med-fine-fibrous",
+            "cronstedtite_M3542",
+            "richterite",
+            "tremolite.or.talc",
+            "talc+calcite.parkcity",
+            "talc+carbonate.parkcity",
+            "talc.crsgrnd",
+            "talc.fngrnd"
+          ]
+        }
+      ],
+      "depth_input": [
+        "kaolgrp_nacrite"
+      ]
+    },
+    "2micron-mins-emit8": {
+      "method": "classes",
+      "native_script": "davinci.make.2micron-mins-emit8",
+      "title": "EMIT minerals (RGB additive: mixtures show as summed colours)",
+      "key_image": "key_2um-mins-emit8-layout-1200w.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Calcite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "calcite.ws272.g2",
+            "talc+calcite.parkcity",
+            "talc+carbonate.parkcity",
+            "calcite+0.2Ca-mont",
+            "calcite+dolomite.5",
+            "calcite.25+dolom.25+Na-mont.5",
+            "calcite.25+dolom.25+Ca-mont.5",
+            "calcite+0.2Na-mont",
+            "calcite+0.5Ca-mont",
+            "calcite+0.3muscovite",
+            "calcite.33+Ca-mont.67",
+            "calcite+0.2kaolwxl",
+            "calcite0.7+kaol0.3",
+            "calcite.33+kaol.33+mus-AMXr2"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Chlorite Serpentine",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "chlorite",
+            "chlorite-skarn",
+            "muscovite+chlorite",
+            "clinochlore.gds158",
+            "clinochlore.nmnh83369",
+            "clinochlore.fe.gds157",
+            "clinochlore.fe.sc-cca-1",
+            "cookeite-CAr-1.a",
+            "cookeite-CAr-1.c",
+            "chlorite.thuringite.smr-15.b.g2",
+            "prehnite+.50chlorite",
+            "prehnite+.67chlorite",
+            "prehnite+.75chlorite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Dolomite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "dolomite",
+            "talc+carbonate.parkcity",
+            "calcite+dolomite.5",
+            "dolo+.5ca-mont",
+            "calcite.25+dolom.25+Na-mont.5",
+            "calcite.25+dolom.25+Ca-mont.5",
+            "dolomite.5+Na-mont.5"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Gypsum",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "gypsum",
+            "gypsum+jar+illite.intmix",
+            "gyp+jar+musc.amix",
+            "gyp+jar+musc+dick.amix",
+            "musc+gyp+jar+dick.amix",
+            "dick+musc+gyp+jar.amix",
+            "sulfate-mix_gypsum.trace.dust+debris-WTC01-2",
+            "gypsum.trace.dust+debris-WTC01-28",
+            "chrysotile.gypsum.wtc01-8"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Illite / Muscovite",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "illite",
+            "illite.gds4",
+            "gypsum+jar+illite.intmix",
+            "ammonillsmec",
+            "illite.roscoelite",
+            "muscovite-med-Al",
+            "muscovite-medhigh-Al",
+            "muscovite-low-Al",
+            "muscoviteFerich",
+            "pyroph+tr.musc",
+            "musc+pyroph",
+            "alunite+musc+pyroph",
+            "kaolin.5+muscov.medAl",
+            "kaolin.5+muscov.medhighAl",
+            "kaolin+musc.intimat",
+            "musc+jarosite.intimat",
+            "gyp+jar+musc.amix",
+            "gyp+jar+musc+dick.amix",
+            "musc+gyp+jar+dick.amix",
+            "dick+musc+gyp+jar.amix",
+            "alunite.5+musc.5",
+            "alunite.33+kaol.33+musc.33",
+            "muscovite+chlorite",
+            "calcite+0.3muscovite",
+            "prehnite+muscovite",
+            "calcite.33+kaol.33+mus-AMXr2"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Kaolinite dioct.-Group",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "kaolwxl",
+            "kaolpxl",
+            "halloy",
+            "dickite",
+            "kaolin.5+smect.5",
+            "kaolin.3+smect.7",
+            "kaol.75+pyroph.25",
+            "alunite.5+kaol.5",
+            "kaol.75+alun.25",
+            "Kalun+kaol.intmx",
+            "Na-alun+kaol.intmx",
+            "kaolin.5+muscov.medAl",
+            "kaolin.5+muscov.medhighAl",
+            "kaolin+musc.intimat",
+            "alunite.33+kaol.33+musc.33",
+            "calcite+0.2kaolwxl",
+            "calcite0.7+kaol0.3",
+            "kaolgrp_nacrite",
+            "calcite.33+kaol.33+mus-AMXr2"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Montmorillonite Group",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "montna",
+            "montmorillonite_fe",
+            "montca",
+            "pyroph.5+mont0.5",
+            "buddington.namont",
+            "buddington.namont2",
+            "calcite+0.2Ca-mont",
+            "dolo+.5ca-mont",
+            "calcite.25+dolom.25+Na-mont.5",
+            "calcite.25+dolom.25+Ca-mont.5",
+            "calcite+0.2Na-mont",
+            "calcite+0.5Ca-mont",
+            "drygrass+.17Na-mont",
+            "dolomite.5+Na-mont.5",
+            "calcite.33+Ca-mont.67",
+            "benzene+montswy",
+            "trichlor",
+            "toluene+montswy",
+            "unleaded.gas",
+            "tce",
+            "beidellite_gds123",
+            "beidellite_gds124",
+            "nontronite.ng-1.a.g2",
+            "hectorite",
+            "saponite.or.talc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Vermiculite",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "vermiculite_ALB4SA00",
+            "vermiculite_WS682",
+            "vermiculite_WS681"
+          ]
+        }
+      ]
+    },
+    "2micron-minerals-muscovite-comp": {
+      "method": "classes",
+      "native_script": "davinci.make.2micron-mins-muscovite-comp",
+      "title": "Muscovite Composition",
+      "key_image": "key_2um-mins-muscovite-comp-layout-1200w.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Medium-High Aluminum",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "muscovite-medhigh-Al",
+            "kaolin.5+muscov.medhighAl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Medium Aluminum",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "muscovite-med-Al",
+            "kaolin.5+muscov.medAl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Low Aluminum",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "muscovite-low-Al"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Fe-Rich",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "muscoviteFerich"
+          ]
+        }
+      ]
+    },
+    "prehnite-chlorite-mix+perchlorate": {
+      "method": "classes",
+      "native_script": "davinci.make.prehnite-chloriteserp-perchlorate.b",
+      "title": "Prehnite, Perchlorate, and Chlorite / Serpentine",
+      "key_image": "key_prehnite-chloriteserp-perchlorate_labels_a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Prehnite",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "prehnite.gds613"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Prehnite 50% + Chlor/Serp 50%",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "prehnite+.50chlorite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Prehnite 33% + Chlor/Serp 67%",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "prehnite+.67chlorite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Prehnite 25% + Chlor/Serp 75%",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "prehnite+.75chlorite"
+          ]
+        },
+        {
+          "section": "Chlorites and Serpentines",
+          "label": "Chlorites and Serpentines",
+          "note": "chlorite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "chlorite"
+          ]
+        },
+        {
+          "section": "Chlorites and Serpentines",
+          "label": "Chlorites and Serpentines",
+          "note": "chlorite-skarn",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "chlorite-skarn"
+          ]
+        },
+        {
+          "section": "Chlorites and Serpentines",
+          "label": "Chlorites and Serpentines",
+          "note": "clinochlores, thuringite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "chlorite.thuringite.smr-15.b.g2",
+            "clinochlore.gds158",
+            "clinochlore.nmnh83369",
+            "clinochlore.fe.gds157",
+            "clinochlore.fe.sc-cca-1",
+            "cookeite-CAr-1.a",
+            "cookeite-CAr-1.c"
+          ]
+        },
+        {
+          "section": "Chlorites and Serpentines",
+          "label": "Chlorites and Serpentines",
+          "note": "chrysotiles, cronstedtite",
+          "colour": "c_bluegreen",
+          "rgb": [0, 245, 195],
+          "rules": [
+            "chrysotile.coarse-fibrous",
+            "chrysotile.fine-fibrous",
+            "chrysotile.med-fine-fibrous",
+            "cronstedtite_M3542"
+          ]
+        },
+        {
+          "section": "Perchlorates",
+          "label": "Mg Perchlorate",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "perchlorate_mg"
+          ]
+        },
+        {
+          "section": "Perchlorates",
+          "label": "Na Perchlorate",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "perchlorate_na"
+          ]
+        }
+      ]
+    },
+    "organics-veg-2um-a": {
+      "method": "classes",
+      "native_script": "davinci.make-organics,veg-2um.a",
+      "title": "Organic Detections, 2 - 2.5 micron Absorptions",
+      "key_image": "key_organics,veg-2um-a-1200w.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Non-photosynthetic Vegetation",
+          "note": "duplicate block in native: first reads dryveg.grass.golden alone",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "dryveg.grass.golden"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Non-photosynthetic Vegetation",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "dryveg.grass.golden",
+            "dryveg.grass.long",
+            "dryveg.wood",
+            "drygrass+.17Na-mont",
+            "dry_long_grass-thick"
+          ]
+        },
+        {
+          "section": "Organics",
+          "label": "Organics, Aliphatics 1",
+          "note": "fiberglass, green plastics",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "fiberglass.roofing",
+            "green_plastic_tarp",
+            "plastic.grnhs.roof"
+          ]
+        },
+        {
+          "section": "Organics",
+          "label": "Organics, Aliphatics 5",
+          "note": "HDPE, PET, PVC",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "plastic.hdpe.1",
+            "plastic.pete2",
+            "plastic.pete3",
+            "plastic.pete4",
+            "plastic.pete",
+            "white_pvc_pipe"
+          ]
+        },
+        {
+          "section": "Organics",
+          "label": "Organics, Aliphatics 3",
+          "note": "polystyrene, tarp",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "plastic.polystyrene",
+            "plastic.tarp1"
+          ]
+        },
+        {
+          "section": "Organics",
+          "label": "Organics, Aliphatics 4",
+          "note": "vinyl",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "plastic.Vinyl"
+          ]
+        },
+        {
+          "section": "Organics",
+          "label": "Organics, Aliphatics 2",
+          "note": "paint",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "paint.1"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Organic - Soil Mixtures, Including Aromatics",
+          "note": "TCE, trichloroethane",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "tce",
+            "trichlor"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Organic - Soil Mixtures, Including Aromatics",
+          "note": "benzene, toluene, gasoline",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "benzene+montswy",
+            "unleaded.gas",
+            "toluene+montswy"
+          ]
+        }
+      ]
+    },
+    "pyroxene.2um.band.position": {
+      "method": "classes",
+      "native_script": "davinci.make.pyroxene.color.a",
+      "title": "Pyroxene Composition: 2-micron band position",
+      "key_image": "key_pyroxene_labels_a.png",
+      "classes": [
+        {
+          "section": "Orthopyroxene",
+          "label": "1.82 microns",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "pyroxene.enstatite"
+          ]
+        },
+        {
+          "section": "Orthopyroxene",
+          "label": "1.85 microns",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "pyroxene.bronzite.hs9.3b.g5"
+          ]
+        },
+        {
+          "section": "Orthopyroxene",
+          "label": "1.86 microns",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "pyroxene.hypersthene.pyx02.e.g5"
+          ]
+        },
+        {
+          "section": "Clinopyroxene",
+          "label": "2.10 microns",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "pyroxene.pigeonite"
+          ]
+        },
+        {
+          "section": "Clinopyroxene",
+          "label": "2.27 microns",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "pyroxene.augite"
+          ]
+        }
+      ]
+    },
+    "1.5um.broadfeats": {
+      "method": "classes",
+      "native_script": "davinci.make.1.5um-broadfeats.color.a",
+      "title": "Broad Absorptions, 1 to 1.5-micron Region: Olivines, Feldspars, Other",
+      "key_image": "key_1.5um-broadfeats.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Fe2+ Anorthite",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "anorthite_hs201.3b"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Fe2+ Bytownite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "bytownite_hs106.3b"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Fe2+ Microcline",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "microcline_hs103.3b"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Other",
+          "note": "wollastonite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "wollastonite_hs348.3b"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Other",
+          "note": "rutile",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "rutile_hs126.3b"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Other",
+          "note": "sphalerite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "sphalerite_s26-341_1.5um"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Olivine Fo 18",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "olivine_fo18_ki3377"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Olivine Fo 60-66",
+          "note": "NOT IN NATIVE KEY: label from rules",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "olivine_fo60_ki3189",
+            "olivine_fo66_ki3054"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Olivine Fo 80 (coarse)",
+          "colour": "c_yellowgreen",
+          "rgb": [190, 255, 0],
+          "rules": [
+            "olivine_fo80_hs285.4b"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Olivine Fo 89",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "olivine_fo89_gds70.d",
+            "olivine_fo89_gds70.c",
+            "olivine_fo89_gds70.a"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Olivine Fo 91",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "olivine_fo91_gds71.b"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Magnetite or High Fe Olivine",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "magnetite_hs195.3b"
+          ]
+        }
+      ]
+    },
+    "1.9um.water.wave.position.a": {
+      "method": "classes",
+      "native_script": "davinci.make.water-1.9um.color.a",
+      "title": "Water, 1.9 to 2.1-micron absorption map",
+      "key_image": "key_water-map-1.9-2um_labels_b.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Shape A: 1.89-1.904 microns",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "water_1.896_beryl",
+            "water_1.902_silica-opal",
+            "water_1.903_smectite-saponite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape B: 1.905-1.908 microns",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "water_1.906_montmor-na",
+            "water_1.907_smectite-nontronite",
+            "water_1.908_phyllo-illite",
+            "water_1.908_smectite-beidell"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape C: 1.908-1.91 microns",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "water_1.909_mont-saz",
+            "water_1.910_halloysite",
+            "water_1.910_stonwplaya",
+            "water_1.910_zeolite-clinopt"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape D: 1.91-1.92 microns",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "water_1.910_zeolite-mordonite",
+            "water_1.912_zeolite-analcime",
+            "water_1.916_nesosil-sillim",
+            "water_1.917_zeolite-heuland",
+            "water_1.918_perchlorate-mg",
+            "water_1.920_sulfate-bassanite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape E: 1.92-1.93 microns",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "water_1.923_chert",
+            "water_1.924_perchlorate-na",
+            "water_broad_1.927_veg",
+            "water_1.929_sulfate-epsomite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape F: 1.93-1.94 microns",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "water_1.931_narrow-cheatgrass",
+            "water_1.932_sulfate-eusgterite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape G: 1.94-1.97 microns",
+          "colour": "c_gold",
+          "rgb": [255, 210, 0],
+          "rules": [
+            "water_1.940_zeolite-natrolite",
+            "water_1.941_zeolite-natrolite",
+            "water_1.941_zeolite-scolecite",
+            "water_1.942_sulfate-schwert",
+            "water_1.943_brick",
+            "water_1.943_sulfate-gypsum",
+            "water_1.944_sulfate-polyhalite",
+            "water_1.946_sulfate-copiapite",
+            "water_1.951_sulfate-bloedite",
+            "water_1.960_sulfate-butler",
+            "water_1.964_sulfate-feso4"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape H: 1.97-2.0 microns",
+          "colour": "c_flesh",
+          "rgb": [255, 200, 155],
+          "rules": [
+            "water_1.971_sulfate-kainite",
+            "water_1.980_salt-carnallite",
+            "water_1.981_sulfate-coquimb",
+            "water_1.991_sulfate-syngite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape I: 2.00-2.05 microns",
+          "colour": "c_white",
+          "rgb": [255, 255, 255],
+          "rules": [
+            "h20_ice_2.02um-77k-a"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape J: 2.06-2.10 microns",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "water_2.060_sulfate_szomoln",
+            "water_2.073_sulfate-kieserite",
+            "water_2.093_sulfate_szomoln"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape K: 2.10-2.15 microns",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "water_2.122_nh4-buddingt",
+            "water_2.130_sulfate_kieserite",
+            "water_2.136_nh4-mascagnite"
+          ]
+        }
+      ]
+    },
+    "1.9um.water.band.position": {
+      "method": "classes",
+      "native_script": "davinci.make.water-1.9um.color.b",
+      "title": "Water Absorptions, 1.9-micron Region (EXPERIMENTAL)",
+      "key_image": "key_1.9-water.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Water Ice",
+          "colour": "c_white",
+          "rgb": [255, 255, 255],
+          "rules": [
+            "h20_ice_2.02um-77k-a"
+          ]
+        },
+        {
+          "section": null,
+          "label": "1.895-micron",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "water_1.896_beryl"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Perchlorates",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "water_1.924_perchlorate-na",
+            "water_1.918_perchlorate-mg"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Hydrated Silica",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "water_1.902_silica-opal",
+            "water_1.923_chert"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Smectites",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "water_1.903_smectite-saponite",
+            "water_1.906_montmor-na",
+            "water_1.907_smectite-nontronite",
+            "water_1.908_smectite-beidell",
+            "water_1.909_mont-saz"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Phyllosilicates",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "water_1.908_phyllo-illite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Other Silicates",
+          "note": "playa mud, cheatgrass, brick, aspen",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "water_1.910_stonwplaya",
+            "water_1.931_narrow-cheatgrass",
+            "water_1.943_brick",
+            "water_broad_1.927_veg"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Kaolinite group",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "water_1.910_halloysite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Zeolites",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "water_1.940_zeolite-natrolite",
+            "water_1.910_zeolite-clinopt",
+            "water_1.910_zeolite-mordonite",
+            "water_1.912_zeolite-analcime",
+            "water_1.916_nesosil-sillim",
+            "water_1.917_zeolite-heuland",
+            "water_1.941_zeolite-natrolite",
+            "water_1.941_zeolite-scolecite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Sulfates (1.93)",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "water_1.920_sulfate-bassanite",
+            "water_1.929_sulfate-epsomite",
+            "water_1.932_sulfate-eusgterite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Sulfates (1.95)",
+          "colour": "c_gold",
+          "rgb": [255, 210, 0],
+          "rules": [
+            "water_1.942_sulfate-schwert",
+            "water_1.943_sulfate-gypsum",
+            "water_1.944_sulfate-polyhalite",
+            "water_1.946_sulfate-copiapite",
+            "water_1.951_sulfate-bloedite",
+            "water_1.960_sulfate-butler",
+            "water_1.964_sulfate-feso4",
+            "water_1.971_sulfate-kainite",
+            "water_1.981_sulfate-coquimb"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Sulfates: Kieserite, Syngite, Szomolnokite",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "water_1.991_sulfate-syngite",
+            "water_2.060_sulfate_szomoln",
+            "water_2.073_sulfate-kieserite",
+            "water_2.093_sulfate_szomoln",
+            "water_2.130_sulfate_kieserite"
+          ]
+        },
+        {
+          "section": "Ammonium Absorptions",
+          "label": "Ammonium Absorptions",
+          "note": "buddingtonite",
+          "colour": "c_flesh",
+          "rgb": [255, 200, 155],
+          "rules": [
+            "water_2.122_nh4-buddingt"
+          ]
+        },
+        {
+          "section": "Ammonium Absorptions",
+          "label": "Ammonium Absorptions",
+          "note": "mascagnite",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "water_2.136_nh4-mascagnite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Salts",
+          "colour": "c_redpink",
+          "rgb": [255, 125, 125],
+          "rules": [
+            "water_1.980_salt-carnallite"
+          ]
+        }
+      ]
+    },
+    "1.9um.water.sulfates.band.position": {
+      "method": "classes",
+      "native_script": "davinci.make.water-1.9um.sulfates.color.a",
+      "title": "Sulfates, Water Absorptions, 1.9-micron Region (EXPERIMENTAL)",
+      "key_image": "key_1.9-water-sulfates.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Bassanite",
+          "note": "RESTORED: native reads bassanite before any colour is set, so native never shows it",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "water_1.920_sulfate-bassanite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Epsomite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "water_1.929_sulfate-epsomite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Eugsterite",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "water_1.932_sulfate-eusgterite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Schwertmannite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "water_1.942_sulfate-schwert"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Gypsum",
+          "colour": "c_bluegreen",
+          "rgb": [0, 245, 195],
+          "rules": [
+            "water_1.943_sulfate-gypsum"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Polyhalite",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "water_1.944_sulfate-polyhalite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Copiapite",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "water_1.946_sulfate-copiapite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Bloedite / Butlerite",
+          "colour": "c_yellowgreen",
+          "rgb": [190, 255, 0],
+          "rules": [
+            "water_1.951_sulfate-bloedite",
+            "water_1.960_sulfate-butler"
+          ]
+        },
+        {
+          "section": null,
+          "label": "FeSO4 reagent",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "water_1.964_sulfate-feso4"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Kainite / Syngite / Coquimbite",
+          "colour": "c_gold",
+          "rgb": [255, 210, 0],
+          "rules": [
+            "water_1.971_sulfate-kainite",
+            "water_1.981_sulfate-coquimb",
+            "water_1.991_sulfate-syngite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Kieserite",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "water_2.073_sulfate-kieserite",
+            "water_2.130_sulfate_kieserite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Szomolnokite",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "water_2.060_sulfate_szomoln",
+            "water_2.093_sulfate_szomoln"
+          ]
+        }
+      ]
+    },
+    "1.9um.water.zeolites.band.position": {
+      "method": "classes",
+      "native_script": "davinci.make.water-1.9um.zeolites.color.a",
+      "title": "Zeolites + Other Water Absorptions, 1.9-micron Region (EXPERIMENTAL)",
+      "key_image": "key_1.9-water-zeolites.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Clinoptilolite",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "water_1.910_zeolite-clinopt"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Mordenite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "water_1.910_zeolite-mordonite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Analcime",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "water_1.912_zeolite-analcime"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Other",
+          "note": "sillimanite, playa mud",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "water_1.916_nesosil-sillim",
+            "water_1.910_stonwplaya"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Heulandite",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "water_1.917_zeolite-heuland"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Natrolite",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "water_1.941_zeolite-natrolite",
+            "water_1.940_zeolite-natrolite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Scolecite",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "water_1.941_zeolite-scolecite"
+          ]
+        }
+      ]
+    },
+    "2.8um.oh.band.position": {
+      "method": "classes",
+      "native_script": "davinci.make.oh2.8um-feats.color.a",
+      "title": "OH Fundamental Band Positions",
+      "key_image": "key_OH-2.7-2.8um-a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "2.72 microns",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "oh2.72um_ref_pyrophyllite"
+          ]
+        },
+        {
+          "section": null,
+          "label": "2.75 microns",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "oh2.75um_ref_muscovite_gds113"
+          ]
+        },
+        {
+          "section": null,
+          "label": "2.76 microns",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "oh2.76um_ref_illite_gds4"
+          ]
+        },
+        {
+          "section": null,
+          "label": "2.81 microns",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "oh2.81um_ref_tourmaline"
+          ]
+        },
+        {
+          "section": null,
+          "label": "2.82 microns",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "oh2.82um_ref_psilomelane"
+          ]
+        },
+        {
+          "section": null,
+          "label": "2.83 microns",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "oh2.83um_ref_thenardite"
+          ]
+        }
+      ]
+    },
+    "3um.waterfeats": {
+      "method": "classes",
+      "native_script": "davinci.make.3um-water.color.a",
+      "title": "Broad Water Absorptions, 3-micron Region",
+      "key_image": "key_3um-waterfeats.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Shape 1",
+          "note": "reference: grossular",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "grossular_3.17um"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape 2",
+          "note": "reference: goethite",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "goethite_3.17um"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Shape 3",
+          "note": "reference: jarosite",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "jarosite_3.18um"
+          ]
+        }
+      ]
+    },
+    "3.5um.feat.position": {
+      "method": "classes",
+      "native_script": "davinci.make.3.5um-feats.color.a",
+      "title": "Carbonates, Organics, Other Absorptions, 3 to 3.5-micron Region",
+      "key_image": "key_3to3.5um.feats.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Calcite",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "carbonate_calcite_3.5um_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Dolomite",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "carbonate_dolomite_3.5um_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Magnesite, Hydromagnesite",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "carbonate_magnesite+hydromagnesite_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Trace Calcite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "carbonate_trace_3.5um_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Hydrogen Peroxide",
+          "colour": "c_flesh",
+          "rgb": [255, 200, 155],
+          "rules": [
+            "hydrogen_peroxide.3.52um_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Niter",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "nitrate_niter_3.6um_curvc"
+          ]
+        },
+        {
+          "section": "Aromatic Hydrocarbon",
+          "label": "Benzene",
+          "note": "RESTORED: native script names non-existent ..._benzene_cv, so native never shows it",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "organic_3.237d_aromatic-benzene_curvc"
+          ]
+        },
+        {
+          "section": "Aromatic Hydrocarbon",
+          "label": "Pyridine",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "organic.3.24um.pyridine_curvc"
+          ]
+        },
+        {
+          "section": "Aromatic Hydrocarbon",
+          "label": "Nitrobenzene",
+          "colour": "c_yellowgreen",
+          "rgb": [190, 255, 0],
+          "rules": [
+            "organic.3.25um.nitrobenzene_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Pentene",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "organic.3.37um.pentene_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nonyne",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "organic.3.41um.nonyne_curvc"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Aliphatic mix",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "organic_trace_aliphatic1_curvc"
+          ]
+        }
+      ]
+    },
+    "ree.b-g21": {
+      "method": "classes",
+      "native_script": "davinci.make.ree.b-g21",
+      "title": "Rare-Earth Element (REE) (g21)",
+      "key_image": "key_ree-b-g21.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Nd2O3",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "ree_nd_neodymium_oxide_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Bastnaesite)",
+          "colour": "c_gold",
+          "rgb": [255, 210, 0],
+          "rules": [
+            "ree_nd_bastnaesite_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Xenotime +Monazite)",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "ree_nd_xenotime+monazite_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Samarium",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "ree_samarium_oxide_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Ancylite)",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "ree_nd_ancylite_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Chloroapatite)",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "ree_nd_chlorapatite_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Fluroapatite)",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "ree_nd_fluorapatite_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Monazite 947)",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "ree_nd_monazite_gds947_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Monazite 957)",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "ree_nd_monazite_gds957_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Parasite)",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "ree_nd_parisite_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Pyromorphite)",
+          "colour": "c_flesh",
+          "rgb": [255, 200, 155],
+          "rules": [
+            "ree_nd_pyromorphite_g21"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Nd (Xenotime)",
+          "colour": "c_redpink",
+          "rgb": [255, 125, 125],
+          "rules": [
+            "ree_nd_xenotime_g21"
+          ]
+        }
+      ]
+    },
+    "vegetation-cover-a": {
+      "method": "classes",
+      "native_script": "davinci.make.vegcover.a",
+      "title": "Vegetation Cover",
+      "key_image": "key_vegetation-cover.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "Green Vegetation",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "vegetation.map"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Trace Green Vegetation",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "vegetation.weak.map"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Dry + Green Vegetation",
+          "note": "key swatch is yellow; script uses c_yellowgreen",
+          "colour": "c_yellowgreen",
+          "rgb": [190, 255, 0],
+          "rules": [
+            "vegetation.dry+green.g3"
+          ]
+        },
+        {
+          "section": null,
+          "label": "Dry, Non-Photosynthetic Vegetation",
+          "note": "key swatch is orange; script uses c_yellow",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "vegetation.dry_nonphotosyn"
+          ]
+        }
+      ]
+    },
+    "veg-spectral-type": {
+      "method": "classes",
+      "native_script": "davinci.make-veg-spectral-type.a",
+      "title": "Vegetation Spectral Type",
+      "key_image": "key_veg-spectral-type.a.png",
+      "classes": [
+        {
+          "section": null,
+          "label": "1 (lawn grass GDS91)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_green",
+          "rgb": [30, 255, 0],
+          "rules": [
+            "vegetation.type1"
+          ]
+        },
+        {
+          "section": null,
+          "label": "2 (aspen leaf-A DW92-2)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_yellow",
+          "rgb": [255, 255, 0],
+          "rules": [
+            "vegetation.type2"
+          ]
+        },
+        {
+          "section": null,
+          "label": "3 (fir tree IH91-2)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_redpink",
+          "rgb": [255, 125, 125],
+          "rules": [
+            "vegetation.type3"
+          ]
+        },
+        {
+          "section": null,
+          "label": "4 (juniper bush IH91-4B)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_mudyellow",
+          "rgb": [186, 165, 0],
+          "rules": [
+            "vegetation.type4"
+          ]
+        },
+        {
+          "section": null,
+          "label": "5 (pinon pine ANP92-14A)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_paleseagreen",
+          "rgb": [110, 245, 140],
+          "rules": [
+            "vegetation.type5"
+          ]
+        },
+        {
+          "section": null,
+          "label": "6 (sage brush IH91-1B)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "vegetation.type6"
+          ]
+        },
+        {
+          "section": null,
+          "label": "7 (walnut leaf)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_yellowgreen",
+          "rgb": [190, 255, 0],
+          "rules": [
+            "vegetation.type7"
+          ]
+        },
+        {
+          "section": null,
+          "label": "8 (blackbrush ANP92-9A)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_lavender",
+          "rgb": [185, 120, 255],
+          "rules": [
+            "vegetation.type8"
+          ]
+        },
+        {
+          "section": null,
+          "label": "9 (blue spruce DW92-5)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "vegetation.type9"
+          ]
+        },
+        {
+          "section": null,
+          "label": "10 (maple leaves DW92-1)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "vegetation.type10"
+          ]
+        },
+        {
+          "section": null,
+          "label": "11 (rabbitbrush ANP92-27)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_cyan",
+          "rgb": [0, 255, 255],
+          "rules": [
+            "vegetation.type11"
+          ]
+        },
+        {
+          "section": null,
+          "label": "12 (Russian olive DW92-4)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "vegetation.type12"
+          ]
+        },
+        {
+          "section": null,
+          "label": "13 (saltbrush ANP92-31A)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "vegetation.type13"
+          ]
+        },
+        {
+          "section": null,
+          "label": "14 (leafy spurge A1 Jun98)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_armygreen",
+          "rgb": [160, 175, 0],
+          "rules": [
+            "vegetation.type14"
+          ]
+        },
+        {
+          "section": null,
+          "label": "15 (leafy spurge A1 Oct97)",
+          "note": "key shows number only; species from rule title",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "vegetation.type15"
+          ]
+        }
+      ]
+    },
+    "acid-minerals-buffering-minerals.a": {
+      "method": "acid_buffer",
+      "native_script": "davinci.make.acid-minerals-buffering-minerals.a",
+      "title": "Acid Generating and Acid Buffering Minerals",
+      "key_image": "key_acid-minerals-buffering-minerals.a.png",
+      "buffering_classes": [
+        {
+          "section": "Acid Buffering Minerals (ABM)",
+          "label": "Calcite",
+          "colour": "c_blue",
+          "rgb": [0, 80, 255],
+          "rules": [
+            "calcite.ws272.g2",
+            "calcite.25+dolom.25+Ca-mont.5",
+            "calcite.25+dolom.25+Na-mont.5",
+            "calcite+dolomite.5"
+          ]
+        },
+        {
+          "section": "Acid Buffering Minerals (ABM)",
+          "label": "Other Carbonates",
+          "colour": "c_skyblue",
+          "rgb": [140, 210, 255],
+          "rules": [
+            "dolomite",
+            "dolo+.5ca-mont",
+            "dolomite.5+Na-mont.5",
+            "magnesite",
+            "malachite.hs254.3b.g2",
+            "rhodochrosite",
+            "siderite",
+            "strontianite",
+            "azurite.ws316.g2"
+          ]
+        }
+      ],
+      "generating_classes": [
+        {
+          "section": "Acid Generating Minerals (AGM)",
+          "label": "Sulfides",
+          "colour": "c_magenta",
+          "rgb": [255, 25, 255],
+          "rules": [
+            "pyrite",
+            "chalcopyrite"
+          ]
+        },
+        {
+          "section": "Acid Generating Minerals (AGM)",
+          "label": "Jarosite (Sulfate)",
+          "colour": "c_red",
+          "rgb": [255, 30, 0],
+          "rules": [
+            "nh3jarosite-scr-nhj",
+            "jarosite-na-gds100",
+            "jarosite-na-gds101",
+            "jarosite-k-90c-gds98",
+            "kjarosite200",
+            "jarosite-K-JR2501",
+            "jarosite-na-nmnh95074-1",
+            "jarosite-H3O-SJ-1",
+            "jarosite_br34a2",
+            "jarosite-thinfilm-GDS243"
+          ]
+        },
+        {
+          "section": "Acid Generating Minerals (AGM)",
+          "label": "Jarosite + Goethite",
+          "colour": "c_purple",
+          "rgb": [120, 0, 255],
+          "rules": [
+            "goeth+jarosite.amx11"
+          ]
+        },
+        {
+          "section": "Acid Generating Minerals (AGM)",
+          "label": "Other Sulfates",
+          "colour": "c_orange",
+          "rgb": [255, 120, 0],
+          "rules": [
+            "schwertmannite",
+            "bluefflor",
+            "coquimbite",
+            "copiapite",
+            "greenslime",
+            "AMD.assemb2",
+            "AMD.assemb1"
+          ]
+        }
+      ],
+      "overlap": {
+        "note": "where both present: ratio = AGM intensity / ABM intensity; colour scaled by mean intensity",
+        "ratio_lt_0.33": [110, 245, 140],
+        "ratio_gt_0.66": [255, 255, 0],
+        "otherwise": [30, 255, 0],
+        "label": "AGM + ABM Mixtures"
+      }
+    },
+    "veg-water-rgb": {
+      "method": "rgb",
+      "native_script": "davinci.make.veg-water-rgb",
+      "channels": {
+        "R": {
+          "rule": "veg1.4um.band",
+          "gain": 1.0,
+          "label": "1.4-micron Water Band"
+        },
+        "G": {
+          "rule": "veg1.2um.band",
+          "gain": 1.5,
+          "label": "1.2-micron Water Band"
+        },
+        "B": {
+          "rule": "veg0.9um.band",
+          "gain": 2.0,
+          "label": "0.9-micron Water Band"
+        }
+      },
+      "title": "Vegetation Water Band RGB Composite",
+      "key_image": "key_veg-water-rgb.png"
+    },
+    "red-edge-shift-a": {
+      "method": "binned",
+      "native_script": "davinci.make.red-edge-shift.a",
+      "input": "depth",
+      "note": "depth DN bins, inclusive both ends as in native, so boundary DNs fall in two bins and their colours add",
+      "layers": [
+        {
+          "rule": "red.edge.shift.1",
+          "bins": [
+            {
+              "dn": [0, 7],
+              "rgb": [0, 80, 255],
+              "label": "shift 0 nm"
+            },
+            {
+              "dn": [7, 23],
+              "rgb": [0, 255, 255],
+              "label": "shift 0.5 nm"
+            },
+            {
+              "dn": [22, 45],
+              "rgb": [30, 255, 0],
+              "label": "shift 1 nm"
+            },
+            {
+              "dn": [44, 75],
+              "rgb": [190, 255, 0],
+              "label": "shift 2 nm"
+            },
+            {
+              "dn": [74, 105],
+              "rgb": [255, 255, 0],
+              "label": "shift 3 nm"
+            },
+            {
+              "dn": [104, 135],
+              "rgb": [255, 210, 0],
+              "label": "shift 4 nm"
+            },
+            {
+              "dn": [134, 165],
+              "rgb": [255, 120, 0],
+              "label": "shift 5 nm"
+            },
+            {
+              "dn": [164, 195],
+              "rgb": [255, 125, 125],
+              "label": "shift 6 nm"
+            },
+            {
+              "dn": [194, 225],
+              "rgb": [255, 25, 255],
+              "label": "shift 7 nm"
+            },
+            {
+              "dn": [224, 255],
+              "rgb": [255, 30, 0],
+              "label": "shift 8+ nm"
+            }
+          ]
+        },
+        {
+          "rule": "red.edge.shift.2",
+          "bins": [
+            {
+              "dn": [0, 8],
+              "rgb": [0, 80, 255]
+            },
+            {
+              "dn": [7, 23],
+              "rgb": [0, 255, 255]
+            },
+            {
+              "dn": [22, 45],
+              "rgb": [30, 255, 0]
+            },
+            {
+              "dn": [44, 75],
+              "rgb": [190, 255, 0]
+            },
+            {
+              "dn": [74, 105],
+              "rgb": [255, 255, 0]
+            },
+            {
+              "dn": [104, 135],
+              "rgb": [255, 210, 0]
+            },
+            {
+              "dn": [134, 165],
+              "rgb": [255, 120, 0]
+            },
+            {
+              "dn": [164, 195],
+              "rgb": [255, 30, 0]
+            },
+            {
+              "dn": [194, 225],
+              "rgb": [255, 25, 255]
+            },
+            {
+              "dn": [224, 255],
+              "rgb": [255, 255, 255]
+            }
+          ],
+          "note": "not in native key; same bins, colours 8 and 10 differ (red, white)"
+        }
+      ],
+      "title": "Vegetation Red-Edge Position Relative to Green Grass",
+      "key_image": "key_red-edge-shift.a.png"
+    }
+  }
+}
+  

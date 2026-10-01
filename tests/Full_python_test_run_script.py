@@ -26,7 +26,7 @@ RULES = REPO / "resources" / "tetracorder_rules_as_dict.json"
 # Tetracorder preset mode
 MODE = "default"
 # python side reference database
-REFERENCE_DB = REPO / "scratch" / "New_Convolver_work" / "tetracorder_rules_references_fwhm-out3.db"
+REFERENCE_DB = REPO / "resources" / "tetracorder_rules_references.db"
 # Root of the wsl holding the container holding the native Tetracorder
 WSL_ROOT = Path(r"\\wsl.localhost\Ubuntu")
 # setup and run directory of the baseline native run
@@ -50,9 +50,9 @@ FWHM_RECORD = 12
 LINES = slice(None)
 # This testrun calls the write_like_tetracorder() method, to produce
 # native-formatted outputs. This directory specifies where they are written
-PYTHON_OUTDIR = REPO / "scratch" / "test_runs" / "profiling1-128lines"
-REPORT_TITLE = "# Fidelity test - profiling\n\n"
-REPORT_FILE = PYTHON_OUTDIR / "fidelity_test_profiling.md"
+PYTHON_OUTDIR = REPO / "scratch" / "test_runs" / "write-method-refactor-shipped-db"
+REPORT_TITLE = "# Fidelity test - write method refactor-shipped-db\n\n"
+REPORT_FILE = PYTHON_OUTDIR / "fidelity_test_write_refactor-shipped-db.md"
 PROFILE = True
 #%% =============== helper functions to derive details from the native run ====
 def wsl_path(path):
@@ -733,3 +733,14 @@ with open(REPORT_FILE, "w", encoding="utf-8",) as f:
 print(f"\nReport written to: {REPORT_FILE}")
 
 #%% =========== End of test, anything below here is messing =====================
+thems = ['1micron-minerals-a', 'hematite+goethite.grain.size-a', 'water-a', 'veg,water,snow', 
+        'snow-grain-size-water.a', '2micron-minerals', '2micron-minerals-b4', '2micron-minerals-detail2', '2micron-mins-emit8', 
+        '2micron-minerals-muscovite-comp', 'prehnite-chlorite-mix+perchlorate', 'organics-veg-2um-a', 'pyroxene.2um.band.position', 
+        '1.5um.broadfeats', '1.9um.water.wave.position.a', '1.9um.water.band.position', '1.9um.water.sulfates.band.position', 
+        '1.9um.water.zeolites.band.position', '2.8um.oh.band.position', '3um.waterfeats', '3.5um.feat.position', 'ree.b-g21', 
+        'vegetation-cover-a', 'veg-spectral-type', 'acid-minerals-buffering-minerals.a', 'veg-water-rgb', 'red-edge-shift-a']
+for theme in thems:
+    try:
+        run.write_theme_image(theme,  PYTHON_OUTDIR / "themes" / "all" / f"{theme}.png")
+    except Exception as e:
+        print(theme, e)
