@@ -11,7 +11,7 @@ components they cover, and nothing in LICENSE changes them.
 
 Spectral convolution (tetrapy)
 ------------------------------
-Location:  tetracorderp/conv/convolve.py
+Location:  tetracorderp/convolve.py
 Upstream:  https://github.com/emit-sds/tetracorder-lite
            (tetrapy package, file tetracorder/conv/convolve.py)
 
@@ -49,9 +49,20 @@ endorse this work, and nothing here should be read as implying that they do.
 
 Spectral libraries
 ------------------
-Location:  resources/  (reference spectra, convolved to sensor resolution)
+Location:  resources/  (reference spectra at native resolution with bandpasses, convolved to the sensor
+           at run time)
 Source:    Derived from the USGS splib06 and the companion sprlb06 research
            library, as distributed with Tetracorder.
 Reference: Clark, R.N., et al., 2007, USGS digital spectral library splib06a:
            U.S. Geological Survey, Digital Data Series 231,
            https://doi.org/10.3133/ds231
+
+
+Post-processing lookups
+-----------------------
+Location:  resources/postprocessing_lookups.json
+Source:    Derived from Tetracorder 6.00's material-classification.txt,
+           geological-origin-table-by-material.txt, cmds.color.support colour
+           scripts and lists.of.files.by.mineral (GPL-3.0, as above).
+           The rule-to-material mapping was completed and extended for this
+           repository; those additions are judgement calls, not upstream's.

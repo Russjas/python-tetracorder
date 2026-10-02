@@ -12,28 +12,21 @@ import cProfile
 import pstats
 
 import numpy as np
-
-REPO = Path(r"C:\Users\Hyperspectral\Documents\GitHub\python-tetracorder") # editable
-if str(REPO) not in sys.path:
-    sys.path.insert(0, str(REPO))
     
 from tetracorderp.config import RRATIO_REFERENCES, NOGROUP0                      
 from tetracorderp.material_evaluation import MaterialEvaluator          
 from tetracorderp.group_evaluator import GroupEvaluator                 
 #%% =============== directory and variable paths ==============================
-# json rules parsed from native cmd files
-RULES = REPO / "resources" / "tetracorder_rules_as_dict.json"
 # Tetracorder preset mode
 MODE = "default"
 # python side reference database
-REFERENCE_DB = REPO / "resources" / "tetracorder_rules_references.db"
 # Root of the wsl holding the container holding the native Tetracorder
 WSL_ROOT = Path(r"\\wsl.localhost\Ubuntu")
 # setup and run directory of the baseline native run
 NATIVE_RUN = WSL_ROOT / "home" / "hyperspectral" / "tetracorder-data" / "cuprite95" / "testrun1"
 # Not all files used in the AVIRIS data runs on Tetracorder native are in the tetracorder-lite clone
 # Some need to be accessed from the original repo instance
-TET_ROOT = Path(r"C:\Users\Hyperspectral\Documents\GitHub\spectroscopy-tetracorder-extracted\spectroscopy-tetracorder-main")
+TET_ROOT = Path(r"C:\path\to\spectroscopy-tetracorder-main")
 # The SPECpr library the native run was configured with (restart r1-av95a).
 # Supplies the sensor wavelength grid and bandpass widths for every test, and
 # in the algorithmic test the convolved reference spectra themselves.
@@ -50,10 +43,10 @@ FWHM_RECORD = 12
 LINES = slice(None)
 # This testrun calls the write_like_tetracorder() method, to produce
 # native-formatted outputs. This directory specifies where they are written
-PYTHON_OUTDIR = REPO / "scratch" / "test_runs" / "write-method-refactor-shipped-db"
-REPORT_TITLE = "# Fidelity test - write method refactor-shipped-db\n\n"
-REPORT_FILE = PYTHON_OUTDIR / "fidelity_test_write_refactor-shipped-db.md"
-PROFILE = True
+PYTHON_OUTDIR = "<path to output dir"
+REPORT_TITLE = "# Fidelity test - refactor 02/10/26\ run2 n\n"
+REPORT_FILE = PYTHON_OUTDIR / "fidelity_test_refactor-20261002-2.md"
+PROFILE = False
 #%% =============== helper functions to derive details from the native run ====
 def wsl_path(path):
     """Map a Linux path recorded by Tetracorder native run onto the Windows WSL share."""
@@ -421,7 +414,6 @@ if profiler:
 run = GroupEvaluator(
     prepared_test_cube, wavelengths, fwhm, mode=MODE,
     target_valid_bands=valid_bands,
-    reference_file=str(REFERENCE_DB), rules_file=str(RULES),
     disabled_groups=disabled_groups, disabled_cases=disabled_cases,
     temperature=scene_temperature, pressure=scene_pressure,
 )
@@ -733,14 +725,7 @@ with open(REPORT_FILE, "w", encoding="utf-8",) as f:
 print(f"\nReport written to: {REPORT_FILE}")
 
 #%% =========== End of test, anything below here is messing =====================
-thems = ['1micron-minerals-a', 'hematite+goethite.grain.size-a', 'water-a', 'veg,water,snow', 
-        'snow-grain-size-water.a', '2micron-minerals', '2micron-minerals-b4', '2micron-minerals-detail2', '2micron-mins-emit8', 
-        '2micron-minerals-muscovite-comp', 'prehnite-chlorite-mix+perchlorate', 'organics-veg-2um-a', 'pyroxene.2um.band.position', 
-        '1.5um.broadfeats', '1.9um.water.wave.position.a', '1.9um.water.band.position', '1.9um.water.sulfates.band.position', 
-        '1.9um.water.zeolites.band.position', '2.8um.oh.band.position', '3um.waterfeats', '3.5um.feat.position', 'ree.b-g21', 
-        'vegetation-cover-a', 'veg-spectral-type', 'acid-minerals-buffering-minerals.a', 'veg-water-rgb', 'red-edge-shift-a']
-for theme in thems:
-    try:
-        run.write_theme_image(theme,  PYTHON_OUTDIR / "themes" / "all" / f"{theme}.png")
-    except Exception as e:
-        print(theme, e)
+run.write_npz(PYTHON_OUTDIR / "full_npz_with_base.npz")
+run.write_all_themes_display(PYTHON_OUTDIR / "display themes", cube_id_prefix = "Cuprite95")
+run.write_all_themes(PYTHON_OUTDIR / "themes", cube_id_prefix = "Cuprite95")
+run.write_geological_theme_images(PYTHON_OUTDIR / "geo-themes", cube_id_prefix = "Cuprite95")

@@ -373,7 +373,8 @@ class MaterialEvaluator:
 
 
 
-def fit_feature(reference, target, target_wavelengths, windows, continuum = "linear", valid_bands = None, polarity = "absorption"):
+def fit_feature(reference, target, target_wavelengths, windows, continuum = "linear", 
+                valid_bands = None, polarity = "absorption"):
     """
     Fits a feature using python equivalents of the specpr operations
 
@@ -389,23 +390,24 @@ def fit_feature(reference, target, target_wavelengths, windows, continuum = "lin
          Feature start and end windows to define the continuum, specified in the rule 
     continuum : str, optional
         "linear" or "convex". Continuum calculation type specified in the rule
+    valid_bands : numpy.ndarray of bool, optional
+        Usable bands. Bands where the reference is deleted (NaN) are dropped as well.
+    polarity : {"absorption", "emission"}, default "absorption"
+        Passed to characterise_feature, which takes the feature type from the reference regardless.
+
 
     Returns
     -------
-    dict
-        Feature fit, depth and continuum-shape measurements.
+    result : dict or None
+        characterise_feature output, or None when the feature cannot be fitted.
+    status : str
+        "valid", or why the feature was not fitted: "out_of_range" (a window outside the sensor), "disabled"
+        (no usable band in a window), "invalid_reference" or "invalid_data".
 
     Raises
     ------
     ValueError
-        on unknown continuum type.
-        
-    Notes
-    -----
-    If a specified window is out of range of the target_wavelengths None is 
-    returned as an ignore flag. This feature cannot be calculated.
-
-    
+        on unknown continuum type.   
     """
     if valid_bands is None:
         valid_bands = np.ones(target_wavelengths.shape, dtype=bool)
@@ -770,33 +772,34 @@ def resolve_nvres_feature(
 
 def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, target_wvls, valid_bands = None):
     """
-    Apply Tetracorder feature tests in Ratfor evaluation order.
+    Fit one feature and apply its tests in tp1mat order: the hard continuum tests (ct, lct, rct) zero failing
+    pixels, then the fuzzy tests (lct/rct>, rct/lct>, rcbblc, lcbbrc, r*bd>) scale fit and depth, each applied
+    to the current values.
 
     Parameters
     ----------
-    feature_fit : dict
-        Output of characterise_feature().
-
-    tests : list of dict
-        Parsed tests for one feature.
+    reference_spectrum : numpy.ndarray
+        Rule reference convolved to the target bands, shape (bands,).
+    feature_dict : dict
+        One feature of a prepared rule: windows, continuum and tests.
+    target_spectra : numpy.ndarray
+        Target spectra, (..., bands).
+    target_wvls : numpy.ndarray
+        Band centres in µm, shape (bands,).
+    valid_bands : numpy.ndarray of bool, optional
+        Usable bands.
 
     Returns
     -------
     dict
-        {
-            "fit": ndarray,
-            "depth": ndarray,
-            "fit_depth": ndarray,
-            "tests": dict,
-        }
-
-        fit and depth are the post-test values used by subsequent
-        Tetracorder feature-role/material logic.
+        status (as fit_feature); mod_fit, mod_depth, mod_fit_depth after the tests; raw_fit, raw_depth before
+        them; polarity; reference_area (the feature weight). The arrays are None unless status is "valid".
     """
     
     windows = feature_dict["windows"]
     continuum_type = feature_dict["continuum"]
-    feat_fit, status = fit_feature(reference_spectrum, target_spectra, target_wvls, windows, continuum = continuum_type, valid_bands = valid_bands)
+    feat_fit, status = fit_feature(reference_spectrum, target_spectra, target_wvls, windows, 
+                                   continuum = continuum_type, valid_bands = valid_bands)
     if status != "valid":
         return {
             "status": status,
@@ -966,23 +969,29 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
     # This also uses CURRENT depth after all previous attenuation.
     # ----------------------------------------------------------
 
+    
+    # tp1mat.r takes the r*bd> reject (lower) limit from zcontlgtr(1) (getifeat.r:506/851), i.e. the lct/rct>
+    # lower limit, not from zrtimesbd(1), which is parsed (getifeat.r:1185) but never read:
+    #   - no lct/rct> on the feature -> reject limit 0.0 (811 features)
+    #   - lct/rct> present           -> reject limit = that test's lower ratio limit (10 features)
+    # Reproduced here for parity with native: thresholds have been tuned around this behaviour, so changing it
+    # is for upstream to decide (spectroscopy-tetracorder issue #6). The commented-out block below uses the
+    # rule's own r*bd> limits instead.
+#================un-comment this block below to end bug emulation =================================================    
+    
     #if "r*bd>" in tests_by_name:
-         # DELIBERATE DIVERGENCE from tp1mat.r (see github spectroscopy-tetracorder issue #6). 
-         #The Ratfor takes the
-        # reject limit from zcontlgtr(1) (getifeat.r:506/851), not zrtimesbd(1):
-        #   - no lct/rct> on the feature -> reject defaults to 0.0 (811 features)
-        #   - lct/rct> present           -> reject = that test's ratio limit (10 features)
-        # zrtimesbd(1) is parsed (getifeat.r:1185) but never read. We honour the
-        # rule's own r*bd> reject value, so this will differ from deployed Tetracorder
-        # on near-threshold pixels
-        #value = continuum * np.abs(depth)
+        #sign = 1.0 if feat_fit["polarity"] == "absorption" else -1.0
+        #with np.errstate(invalid="ignore"):
+        #    present = (depth / sign) > 1e-6
+        #value = np.where(present, continuum * depth, 0.0)
 
         #factor = fuzzy_greater(value, values_for("r*bd>"))
 
         #apply_factor("r*bd>", factor)
-
+#=================================================================================================================
+#================comment the block below to end bug emulation =====================================================
     if "r*bd>" in tests_by_name:
-         # tp1mat.r: xtmp1 = conref*bdepth - SIGNED, despite the Ratfor comment
+        # tp1mat.r: xtmp1 = conref*bdepth - SIGNED, despite the Ratfor comment
         # claiming r*abs(bd) - and forced to 0.0 when the feature is absent
         # (bdepth/xfeat <= 0.1e-5). An emission feature therefore always gives
         # xtmp1 <= 0 and can never clear a lower limit of 0.0, so native never
@@ -992,10 +1001,7 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
             present = (depth / sign) > 1e-6
         value = np.where(present, continuum * depth, 0.0)
 
-        # TEMPORARY native Tetracorder bug emulation:
-        # tp1mat.r incorrectly takes the LOWER r*bd fuzzy limit
-        # from zcontlgtr(1), i.e. the lower lct/rct> threshold.
-        # If no lct/rct> test exists, zcontlgtr defaults to 0.0.
+        # native limits (see above): reject from the lct/rct> lower limit, else 0.0; full from the rule
         rbd_upper = values_for("r*bd>")[1]
         #rbd_lower = values_for("r*bd>")[0]
         if "lct/rct>" in tests_by_name:
@@ -1019,7 +1025,7 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
         )
 
         apply_factor("r*bd>", factor)
-
+#==========================================================================================
     # ----------------------------------------------------------
     # "weight" is not a spectral rejection/fuzzy test here.
     # Deal with it during feature weighting/material aggregation.

@@ -294,7 +294,7 @@ def _prepare(spectra, wavelengths, valid_bands):
 #               / n.astype(np.float32))
 #     return refl.astype(np.float32), wl.astype(np.float32), n
 # =============================================================================
-@njit(cache=True, error_model="numpy")
+@njit(error_model="numpy")
 def _window_mean_kernel(values, wav, channels):
     P = values.shape[0]
     refl = np.empty(P, dtype=np.float32)
@@ -397,7 +397,7 @@ def linear_feature_continuum(
     return ContinuumFeature(
         continuum_type="linear",
         wavelengths=wav,
-        continuum_removed=np.where(np.isfinite(continuum_removed), continuum_removed, np.nan),
+        continuum_removed=continuum_removed,
         continuum=continuum,
         left_continuum=left_refl,
         right_continuum=right_refl,
@@ -488,7 +488,7 @@ def curved_feature_continuum(spectra, wavelengths, continuum_windows, valid_band
     return ContinuumFeature(
         continuum_type="curved",
         wavelengths=wav,
-        continuum_removed=np.where(np.isfinite(continuum_removed), continuum_removed, np.nan),
+        continuum_removed=continuum_removed,
         continuum=continuum,
         left_continuum=means[1],
         right_continuum=means[2],
@@ -523,11 +523,11 @@ def characterise_feature(
     Returns
     -------
     dict
-        fit and depth (masked where bandmp deletes its output or tp1mat
+        fit and depth (NaN where bandmp deletes its output or tp1mat
         zeroes the feature), continuum at the band extremum, left/right
         continuum and continuum-shape ratios.
 
-    Masked (feature zeroed) where:
+    NaN (feature zeroed) where:
         bandmp:  no channels summed, |b| < 0.1e-20, |xk + 1| < 0.1e-20,
                  or a deleted continuum;
         tp1mat:  fit outside (0, 1.1), |depth| < 0.1e-6, or continuum,

@@ -22,8 +22,7 @@ grid, and the output sample is the normalized, channel-width-weighted average of
 input reflectance under that bandpass.
 
 A :class:`Convolver` is constructed once for a target grid and reused for every
-spectrum. The specpr "deleted point" sentinel is :data:`~tetrapy.conv.specpr.DELETED`;
-values below :data:`DEL_THRESH` are treated as deleted.
+spectrum. Output channels with no support are NaN.
 """
 
 import numpy as np
@@ -84,7 +83,8 @@ class Convolver:
         -------
         numpy.ndarray
             Convolved reflectance on the target grid (float32). Output channels with
-            no valid support carry the deleted sentinel.
+            no valid support carry the deleted sentinel in the original, but here are
+            NaN.
         """
         in_wave = np.asarray(in_wave, dtype=np.float64)
         in_fwhm = np.asarray(in_fwhm, dtype=np.float64)

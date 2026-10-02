@@ -19,34 +19,48 @@ in which list, which image (fit, depth, fd, or the gamma-stretched fd.gif), how 
 | Abundances | `results.abundances/model1–4/` | `cmd.compute-model-abundances`, by hand | EMIT-specific abundance models (linear band depth, Beer's-law slab, random-walk mass, model 4). Needs the cube and optical constants. |
 
 ## Python outputs
+
 | My name | native equivalent | python call | Made by | What it is |
 |---|---|---|---|---|
-| .npz | No | `GroupEvaluator.write_npz(filepath.npz)` | numpy serialisation | A frozen record of the results of a python-tetracorder evaluation run: per group and case, the winner (as material codes) plus fit, depth and fit_depth as float32, and the wavelengths and valid bands. Also embeds the rules file the run used and the image shape, and records the mode, temperature, pressure and disabled sets in `meta`. Reloaded with `GroupEvaluator.from_npz(path)`, which supports every writer below, but cannot re-evaluate. |
-| 8-bit data (in memory) | 8-bit data | `GroupEvaluator.scale_like_tetracorder(kind, number)` | `to_dn`, rule `8 DN 255 = x` via `output_specs` | The native DN planes for one group or case, as arrays rather than files: `winner`, `fit`, `depth`, `fd` (uint8), each scaled by its pixel's winning rule. Cached. Every image writer below is built on it. |
+| .npz | No | `GroupEvaluator.write_npz(filepath.npz)` | numpy serialisation | A frozen record of the results of a python-tetracorder evaluation run: per group and case, the winner (as material codes) plus fit, depth and fit_depth as float32, and the wavelengths and valid bands. Also embeds the rules file the run used, the image shape and the base image, the pixel mask if one was given, and records the mode, temperature, pressure and disabled sets in `meta`. Reloaded with `GroupEvaluator.from_npz(path)`, which supports every writer below but cannot re-evaluate. |
+| Base image | `base-image/color-visRGB.jpg`, `base-image/base-image.jpg` | `GroupEvaluator.base` (attribute); `GroupEvaluator.base_image(wavelengths)` | `fd_stretch` | The backdrop for the Themed images display. Built once when the run is evaluated, reading only the three chosen bands (`None` for flat runs), stored in the .npz and restored by `from_npz`. An equivalent of native's, not a reproduction: the valid bands nearest true colour (0.64/0.55/0.47 µm), else SWIR (2.20/1.65/1.25 µm), else the first, middle and last valid channels; a shared 1 % low clip, a linear stretch, then fd-gamma's tone curve. Set `run.base = run.base_image(...)` for other bands. |
+| 8-bit data (in memory) | 8-bit data | `GroupEvaluator.scale_like_tetracorder(kind, number)` | rule `8 DN 255 = x` via `output_specs`; `fd_stretch` | The native DN planes for one group or case, as arrays rather than files: `winner`, `fit`, `depth`, `fd` (uint8), each scaled by its pixel's winning rule, plus `fd_gamma`, the in-memory equivalent of native's `.fd.gif`. Cached. Every image writer below is built on it. |
 | 8-bit data | 8-bit data | `GroupEvaluator.write_like_tetracorder(output_dir)` | `scale_like_tetracorder`, VICAR label + gzip, ENVI `.hdr` | Native's `<group or case dir>/<name>.{fit,depth,fd}.gz` and `.gz.hdr`, including group 0 rules copied into every directory that takes group 0. Matches native: Jaccard 1.0000 in all 13 Cuprite 95 directories, fit exact ≥ 0.9987. A flat (non-image) run is written as a one-line image. |
-| fd-gamma | fd-gamma | none (internal) | `fd_stretch` | Not written as files. The same stretch is applied in memory wherever native reads a `.fd.gif`. |
-| fd-overlays | fd-overlays | not implemented | | Planned: one rule's fd over the grey base image, dual layout. The native output to compare against is empty because of the base-image bug in `gen.fd.jpg.overlay+base-dual.images`. |
-| Themed images | Themed images (colour map only) | `GroupEvaluator.theme_map(theme)` → array; `GroupEvaluator.write_theme_image(theme, path)` → PNG | `postprocessing_lookups.json` `COLOUR_THEMES`; `scale_like_tetracorder`, `fd_stretch` | All 27 native themes: `classes`, `acid_buffer`, `rgb`, `binned`. Each rule is read as native reads its file (`.fd.gif`, or `.fd.gz`/`.depth.gz` per `rule_inputs`), and group 0 rules come from the theme's group (group 1 if all rules are group 0). Output is the colour map alone. The dual base image and the key below (`+labels`) are still to do. Image runs only. |
-| Geological origins data | Geological origins data | not implemented | | On hold. Would use `GEOLOGICAL_ORIGIN_CHANNELS` and `RULE_LOOKUP_MATERIAL` with native's weighting. Curated mapping, so not a faithful reproduction. |
-| Geological theme images | Geological theme images (lists only) | via `export_for_qgis` | `RULE_LOOKUP_MATERIAL` → `MATERIAL_CLASSIFICATIONS` | The `-list.txt` files are written, from the curated mapping. The `-class.gif` and group gifs are not implemented. |
-| Masses | Masses | not implemented | | The per-mineral lists are available as `ABUNDANCE_LISTS`; the mass physics is not ported. |
+| fd-gamma | fd-gamma | none (internal) | `scale_like_tetracorder`, `fd_stretch` | Not written as files, by decision. Held as the `fd_gamma` plane of `scale_like_tetracorder` and used wherever native reads a `.fd.gif`. |
+| fd-overlays | fd-overlays | not implemented | | Not implemented, by decision. They add nothing beyond the 8-bit data and the Themed images. Native's are empty on our reference run because of the base-image bug in `gen.fd.jpg.overlay+base-dual.images`. |
+| Themed images | `color.results/*.png` (colour map) | `GroupEvaluator.theme_map(theme)` → array; `write_all_themes(output_dir, cube_id_prefix="")` | `COLOUR_THEMES`; `scale_like_tetracorder` | All 27 native themes (`classes`, `acid_buffer`, `rgb`, `binned`) as colour maps alone. Each rule is read as native reads its file (`.fd.gif`, or `.fd.gz`/`.depth.gz` per `rule_inputs`). Group 0 rules come from the theme's group, or group 1 if every rule is group 0. `write_all_themes` writes `color.results/[<prefix>_]color-results_<theme>.png` and skips themes with no result. Image runs only. |
+| Themed images (display) | `color.results+labels/*+labels.png` | `GroupEvaluator.write_all_themes_display(output_dir, cube_id_prefix="", base=None)` | `theme_map`, `self.base`, `postprocessing.display_legend` (Pillow, DejaVu Sans Bold) | The colour map with the base image to its right and a key below, as `color.results+labels/[<prefix>_]color-results_<theme>+labels.png`. The key is rendered from `COLOUR_THEMES` in native's style: white bold on black, wrapped title, section columns, dark-to-full gradient swatches (flat for bins), "python-tetracorder" footer. Scenes narrower than 600 px get the key as a single column to the right instead. Native's dual-only image is not produced. Image runs only. |
+| Geological origins data | Geological origins data | images planned | | The 11-channel cube is not written, by decision. Only the 11 per-origin images derived from it are planned, computed in memory with native's weighting from `GEOLOGICAL_ORIGIN_CHANNELS` and `RULE_LOOKUP_MATERIAL`. Curated mapping, so not a faithful reproduction. |
+| Geological theme images | Geological theme images | `GroupEvaluator.geological_theme_images()` → arrays; `GroupEvaluator.write_geological_theme_images(output_dir, cube_id_prefix="")` | `RULE_LOOKUP_MATERIAL` → `MATERIAL_CLASSIFICATIONS`; `scale_like_tetracorder`, `fd_stretch` | One greyscale image per `Classification` and per `material_group` value, in one pass: `byte(Σ fd-gamma)` over every rule_id with a material carrying that value, in every directory it is written to. Written with their lists, as native names them: `geologic-classifications/[<prefix>-]<Classification>-class.gif` and `-list.txt`, and `geologic-groups/[<prefix>-]<material_group>-group.gif` and `-group-list.txt`. Values with nothing detected get a list but no image, as native. Curated mapping. Image runs only. |
+| Masses | Masses | out of scope | | EMIT-specific post-process. The per-mineral lists are kept as `ABUNDANCE_LISTS`, used by `export_for_qgis`. |
 | Abundances | Abundances | out of scope | | Needs the reflectance cube and optical constants; EMIT-specific. |
-| QGIS export | No (mimics a native 6.00 run directory with geology on) | `GroupEvaluator.export_for_qgis(output_dir, cube_id_prefix="")` | `write_like_tetracorder`; `ABUNDANCE_LISTS`; `RULE_LOOKUP_MATERIAL` → `MATERIAL_CLASSIFICATIONS` | A shim for Grant Boxer's Tetracorder for QGIS plugin (v1.14). Writes a more authentic Tetracorder output directory, with expected book-keeping files. **Plugin not yet published - citation and details to follow** |
+| QGIS export | No (mimics a native 6.00 run directory with geology on) | `GroupEvaluator.export_for_qgis(output_dir, cube_id_prefix="")` | `write_like_tetracorder`; `ABUNDANCE_LISTS`; `_write_geological_theme_lists` | A shim for Grant Boxer's Tetracorder for QGIS plugin (v1.14). Writes a more authentic Tetracorder output directory, with the expected book-keeping files: the 8-bit data, the 21 mineral lists (DN scale from the rules) and the geological theme lists. **Plugin not yet published - citation and details to follow** |
+
 
 
 ## Outputs not implemented
 
-The fd-overlays, the geological origins data, the geological theme gifs, the masses and the abundance models are not
-produced by python-tetracorder. The fd-overlays and the theme maps' dual base image and key need a grey base image
-built from the cube; they are planned. Native's own fd-overlays are empty on our reference run, because of a bug in
-`gen.fd.jpg.overlay+base-dual.images` (the base image is written with a doubled `.base.jpg` and copied from the
-wrong directory), so there is nothing to test them against. The geological origins cube and the class and group gifs
-are on hold. Their inputs (`GEOLOGICAL_ORIGIN_CHANNELS`, `RULE_LOOKUP_MATERIAL`, `MATERIAL_CLASSIFICATIONS`) are
-complete, but they depend on a curated material mapping, so they would not reproduce native pixel for pixel. The
-class and group lists themselves are written, by `export_for_qgis`. The masses are an EMIT-specific post-process with
-hard-coded constants (relative depth to kaolinite for every mineral, density 3.1, one mistyped Δk); their
-per-mineral lists are kept as `ABUNDANCE_LISTS`, but the physics is not ported. The model abundances need the
-reflectance cube and optical constants and are out of scope.
+python-tetracorder does not produce fd-gamma or fd-overlays files, the geological origins data, the masses or the
+abundance models.
+
+- **fd-gamma and fd-overlays, by decision.** fd-gamma is applied in memory wherever native reads a `.fd.gif`, so
+  written files would add nothing. The fd-overlays add nothing beyond the 8-bit data and the Themed images. Native's
+  own fd-overlays are empty on our reference run anyway, because of a bug in `gen.fd.jpg.overlay+base-dual.images`
+  (the base image is written with a doubled `.base.jpg` and copied from the wrong directory).
+- **The geological origins data (the 11-channel cube), by decision.** Only the 11 per-origin images derived from it
+  are wanted, and those are still to be written. Their inputs (`GEOLOGICAL_ORIGIN_CHANNELS`, `RULE_LOOKUP_MATERIAL`)
+  are in place, but they depend on our curated material mapping, so they will not reproduce native pixel for pixel.
+- **The masses, out of scope.** They are an EMIT-specific post-process with hard-coded constants: relative depth to
+  kaolinite for every mineral, density 3.1, and one mistyped Δk. Their per-mineral lists are kept as
+  `ABUNDANCE_LISTS` and used by `export_for_qgis`, but the physics is not ported.
+- **The model abundances, out of scope.** They need the reflectance cube and optical constants.
+
+Two outputs are produced differently from native:
+
+- **The base image** behind the Themed images display is an equivalent of native's, not a reproduction. It is built
+  once when the run is evaluated and stored in the .npz.
+- **The keys** are rendered from `COLOUR_THEMES` in native's style, rather than copied from native's hand-drawn key
+  PNGs.  
 
 ## Completing the material components, and other changes to the lookups
 
@@ -88,7 +102,7 @@ What we did:
   (`GEOLOGICAL_ORIGIN_CHANNELS` has 213 materials against 246 classifications), so those materials contribute
   nothing to an origins product.
 
-**NB** This extension of the rules components and materials list was performed exclusive by us, with all mistakes in judgement our own.  
+**NB** This extension of the rules components and materials list was performed exclusively by us, with all mistakes in judgement our own.  
 As such these look up tables are not representative of the logic contained in the authoritative Tetracorder.
 
 The other tables in `postprocessing_lookups.json`:
