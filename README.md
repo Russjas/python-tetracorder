@@ -1,6 +1,6 @@
 # python-tetracorder
 
-![Cuprite, Nevada (AVIRIS 1995): 2 µm mineral map from native Tetracorder 6.00 and from python-tetracorder](https://raw.githubusercontent.com/Russjass/python-tetracorder/main/images/cuprite95_group2_comparison.jpg)
+![Cuprite, Nevada (AVIRIS 1995): 2 µm mineral map from native Tetracorder 6.00 and from python-tetracorder](https://raw.githubusercontent.com/Russjas/python-tetracorder/main/images/cuprite95_group2_comparison.jpg)
 *Cuprite95 group 2 (2 µm minerals). Native Tetracorder 6.00 (centre) and python-tetracorder (right) from the same inputs,
 both drawn with Tetracorder's own colouring. See [Fidelity](#fidelity).*
 
