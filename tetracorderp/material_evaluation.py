@@ -15,8 +15,9 @@ from .tetracorder_ops import (linear_feature_continuum,
                              prepare_rules,
                              _wtochbin
 )
-from .config import RRATIO_REFERENCES
+from .config import RRATIO_REFERENCES, REFERENCE_LIBRARIES
 from .convolve import Convolver
+from .feature_cache import fit_target_group, group_by_target, prepare_reference_features, reference_key
 
 def _zero_nan(x):
     """Deleted (NaN) pixels contribute 0, as np.ma.filled(x, 0.0) did for masked ones."""
@@ -47,7 +48,8 @@ class MaterialEvaluator:
                  target_fwhm: np.ndarray,
                  target_valid_bands: np.ndarray|None = None,
                  mode: str = "default",
-                 disabled_materials: set|None = None
+                 disabled_materials: set|None = None,
+                 fused_fitting: bool = True
                  ):
 
         self.rules, self.not_definitions = self._prepare_rules(rules, mode)
@@ -68,12 +70,23 @@ class MaterialEvaluator:
             references = load_references(references)
         self.rule_spectra = self._prepare_rule_spectra(references)
         self.rratio_spectra = self._prepare_rratio_spectra(references)
-
+        # pixel-independent preparation of every positive feature, shared by all rules (feature_cache.py)
+        self.fused_fitting = fused_fitting
+        self.reference_features = prepare_reference_features(self.rules, self.rule_spectra, self.wavelengths,
+                                                             self.valid_bands)
+        self._target_groups = group_by_target(self.reference_features)
+        self._wl32 = np.asarray(self.wavelengths, dtype=np.float32)
+        self._feature_fits = {}         # reference_key -> fit for the current target (same_target contract)
+        self._target_flat = None        # current target as (pixels, bands) float32
+        self._target_lead = None        # its leading shape
 
     def cache_clear(self):
-        """Forget cached NOT-source results. Call before evaluating a new set of spectra with same_target=True."""
+        """Forget the cached NOT-source results and fitted features. Call before evaluating new spectra with
+        same_target=True."""
         self._not_source_cache.clear()
-
+        self._feature_fits.clear()
+        self._target_flat = None
+        self._target_lead = None
 
     def evaluate(self, rule_id: str, target_spectra: np.ndarray, same_target: bool = False) -> dict | None:
 
@@ -95,7 +108,7 @@ class MaterialEvaluator:
 
         reference_spectrum = self.rule_spectra[rule_id]
 
-        resolved_features = self._resolve_positive_features(rule_features, reference_spectrum,
+        resolved_features = self._resolve_positive_features(rule, rule_features, reference_spectrum,
                                                             target_spectra)
 
         material = resolve_positive_material(rule_features, resolved_features)
@@ -178,11 +191,6 @@ class MaterialEvaluator:
 
 
     def _prepare_rule_spectra(self, references):
-        LIBRARY_MAP = {
-            "splib06": "splib06b",
-            "sprlb06": "sprlb06b",
-        }
-
         if isinstance(references, (str, Path)):
             references = load_references(references)
 
@@ -193,7 +201,7 @@ class MaterialEvaluator:
 
         for rule_id, rule in self.rules.items():
             library = rule["library_records"]["SMALL"]["library"].strip("[]")
-            library = LIBRARY_MAP[library]
+            library = REFERENCE_LIBRARIES[library]
 
             record = int(rule["library_records"]["SMALL"]["record"])
             key = (library, record)
@@ -219,9 +227,32 @@ class MaterialEvaluator:
                                                     ratio_reference["reflectance"])
         return spectra
 
+    def _fitted_feature(self, rule, feature, target_spectra):
+        """
+        (fit_feature-shaped result, status) for one positive feature, or None when fused fitting is off (the caller
+        then uses fit_feature). The first request for a feature fits its whole target group in one pass; later
+        requests are lookups. Valid while the target is unchanged: the same_target contract of evaluate().
+        """
+        if not self.fused_fitting:
+            return None
+        key = reference_key(rule, feature)
+        entry = self.reference_features[key]
+        if entry.status != "valid":
+            return None, entry.status
+        if key not in self._feature_fits:
+            if self._target_flat is None:
+                spectra = np.asarray(target_spectra)
+                self._target_lead = spectra.shape[:-1]
+                self._target_flat = np.ascontiguousarray(spectra.reshape(-1, spectra.shape[-1]), dtype=np.float32)
+            keys = self._target_groups[entry.target_key]
+            results = fit_target_group(self._target_flat, self._wl32, [self.reference_features[k] for k in keys],
+                                       lead_shape=self._target_lead)
+            self._feature_fits.update(zip(keys, results))
+        return self._feature_fits[key], "valid"
 
 
     def _resolve_positive_features(self,
+                                   rule: dict,
                                    rule_features: dict,
                                    reference_spectrum: np.ndarray,
                                    target_spectra: np.ndarray) -> dict:
@@ -234,11 +265,11 @@ class MaterialEvaluator:
 
             resolved_features[feature_id] = resolve_feature_tests(reference_spectrum,
                                             feature, target_spectra,
-                                            self.wavelengths, self.valid_bands)
+                                            self.wavelengths, self.valid_bands,
+                                            fitted=self._fitted_feature(rule, feature, target_spectra))
+        return resolved_features    
 
-        return resolved_features
-
-
+    
     def _native_not_source(self, source_rule_id, source_feature_id, target_spectra):
         """
         Fit and depth of a NOT source feature as native tp1mat leaves them in
@@ -278,7 +309,8 @@ class MaterialEvaluator:
                 continue
 
             result = resolve_feature_tests(reference, feature, target_spectra,
-                                           self.wavelengths, self.valid_bands)
+                                           self.wavelengths, self.valid_bands,
+                                           fitted=self._fitted_feature(source_rule, feature, target_spectra))
             valid = result["status"] == "valid"
 
             if valid:
@@ -770,7 +802,8 @@ def resolve_nvres_feature(
     }
 
 
-def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, target_wvls, valid_bands = None):
+def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, target_wvls, valid_bands = None,
+                          fitted = None):
     """
     Fit one feature and apply its tests in tp1mat order: the hard continuum tests (ct, lct, rct) zero failing
     pixels, then the fuzzy tests (lct/rct>, rct/lct>, rcbblc, lcbbrc, r*bd>) scale fit and depth, each applied
@@ -788,6 +821,8 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
         Band centres in µm, shape (bands,).
     valid_bands : numpy.ndarray of bool, optional
         Usable bands.
+    fitted : (dict, str), optional 
+        A precomputed (fit_feature result, status); skips the fit.
 
     Returns
     -------
@@ -796,10 +831,13 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
         them; polarity; reference_area (the feature weight). The arrays are None unless status is "valid".
     """
     
-    windows = feature_dict["windows"]
-    continuum_type = feature_dict["continuum"]
-    feat_fit, status = fit_feature(reference_spectrum, target_spectra, target_wvls, windows, 
-                                   continuum = continuum_type, valid_bands = valid_bands)
+    if fitted is None:
+        windows = feature_dict["windows"]
+        continuum_type = feature_dict["continuum"]
+        feat_fit, status = fit_feature(reference_spectrum, target_spectra, target_wvls, windows,
+                                       continuum = continuum_type, valid_bands = valid_bands)
+    else:
+        feat_fit, status = fitted       # (result, status) from MaterialEvaluator._fitted_feature
     if status != "valid":
         return {
             "status": status,
@@ -812,9 +850,6 @@ def resolve_feature_tests(reference_spectrum, feature_dict, target_spectra, targ
             "reference_area": None,
         }
 
-    
-    
-    
     tests = feature_dict.get("tests", [])
 
     fit = np.asarray(feat_fit["fit"]).copy()

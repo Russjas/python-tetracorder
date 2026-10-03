@@ -1,5 +1,13 @@
 #%%
+"""
+Algorithmic fidelity test: the full GroupEvaluator run on the native Cuprite95 cube, with the reference spectra taken
+from the native SPECpr pre-convolved libraries (s06av95a / r06av95a) instead of the package's SQLite database and
+GaussianConvolver. Output and report match Full_python_test_run_script.py.
 
+The only substitution is where reference spectra come from: NativeReferenceMaterialEvaluator overrides
+_prepare_rule_spectra / _prepare_rratio_spectra. No evaluation function is patched; the fused fitting path, groups,
+group 0, cases, NOTs and constraints all run as in the package.
+"""
 import tetracorderp, sys; print(tetracorderp.__file__); print(sys.executable)
 #%%
 from pathlib import Path
@@ -46,9 +54,16 @@ FWHM_RECORD = 12
 LINES = slice(None)
 # This testrun calls the write_like_tetracorder() method, to produce
 # native-formatted outputs. This directory specifies where they are written
-PYTHON_OUTDIR = Path("C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/fused_tests")
-REPORT_TITLE = "# Fidelity test - Fused kernel n\n"
-REPORT_FILE = PYTHON_OUTDIR / "fidelity_test_fused_kernel.md"
+PYTHON_OUTDIR = Path("C:/Users/Hyperspectral/Documents/GitHub/python-tetracorder/scratch/fused_tests_native_refs")
+REPORT_TITLE = "# Fidelity test - SPECpr pre-convolved references, fused kernel\n"
+REPORT_FILE = PYTHON_OUTDIR / "fidelity_test_specpr_preconvolved_fused.md"
+FUSED_FITTING = True
+# Native libraries for each library name: the rules' SMALL library ("[splib06]") and config.RRATIO_REFERENCES
+# ("splib06b"). Restart r1-av95a: y = /sl1/usgs/library06.conv/s06av95a, w = /sl1/usgs/rlib06/r06av95a
+LIBRARY_FILES = {
+    "[splib06]": S06_AV95_TET, "[sprlb06]": R06_AV95_TET,
+    "splib06b": S06_AV95_TET, "sprlb06b": R06_AV95_TET,
+}
 PROFILE = False
 #%% =============== helper functions to derive details from the native run ====
 def wsl_path(path):
@@ -371,6 +386,83 @@ def read_specpr(path, record_number):
 
     return title, data
 
+# =============== native reference spectra ===================================
+
+def native_rule_spectra(rules, nchans):
+    """Each rule's SMALL reference from the native convolved library, read once per (library, record)."""
+    spectra, records, failures = {}, {}, []
+    for rule_id, rule in rules.items():
+        small = rule["library_records"]["SMALL"]
+        key = (small["library"], int(small["record"]))
+        try:
+            if key not in records:
+                records[key] = read_specpr(LIBRARY_FILES[key[0]], key[1])[1]
+        except Exception as exc:
+            failures.append(f"{rule_id}: {small} {exc!r}")
+            continue
+        if records[key].shape != (nchans,):
+            failures.append(f"{rule_id}: {records[key].shape} channels")
+            continue
+        spectra[rule_id] = records[key]
+    if failures:
+        raise RuntimeError("native references not loaded:\n  " + "\n  ".join(failures))
+    return spectra
+
+
+class NativeReferenceMaterialEvaluator(MaterialEvaluator):
+    """MaterialEvaluator whose references are the native SPECpr-convolved spectra."""
+
+    def _prepare_rule_spectra(self, references):
+        return native_rule_spectra(self.rules, self.wavelengths.size)
+
+    def _prepare_rratio_spectra(self, references):
+        return {name: read_specpr(LIBRARY_FILES[library], record)[1]
+                for name, (library, record) in RRATIO_REFERENCES.items()}
+
+
+class NativeReferenceGroupEvaluator(GroupEvaluator):
+    """GroupEvaluator.__init__ with the evaluator above; everything else is the package's."""
+
+    def __init__(self, target_spectra, target_wavelengths, mode="default",
+                 target_valid_bands=None, masked_pixels=None, rules_file=None,
+                 disabled_groups=None, disabled_cases=None, disabled_materials=None,
+                 temperature=None, pressure=None, blocking=True, fused_fitting=True):
+        self.temperature = temperature
+        self.pressure = pressure
+        self.target = target_spectra
+        self.target_shape = tuple(np.shape(target_spectra)[:-1])
+        self.masked_pixels = None if masked_pixels is None else np.asarray(masked_pixels, dtype=bool)
+        self.wavelengths = target_wavelengths
+        self.fwhm = None                     # only used for convolution, which the subclass skips
+        self.mode = mode
+        self.disabled_groups = {int(g) for g in (disabled_groups or ())}
+        self.disabled_cases = {int(c) for c in (disabled_cases or ())}
+        self.disabled_materials = set(disabled_materials or ())
+        self.valid_bands = target_valid_bands
+        if self.valid_bands is None:
+            self.valid_bands = np.ones(self.wavelengths.shape, dtype=bool)
+        self.base = self.base_image() if len(self.target_shape) == 2 else None
+        self.reference_file = None           # the SQLite database is not used
+        self.rules_file = rules_file or self._find_file("tetracorder_rules_as_dict.json")
+        self.evaluator = NativeReferenceMaterialEvaluator(
+            self.rules_file,
+            {},                              # references come from the native libraries
+            self.wavelengths,
+            self.fwhm,
+            target_valid_bands=self.valid_bands,
+            mode=mode,
+            disabled_materials=self.disabled_materials,
+            fused_fitting=fused_fitting,
+        )
+        self.disabled_materials |= self._resolve_physical_and_disable()
+        self.evaluator.disabled_materials = self.disabled_materials
+        if self.masked_pixels is not None:
+            blocking = True
+        if blocking:
+            self.group_winners, self.case_winners = self._evaluate_by_block()
+        else:
+            self.group_winners, self.case_winners = self.evaluate(self.target)
+
 #%% =============== Find the cube and parameters used in the native run =======
 # parse the history of the native run to reuse the cube and parameters
 native = get_native_history_parameters()
@@ -414,12 +506,12 @@ profiler = cProfile.Profile() if PROFILE else None
 t0 = time.perf_counter()
 if profiler:
     profiler.enable()
-run = GroupEvaluator(
-    prepared_test_cube, wavelengths, fwhm, mode=MODE,
+run = NativeReferenceGroupEvaluator(
+    prepared_test_cube, wavelengths, mode=MODE,
     target_valid_bands=valid_bands,
     disabled_groups=disabled_groups, disabled_cases=disabled_cases,
     temperature=scene_temperature, pressure=scene_pressure,
-    fused_fitting=True, blocking=True
+    fused_fitting=FUSED_FITTING, blocking=True
 )
 if profiler:
     profiler.disable()
@@ -712,6 +804,8 @@ for dirname in sorted(common_dirs):
 run_table = ("## Run Summary\n\n"
     "| Item | Value |\n"
     "|---|---:|\n"
+    f"| References | native SPECpr {S06_AV95_TET.name} / {R06_AV95_TET.name} |\n"
+    f"| Fused fitting | {FUSED_FITTING} |\n"
     f"| Package run | {run_seconds:.0f} s |\n"
     f"| Materials disabled | {len(run.disabled_materials)} |\n\n\n"
 )

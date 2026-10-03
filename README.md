@@ -81,6 +81,9 @@ Other arguments:
 - `reference_file`, `rules_file`: your own reference database or rule set, in place of the bundled ones.
 - `blocking` (default `True`): evaluate in strips of about 40k pixels. Results are identical to whole-cube evaluation,
   and it is faster and uses far less memory, so there is little reason to turn it off.
+- `fused_fitting` (default `True`): fit features through the shared, Numba-fused path (see
+  [Performance pass 2](#performance-pass-2---390-s-to-73-s)). `False` uses the original per-rule `fit_feature`, about
+  5× slower; it is kept as the reference implementation for parity testing.
 
 ### Masked pixels
 
@@ -122,19 +125,20 @@ were transcribed and in places completed by us; see [the lookups section of Outp
 
 ## Scene size and run time
 
-python-tetracorder is slower than native. Indicative times on a single desktop machine:
+python-tetracorder is slower than native. Indicative times on a single desktop machine, after [performance pass 2](#Performance-pass-2):
 
 | Scene | Pixels evaluated | Time |
 |---|---:|---:|
-| Cuprite95, AVIRIS (972 × 614), all enabled groups and cases | 596,808 | ~390 s |
+| Cuprite95, AVIRIS (972 × 614), all enabled groups and cases | 596,808 | ~70 s |
 | Drill core box scan (Specim SWIR) | 180,016 | ~120 s |
-| EMIT L2A, `emit_c` mode, cloud-masked | 966,895 of 1,589,760 | 702 s |
-| EnMAP L2A full cube, unmasked | 1,402,440 | 1,873 s |
+| EMIT L2A, `emit_c` mode, cloud-masked | 966,895 of 1,589,760 | ~290 s |
+| EnMAP L2A full cube, cloud and no-data masked | 1,402,440 | ~230 s |
 
 Time scales with the number of pixels evaluated, so masking clouds and empty borders pays off directly.
 
 The cube must fit in memory, as a float32 array or smaller: the evaluation converts one strip at a time and never
-copies the whole cube. A scene too large for RAM, such as a full AVIRIS-NG or AVIRIS-3 flight line, should be cut into
+copies the whole cube. Allow up to about 1 GB on top of that for the fitted features held per strip.. A scene too 
+large for RAM, such as a full AVIRIS-NG or AVIRIS-3 flight line, should be cut into
 tiles outside the package and the results stitched back together. Every pixel is evaluated independently, so tiling
 does not change the results.
 
@@ -219,7 +223,9 @@ Its results are documented [here](tests/fidelity_test_full_python.md).
 All further tests use the bundled database and rules, through the test script
 [here](tests/Full_python_test_run_script.py). It needs the native run and the Tetracorder repository, so it cannot be
 run from the package alone. The latest report, for this release, is
-[tests/fidelity_test_refactor-20261002-2.md](tests/fidelity_test_refactor-20261002-2.md).
+[tests/fidelity_test_fused_kernel.md](tests/fidelity_test_fused_kernel.md). The algorithmic test is repeated for this
+release with [tests/native_refs_full_run_script.py](tests/native_refs_full_run_script.py); its report is
+[tests/fidelity_test_specpr_preconvolved_fused.md](tests/fidelity_test_specpr_preconvolved_fused.md).
 
 ### Comparison
 
@@ -238,7 +244,7 @@ assessed directly from the corresponding 8-bit values.
 ### Results
 
 Summary statistics are calculated for each group and case. The complete comparison output is in
-[this file](tests/fidelity_test_full_python.md); only the summary is presented here.
+[this file](tests/fidelity_test_fused_kernel.md); only the summary is presented here.
 
 | Group | Materials | Native only | Python only | Native pixels | Python pixels | Jaccard | Fit exact |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -271,6 +277,36 @@ Every change described in [Development history](#development-history), including
 checked against this test and reproduced the table above exactly.
 
 ## Development history
+
+### Performance pass 2
+
+| Scene | 1.0 | 1.1 (fused fitting) |
+|---|---:|---:|
+| Cuprite95, AVIRIS, fidelity run | 397 s | 73 s |
+| EnMAP L2A | 1,324 s | 214 s |
+
+Feature fitting was about 93% of the evaluation time, and most of it was repeated work: rules share reference
+records and windows, and many features with different references need an identical target continuum removal.
+`feature_cache.py` separates the work by what it depends on.
+
+- **Reference preparation, once per run.** Everything in `fit_feature` that does not depend on pixels (window checks,
+  the bdmset reference continuum, band extremum, polarity, feature weight) is prepared once per positive feature,
+  keyed by `reference_key(rule, feature)` = (library, record, continuum, windows), derived from the rule itself. On
+  Cuprite95, 1,260 positive features need 1,130 reference preparations.
+- **Target preparation, once per group of features per strip.** Features whose target continuum removal is
+  identical (same channels and valid bands) are fitted together: 947 valid features need 606 target preparations.
+- **Fused Numba kernel for linear continua.** One pass per pixel computes the bandmp window means, the continuum,
+  the continuum-removed row and the REAL*8 least-squares sums for every reference in the group, in channel order as
+  the Fortran DO loops, in parallel across pixels. Convex (bandmpcv) groups use batched NumPy.
+- **Fitted on demand.** A group is fitted the first time a rule or NOT source in the strip asks for one of its
+  features; later requests are lookups. Features of disabled groups and untriggered cases are never fitted.
+
+Fidelity: the Cuprite95 report is identical to 1.0's, material by material. Repeated with the native SPECpr
+references, two pixels differ in winner from native, both near-ties in group 2 that also flip in the 1.0 code; the
+remaining differences in the full-Python run come from reference convolution, not evaluation.
+
+Cost: the fitted features of a strip are held until the next strip, at most about 0.8 GB for 40k pixels.
+`fused_fitting=False` restores the 1.0 path.
 
 ### Performance pass 1 - 900+ s to ~390 s
 
@@ -370,8 +406,10 @@ The full fidelity report for this pass is in [tests/fidelity_test_blocking.md](t
 
 ### After this release
 
-- Performance: evaluating strips in parallel threads is the most promising next step. Fusing more of the linear
-  feature fit into Numba is estimated to give only a few per cent, as it would replace NumPy's own compiled loops.
+- Performance: convex-continuum groups still use NumPy, and reference convolution takes about 20 s per run; both
+  are candidates. The fused kernel is already parallel across pixels, so parallel strips would add little.
+- The two near-tie winner swaps in group 2 (alunite/kaolinite and muscovite Al content) are evaluation-level and
+  worth tracing through `resolve_group`.
 - The geological origins images: origin vectors for the materials we added are still to be filled in.
 
 ## Scope

@@ -17,7 +17,6 @@ from .material_evaluation import MaterialEvaluator
 from .postprocessing import GEOLOGICAL_THEME_FIELDS, display_legend, fd_stretch
 from .tetracorder_ops import prepare_rules
 
-
 class GroupEvaluator:
     """
     Evaluate spectra against the Tetracorder 6.00 rule set and resolve the group and case winners.
@@ -60,6 +59,10 @@ class GroupEvaluator:
     blocking : bool, default True
         Evaluate in strips of about 40k pixels, which is much faster and uses far less memory than the
         whole cube at once. Results are identical either way.
+    fused_fitting : bool, default True
+        Fit features through feature_cache: each target preparation once, shared across rules and NOT sources,
+        with the linear features in a fused numba kernel. False uses fit_feature per rule and feature, as before.
+        The two agree except for occasional 1-ulp differences in fit and depth from the REAL*8 summation order.
 
     Attributes
     ----------
@@ -72,7 +75,7 @@ class GroupEvaluator:
         uint8 RGB base image for the display composites (image runs only).
     disabled_materials : set
         Rule ids not evaluated, including those disabled by temperature and pressure.
-
+    
     See Also
     --------
     from_npz : rebuild a run from write_npz output, without re-evaluating.
@@ -104,7 +107,7 @@ class GroupEvaluator:
                  target_valid_bands = None, masked_pixels = None,
                  reference_file = None, rules_file = None,
                  disabled_groups = None, disabled_cases = None, disabled_materials = None,
-                 temperature = None, pressure = None, blocking = True ):
+                 temperature = None, pressure = None, blocking = True, fused_fitting = True):
         self.temperature = temperature    # (min, max) Kelvin of the data set, or None
         self.pressure = pressure          # (min, max) bar of the data set, or None
         self.target =  target_spectra
@@ -135,7 +138,8 @@ class GroupEvaluator:
                 self.fwhm,
                 target_valid_bands = self.valid_bands,
                 mode=mode,
-                disabled_materials = self.disabled_materials)
+                disabled_materials = self.disabled_materials,
+                fused_fitting = fused_fitting)
         self.disabled_materials |= self._resolve_physical_and_disable()
         self.evaluator.disabled_materials = self.disabled_materials
         if self.masked_pixels is not None: blocking = True # Providing a mask forces the blocking path 
@@ -307,12 +311,10 @@ class GroupEvaluator:
         The arithmetic is unchanged; the gain comes almost entirely from memory behaviour.
 
         1. Working arrays stop streaming from main memory.
-           Each feature fit builds several pixels x channels temporaries: the valid-band-masked span, the continuum,
-           the continuum-removed spectrum, and the float64 masks and products for the bandmp least-squares sums.
-           Over the whole cube (i.e ~600k pixels, ~25 channels per span) each of these is tens to over a
-           hundred MB, far larger than any CPU cache. Every pass over them is limited by DRAM bandwidth, and each is
-           made and discarded thousands of times per run. For a strip of 64 lines (~39k pixels) the same arrays are
-           a few MB, small enough to stay in L2/L3 cache between one operation and the next.
+           Feature fitting runs one pixel at a time in feature_cache's fused kernel, but the feature tests, weighting,
+           constraints and NOT vetoes still work on whole pixel arrays, made and discarded thousands of times per
+           run. Over the whole cube (~600k pixels) every pass over them is limited by DRAM bandwidth; for a ~40k-pixel
+           strip they stay in L2/L3 cache.
 
         2. Allocation gets cheaper.
            Arrays of hundreds of MB are allocated and returned to the operating system individually, and every
@@ -339,8 +341,10 @@ class GroupEvaluator:
         once, as contiguous float32. The stitched outputs exist twice only momentarily while each key is
         concatenated.
 
-        The NOT-source cache holds pixel data for one set of spectra, and evaluate() passes same_target=True to reuse
-        it across materials, so it is cleared at the start of every strip. Nothing in it could carry over anyway.
+        The NOT-source and fitted-feature caches hold pixel data for one set of spectra, and evaluate() passes
+        same_target=True to reuse them across materials, so they are cleared at the start of every strip. The
+        fitted-feature cache holds fit, depth and three continua (20 bytes per pixel) for every feature fitted in the
+        strip: at most about 0.8 GB for a 40k-pixel strip and the full rule set. Smaller strips lower that ceiling.
         """
         if block_lines is None:                                          # ~40k pixels a strip (64 Cuprite lines)
             block_lines = max(1, 40000 // self.target_shape[1]) if len(self.target_shape) == 2 else 40000

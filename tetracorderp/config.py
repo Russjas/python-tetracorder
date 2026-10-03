@@ -294,6 +294,9 @@ RRATIO_REFERENCES = {
             "[RATIOGREENVEG]": ("splib06b", 7260),
             "[RATIOGVEG1]": ("splib06b", 7644),
         }
+
+REFERENCE_LIBRARIES = {"splib06": "splib06b", "sprlb06": "sprlb06b"}
+
 # Tetracorder output directories, from cmds.start.t6.00a:104-149 (==[DIRgN] / ==[DIRcN])
 OUTPUT_DIRS = {
     "group": {
